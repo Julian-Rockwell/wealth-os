@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Upload as UploadIcon, FileText, CheckCircle2, AlertCircle, TrendingUp, Plus, Link2, Edit3, Trash2, X, Check } from "lucide-react";
+import { Upload as UploadIcon, FileText, CheckCircle2, AlertCircle, TrendingUp, Plus, Link2, Edit3, Trash2, X, Check, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
 import type { Account, Holding, Liability, FinancialSnapshot, AccountStatus, AccountType, AssetClass, Liquidity, LiabilityType } from "@/types/financial";
+import { SAMPLE_REYNOLDS_DATA } from "@/utils/sampleData";
 
 interface FileUploadState {
   file: File;
@@ -33,7 +34,7 @@ interface UploadProps {
 }
 
 export default function Upload({ onComplete }: UploadProps = {}) {
-  const { setSnapshot, draftData, setDraftData } = useFinancialData();
+  const { setSnapshot, draftData, setDraftData, resetAllData } = useFinancialData();
   const [files, setFiles] = useState<FileUploadState[]>(draftData.files || []);
   const [isDragging, setIsDragging] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -756,6 +757,35 @@ export default function Upload({ onComplete }: UploadProps = {}) {
             </div>
           </TabsContent>
         </Tabs>
+
+        {/* Sample Data Section */}
+        <div className="text-center my-8">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex-1 h-px bg-border"></div>
+            <span className="text-sm text-muted-foreground">Or try with sample data</span>
+            <div className="flex-1 h-px bg-border"></div>
+          </div>
+          <Button
+            onClick={() => {
+              if (confirm("Load Reynolds Family demo data? This will replace any existing data.")) {
+                resetAllData();
+                setSnapshot(SAMPLE_REYNOLDS_DATA);
+                toast.success("Sample data loaded successfully!");
+                setTimeout(() => {
+                  if (onComplete) {
+                    onComplete();
+                  }
+                }, 500);
+              }
+            }}
+            variant="outline"
+            size="lg"
+            className="gradient-primary"
+          >
+            <Database className="w-4 h-4 mr-2" />
+            Load Reynolds Family Demo
+          </Button>
+        </div>
 
         {/* Pre-flight Summary */}
         {(files.length > 0 || mockConnections.length > 0 || manualHoldings.length > 0) && allFilesComplete && (
