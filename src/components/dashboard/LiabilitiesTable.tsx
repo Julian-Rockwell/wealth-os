@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import type { Liability } from "@/types/financial";
@@ -16,9 +15,7 @@ export const LiabilitiesTable = ({ liabilities, onUpdate }: LiabilitiesTableProp
   };
 
   return (
-    <Card className="p-6 shadow-soft">
-      <h3 className="font-semibold mb-4">Liabilities</h3>
-      
+    <>
       {liabilities.length === 0 ? (
         <p className="text-sm text-muted-foreground text-center py-8">
           No liabilities data available
@@ -70,6 +67,6 @@ export const LiabilitiesTable = ({ liabilities, onUpdate }: LiabilitiesTableProp
           </span>
         </div>
       </div>
-    </Card>
+    </>
   );
 };

@@ -1,19 +1,20 @@
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Transaction, TransactionCategory, DashboardFilters } from "@/types/dashboard";
-import { AlertCircle, ChevronDown, ChevronUp, Edit2, Check, X } from "lucide-react";
+import { AlertCircle, ChevronDown, ChevronUp, Edit2, Check, X, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface TransactionsTableProps {
   transactions: Transaction[];
   onUpdate: (id: string, updates: Partial<Transaction>) => void;
+  onDelete?: (id: string) => void;
   filters: DashboardFilters;
 }
 
-export const TransactionsTable = ({ transactions, onUpdate, filters }: TransactionsTableProps) => {
+export const TransactionsTable = ({ transactions, onUpdate, onDelete, filters }: TransactionsTableProps) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editAmount, setEditAmount] = useState("");
   const [editMerchant, setEditMerchant] = useState("");
@@ -62,10 +63,10 @@ export const TransactionsTable = ({ transactions, onUpdate, filters }: Transacti
   };
 
   return (
-    <Card className="shadow-soft overflow-hidden">
-      <div className="p-4 border-b flex items-center justify-between">
+    <div>
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="font-semibold">Transactions</h3>
+          <h4 className="font-semibold">Transaction Details</h4>
           <p className="text-sm text-muted-foreground mt-1">
             Click any category to edit. Low confidence transactions are highlighted.
           </p>
@@ -194,14 +195,29 @@ export const TransactionsTable = ({ transactions, onUpdate, filters }: Transacti
                           </Button>
                         </div>
                       ) : (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => startEditing(txn)}
-                          className="h-7 w-7 p-0"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </Button>
+                        <div className="flex items-center justify-center gap-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => startEditing(txn)}
+                            className="h-7 w-7 p-0"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </Button>
+                          {onDelete && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                onDelete(txn.id);
+                                toast.success("Transaction deleted");
+                              }}
+                              className="h-7 w-7 p-0"
+                            >
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </Button>
+                          )}
+                        </div>
                       )}
                     </td>
                   </tr>
@@ -211,7 +227,7 @@ export const TransactionsTable = ({ transactions, onUpdate, filters }: Transacti
           </div>
           
           {filteredTransactions.length === 50 && (
-            <div className="p-4 text-center text-sm text-muted-foreground border-t">
+            <div className="text-center text-sm text-muted-foreground border-t pt-4">
               Showing first 50 transactions. Use filters to narrow results.
             </div>
           )}
@@ -219,10 +235,10 @@ export const TransactionsTable = ({ transactions, onUpdate, filters }: Transacti
       )}
       
       {isCollapsed && (
-        <div className="p-4 text-center text-sm text-muted-foreground">
+        <div className="text-center text-sm text-muted-foreground py-4">
           {filteredTransactions.length} transactions hidden. Click Expand to view.
         </div>
       )}
-    </Card>
+    </div>
   );
 };

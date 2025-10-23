@@ -203,9 +203,54 @@ export const useDashboardData = () => {
     });
   }, []);
 
+  const deleteTransaction = useCallback((id: string) => {
+    setData((prev) => {
+      const newTxns = prev.txns.filter((t) => t.id !== id);
+      
+      // Recalculate totals
+      const totalNeeds = newTxns
+        .filter((t) => t.category === "need" && t.sign === "debit")
+        .reduce((sum, t) => sum + t.amount, 0);
+      const totalWants = newTxns
+        .filter((t) => t.category === "want")
+        .reduce((sum, t) => sum + t.amount, 0);
+      const totalSavings = newTxns
+        .filter((t) => t.category === "saving")
+        .reduce((sum, t) => sum + t.amount, 0);
+      
+      const totalExpenses = totalNeeds + totalWants + totalSavings;
+
+      return {
+        ...prev,
+        txns: newTxns,
+        expenses: {
+          needs: {
+            ...prev.expenses.needs,
+            total: totalNeeds,
+            pct: (totalNeeds / totalExpenses) * 100,
+          },
+          wants: {
+            ...prev.expenses.wants,
+            total: totalWants,
+            pct: (totalWants / totalExpenses) * 100,
+          },
+          savings: {
+            ...prev.expenses.savings,
+            total: totalSavings,
+            pct: (totalSavings / totalExpenses) * 100,
+          },
+        },
+        cashflow: {
+          monthlySurplus: prev.income.avgMonthly - totalExpenses / prev.period.months,
+        },
+      };
+    });
+  }, []);
+
   return {
     data,
     updateTransaction,
+    deleteTransaction,
     filters,
     setFilters,
   };

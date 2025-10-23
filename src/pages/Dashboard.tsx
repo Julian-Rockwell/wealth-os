@@ -5,6 +5,8 @@ import { KpiPanel } from "@/components/dashboard/KpiPanel";
 import { ViewToggle } from "@/components/dashboard/ViewToggle";
 import { FiltersCard } from "@/components/dashboard/FiltersCard";
 import { BudgetDonut } from "@/components/dashboard/BudgetDonut";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card } from "@/components/ui/card";
 import { MonthlyStackedBars } from "@/components/dashboard/MonthlyStackedBars";
 import { TransactionsTable } from "@/components/dashboard/TransactionsTable";
 import { KeyInsights } from "@/components/dashboard/KeyInsights";
@@ -28,7 +30,7 @@ interface DashboardProps {
 
 export default function Dashboard({ onContinue }: DashboardProps = {}) {
   const [viewMode, setViewMode] = useState<ViewMode>("category");
-  const { data, updateTransaction, filters, setFilters } = useDashboardData();
+  const { data, updateTransaction, deleteTransaction, filters, setFilters } = useDashboardData();
   const { snapshot, setSnapshot } = useFinancialData();
   const [reviewed, setReviewed] = useState(false);
 
@@ -76,6 +78,7 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
               <TransactionsTable 
                 transactions={data.txns} 
                 onUpdate={updateTransaction}
+                onDelete={deleteTransaction}
                 filters={filters}
               />
 
@@ -109,21 +112,42 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
               <MonthlyStackedBars data={data} />
             </div>
 
-            <HoldingsTable holdings={snapshot.holdings} />
-
             <AssetAllocationView holdings={snapshot.holdings} />
-
-            <LiabilitiesTable liabilities={snapshot.liabilities} />
 
             <LiquidAssetsPanel holdings={snapshot.holdings} />
 
-            <FiltersCard data={data} filters={filters} setFilters={setFilters} />
+            {/* Unified Data Table Card with Tabs */}
+            <Card className="p-6 shadow-soft">
+              <h3 className="text-lg font-semibold mb-6">Financial Data</h3>
+              
+              <Tabs defaultValue="holdings" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="holdings">Holdings & Assets</TabsTrigger>
+                  <TabsTrigger value="liabilities">Liabilities</TabsTrigger>
+                  <TabsTrigger value="transactions">Transactions</TabsTrigger>
+                </TabsList>
 
-            <TransactionsTable 
-              transactions={data.txns} 
-              onUpdate={updateTransaction}
-              filters={filters}
-            />
+                <TabsContent value="holdings" className="mt-6">
+                  <HoldingsTable holdings={snapshot.holdings} />
+                </TabsContent>
+
+                <TabsContent value="liabilities" className="mt-6">
+                  <LiabilitiesTable liabilities={snapshot.liabilities} />
+                </TabsContent>
+
+                <TabsContent value="transactions" className="mt-6">
+                  <FiltersCard data={data} filters={filters} setFilters={setFilters} />
+                  <div className="mt-4">
+                    <TransactionsTable 
+                      transactions={data.txns} 
+                      onUpdate={updateTransaction}
+                      onDelete={deleteTransaction}
+                      filters={filters}
+                    />
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </Card>
 
             <KeyInsights data={data} />
 

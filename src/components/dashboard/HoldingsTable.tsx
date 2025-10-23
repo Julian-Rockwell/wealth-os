@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import type { Holding } from "@/types/financial";
@@ -23,9 +22,7 @@ export const HoldingsTable = ({ holdings, onUpdate }: HoldingsTableProps) => {
   };
 
   return (
-    <Card className="p-6 shadow-soft">
-      <h3 className="font-semibold mb-4">Holdings & Assets</h3>
-      
+    <>
       {holdings.length === 0 ? (
         <p className="text-sm text-muted-foreground text-center py-8">
           No holdings data available
@@ -77,6 +74,6 @@ export const HoldingsTable = ({ holdings, onUpdate }: HoldingsTableProps) => {
           </span>
         </div>
       </div>
-    </Card>
+    </>
   );
 };
