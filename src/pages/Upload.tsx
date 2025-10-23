@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Upload as UploadIcon, FileText, CheckCircle2, AlertCircle, TrendingUp, Plus, Link2, Edit3 } from "lucide-react";
+import { Upload as UploadIcon, FileText, CheckCircle2, AlertCircle, TrendingUp, Plus, Link2, Edit3, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import type { Account, Holding, Liability, FinancialSnapshot, AccountStatus } from "@/types/financial";
+import type { Account, Holding, Liability, FinancialSnapshot, AccountStatus, AccountType, AssetClass, Liquidity, LiabilityType } from "@/types/financial";
 
 interface FileUploadState {
   file: File;
@@ -116,6 +119,16 @@ export default function Upload() {
     });
   };
 
+  const removeMockConnection = (id: string) => {
+    setMockConnections((prev) => prev.filter(c => c.id !== id));
+    toast.success("Connection removed");
+  };
+
+  const removeFile = (index: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+    toast.success("File removed");
+  };
+
   const addMockConnection = () => {
     const mockAccounts = [
       { name: "Chase Checking", type: "bank" as const, balance: 5000 + Math.random() * 10000 },
@@ -153,6 +166,17 @@ export default function Upload() {
     setManualHoldings((prev) => [...prev, newHolding]);
   };
 
+  const updateManualHolding = (id: string, updates: Partial<Holding>) => {
+    setManualHoldings((prev) =>
+      prev.map((h) => (h.id === id ? { ...h, ...updates } : h))
+    );
+  };
+
+  const removeManualHolding = (id: string) => {
+    setManualHoldings((prev) => prev.filter((h) => h.id !== id));
+    toast.success("Asset removed");
+  };
+
   const addManualLiability = () => {
     const newLiability: Liability = {
       id: `liability-${Date.now()}`,
@@ -165,6 +189,17 @@ export default function Upload() {
       remainingTermMonths: 0,
     };
     setManualLiabilities((prev) => [...prev, newLiability]);
+  };
+
+  const updateManualLiability = (id: string, updates: Partial<Liability>) => {
+    setManualLiabilities((prev) =>
+      prev.map((l) => (l.id === id ? { ...l, ...updates } : l))
+    );
+  };
+
+  const removeManualLiability = (id: string) => {
+    setManualLiabilities((prev) => prev.filter((l) => l.id !== id));
+    toast.success("Liability removed");
   };
 
   const totalMonths = files.reduce((sum, f) => sum + (f.months || 0), 0);
@@ -290,9 +325,18 @@ export default function Upload() {
                           </p>
                         </div>
                       </div>
-                      <p className="font-semibold">
-                        ${Math.abs(conn.balance).toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                      </p>
+                      <div className="flex items-center gap-3">
+                        <p className="font-semibold">
+                          ${Math.abs(conn.balance).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        </p>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => removeMockConnection(conn.id)}
+                        >
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -373,6 +417,13 @@ export default function Upload() {
                           <Progress value={fileState.progress} className="mt-2 h-1" />
                         )}
                       </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeFile(index)}
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
                     </div>
                   </Card>
                 ))}
@@ -396,14 +447,106 @@ export default function Upload() {
                     No assets added yet. Click "Add Asset" to start.
                   </p>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {manualHoldings.map((holding) => (
-                      <div key={holding.id} className="p-3 rounded-lg bg-muted">
-                        <p className="font-medium">{holding.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          ${holding.balance.toLocaleString()} • {holding.assetClass}
-                        </p>
-                      </div>
+                      <Card key={holding.id} className="p-4">
+                        <div className="space-y-3">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1 grid grid-cols-2 gap-3">
+                              <div>
+                                <Label className="text-xs">Asset Name</Label>
+                                <Input
+                                  value={holding.name}
+                                  onChange={(e) => updateManualHolding(holding.id, { name: e.target.value })}
+                                  placeholder="e.g., My House"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs">Balance ($)</Label>
+                                <Input
+                                  type="number"
+                                  value={holding.balance}
+                                  onChange={(e) => updateManualHolding(holding.id, { balance: parseFloat(e.target.value) || 0 })}
+                                  placeholder="0.00"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs">Account Type</Label>
+                                <Select
+                                  value={holding.accountType}
+                                  onValueChange={(value) => updateManualHolding(holding.id, { accountType: value as AccountType })}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="checking">Checking</SelectItem>
+                                    <SelectItem value="savings">Savings</SelectItem>
+                                    <SelectItem value="brokerage">Brokerage</SelectItem>
+                                    <SelectItem value="401k">401k</SelectItem>
+                                    <SelectItem value="IRA">IRA</SelectItem>
+                                    <SelectItem value="real_estate">Real Estate</SelectItem>
+                                    <SelectItem value="vehicle">Vehicle</SelectItem>
+                                    <SelectItem value="other">Other</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div>
+                                <Label className="text-xs">Asset Class</Label>
+                                <Select
+                                  value={holding.assetClass}
+                                  onValueChange={(value) => updateManualHolding(holding.id, { assetClass: value as AssetClass })}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="cash">Cash</SelectItem>
+                                    <SelectItem value="stocks">Stocks</SelectItem>
+                                    <SelectItem value="bonds">Bonds</SelectItem>
+                                    <SelectItem value="real_estate">Real Estate</SelectItem>
+                                    <SelectItem value="commodities">Commodities</SelectItem>
+                                    <SelectItem value="crypto">Crypto</SelectItem>
+                                    <SelectItem value="other">Other</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div>
+                                <Label className="text-xs">Liquidity</Label>
+                                <Select
+                                  value={holding.liquidity}
+                                  onValueChange={(value) => updateManualHolding(holding.id, { liquidity: value as Liquidity })}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="liquid">Liquid (&lt;1 week)</SelectItem>
+                                    <SelectItem value="semi_liquid">Semi-Liquid (1-4 weeks)</SelectItem>
+                                    <SelectItem value="illiquid">Illiquid (&gt;4 weeks)</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div>
+                                <Label className="text-xs">Currency</Label>
+                                <Input
+                                  value={holding.currency}
+                                  onChange={(e) => updateManualHolding(holding.id, { currency: e.target.value })}
+                                  placeholder="USD"
+                                />
+                              </div>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeManualHolding(holding.id)}
+                              className="ml-2"
+                            >
+                              <X className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>
                     ))}
                   </div>
                 )}
@@ -422,14 +565,88 @@ export default function Upload() {
                     No liabilities added yet. Click "Add Liability" to start.
                   </p>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {manualLiabilities.map((liability) => (
-                      <div key={liability.id} className="p-3 rounded-lg bg-muted">
-                        <p className="font-medium">{liability.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          ${liability.balance.toLocaleString()} • {liability.apr}% APR
-                        </p>
-                      </div>
+                      <Card key={liability.id} className="p-4">
+                        <div className="space-y-3">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1 grid grid-cols-2 gap-3">
+                              <div>
+                                <Label className="text-xs">Liability Name</Label>
+                                <Input
+                                  value={liability.name}
+                                  onChange={(e) => updateManualLiability(liability.id, { name: e.target.value })}
+                                  placeholder="e.g., Mortgage"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs">Type</Label>
+                                <Select
+                                  value={liability.type}
+                                  onValueChange={(value) => updateManualLiability(liability.id, { type: value as LiabilityType })}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="mortgage">Mortgage</SelectItem>
+                                    <SelectItem value="auto">Auto Loan</SelectItem>
+                                    <SelectItem value="student">Student Loan</SelectItem>
+                                    <SelectItem value="credit_card">Credit Card</SelectItem>
+                                    <SelectItem value="personal">Personal Loan</SelectItem>
+                                    <SelectItem value="other">Other</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div>
+                                <Label className="text-xs">Balance ($)</Label>
+                                <Input
+                                  type="number"
+                                  value={liability.balance}
+                                  onChange={(e) => updateManualLiability(liability.id, { balance: parseFloat(e.target.value) || 0 })}
+                                  placeholder="0.00"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs">APR (%)</Label>
+                                <Input
+                                  type="number"
+                                  step="0.01"
+                                  value={liability.apr}
+                                  onChange={(e) => updateManualLiability(liability.id, { apr: parseFloat(e.target.value) || 0 })}
+                                  placeholder="0.00"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs">Monthly Payment ($)</Label>
+                                <Input
+                                  type="number"
+                                  value={liability.monthlyPayment}
+                                  onChange={(e) => updateManualLiability(liability.id, { monthlyPayment: parseFloat(e.target.value) || 0 })}
+                                  placeholder="0.00"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs">Remaining Term (months)</Label>
+                                <Input
+                                  type="number"
+                                  value={liability.remainingTermMonths}
+                                  onChange={(e) => updateManualLiability(liability.id, { remainingTermMonths: parseInt(e.target.value) || 0 })}
+                                  placeholder="0"
+                                />
+                              </div>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeManualLiability(liability.id)}
+                              className="ml-2"
+                            >
+                              <X className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>
                     ))}
                   </div>
                 )}

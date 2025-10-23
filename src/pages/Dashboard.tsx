@@ -13,6 +13,7 @@ import { ConnectionStatus } from "@/components/dashboard/ConnectionStatus";
 import { HoldingsTable } from "@/components/dashboard/HoldingsTable";
 import { LiabilitiesTable } from "@/components/dashboard/LiabilitiesTable";
 import { LiquidAssetsPanel } from "@/components/dashboard/LiquidAssetsPanel";
+import { AssetAllocationView } from "@/components/dashboard/AssetAllocationView";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import type { FinancialSnapshot } from "@/types/financial";
 import { Button } from "@/components/ui/button";
@@ -108,6 +109,8 @@ export default function Dashboard() {
             </div>
 
             <HoldingsTable holdings={snapshot.holdings} />
+
+            <AssetAllocationView holdings={snapshot.holdings} />
 
             <LiabilitiesTable liabilities={snapshot.liabilities} />
 
