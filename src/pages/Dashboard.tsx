@@ -22,6 +22,7 @@ import type { FinancialSnapshot } from "@/types/financial";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { AlertCircle } from "lucide-react";
 export type ViewMode = "category" | "subcategory" | "merchant" | "liquidity" | "custom";
 
 interface DashboardProps {
@@ -96,17 +97,31 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
+        {/* Backfill Alert */}
+        {snapshot.analyzedPeriod.totalMonths < 3 && (
+          <div className="mb-6 p-4 rounded-lg bg-warning/10 border border-warning/20">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-warning" />
+              <div>
+                <p className="text-sm font-medium">Limited Historical Data</p>
+                <p className="text-xs text-muted-foreground">
+                  Add more transaction history to unlock full trend analysis. Current coverage: {snapshot.analyzedPeriod.totalMonths} month(s). Target: 3+ months.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="grid lg:grid-cols-[360px,1fr] gap-6">
-          {/* Left Column - Fixed */}
+          {/* Left Column - KPIs & Status */}
           <div className="space-y-6">
             <NetWorthKPI snapshot={snapshot} />
             <ConnectionStatus accounts={snapshot.accounts} />
             <LiquidAssetsPanel holdings={snapshot.holdings} />
           </div>
 
-          {/* Right Column - Scroll */}
+          {/* Right Column - Data & Visualizations */}
           <div className="space-y-6">
-            <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
             
             <div className="grid md:grid-cols-2 gap-6">
               <BudgetDonut data={data} viewMode={viewMode} />
@@ -146,11 +161,23 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
               </Tabs>
             </Card>
 
+            {/* Asset Allocation */}
             <AssetAllocationView holdings={snapshot.holdings} />
 
+            {/* Insights & Recommendations */}
             <KeyInsights data={data} />
-
             <PersonalizedRecommendations data={data} />
+
+            {/* Placeholders for Phase 2 */}
+            <Card className="p-6 shadow-soft border-dashed">
+              <h3 className="text-lg font-semibold mb-2 text-muted-foreground">Cash Flow Analysis</h3>
+              <p className="text-sm text-muted-foreground">Phase 2: Detailed income vs expenses over time</p>
+            </Card>
+            
+            <Card className="p-6 shadow-soft border-dashed">
+              <h3 className="text-lg font-semibold mb-2 text-muted-foreground">Reports & Exports</h3>
+              <p className="text-sm text-muted-foreground">Phase 2: Generate detailed PDF/CSV reports</p>
+            </Card>
 
             {/* Footer with review checkbox and continue button */}
             <div className="flex items-center justify-between p-6 bg-card rounded-lg shadow-soft border">
