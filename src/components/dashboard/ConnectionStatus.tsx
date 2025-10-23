@@ -33,7 +33,7 @@ export const ConnectionStatus = ({ accounts }: ConnectionStatusProps) => {
             <CheckCircle2 className="w-5 h-5 text-success" />
             <div className="flex-1">
               <p className="text-sm font-medium">{account.name}</p>
-              <p className="text-xs text-muted-foreground">Connected • ${account.balance.toLocaleString()}</p>
+              <p className="text-xs text-muted-foreground">Connected</p>
             </div>
           </div>
         ))}
