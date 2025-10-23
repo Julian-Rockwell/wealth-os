@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
-import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { useState } from "react";
+import { useFinancialData } from "@/contexts/FinancialDataContext";
+
 import { KpiPanel } from "@/components/dashboard/KpiPanel";
 import { ViewToggle } from "@/components/dashboard/ViewToggle";
 import { FiltersCard } from "@/components/dashboard/FiltersCard";
@@ -19,38 +20,41 @@ import type { FinancialSnapshot } from "@/types/financial";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { useNavigate } from "react-router-dom";
-
 export type ViewMode = "category" | "subcategory" | "merchant" | "liquidity" | "custom";
 
-export default function Dashboard() {
-  const navigate = useNavigate();
+interface DashboardProps {
+  onContinue?: () => void;
+}
+
+export default function Dashboard({ onContinue }: DashboardProps = {}) {
   const [viewMode, setViewMode] = useState<ViewMode>("category");
   const { data, updateTransaction, filters, setFilters } = useDashboardData();
-  const [snapshot, setSnapshot] = useState<FinancialSnapshot | null>(null);
+  const { snapshot, setSnapshot } = useFinancialData();
   const [reviewed, setReviewed] = useState(false);
 
-  useEffect(() => {
-    const stored = localStorage.getItem("financialSnapshot");
-    if (stored) {
-      setSnapshot(JSON.parse(stored));
-    }
-  }, []);
-
   const handleContinueToAnalyzer = () => {
-    if (!reviewed) {
+    if (!reviewed || !snapshot) {
       return;
     }
-    // Here we would pass the snapshot to the expense analyzer
-    // For now, we stay on the current dashboard which already shows 50/30/20 analysis
+    
+    // Update snapshot with reviewed flag
+    const updatedSnapshot = {
+      ...snapshot,
+      uiFlags: {
+        ...snapshot.uiFlags,
+        reviewedIn11: true,
+      },
+    };
+    setSnapshot(updatedSnapshot);
+    
+    // Call onContinue callback
+    onContinue?.();
   };
 
-  // If no snapshot, show the old dashboard
+  // If no snapshot, show message
   if (!snapshot) {
     return (
       <div className="min-h-screen bg-background">
-        <DashboardHeader />
-        
         <div className="container mx-auto px-4 py-8">
           <div className="grid lg:grid-cols-[320px,1fr] gap-6">
             {/* Left Column - KPIs */}
@@ -88,8 +92,6 @@ export default function Dashboard() {
   // New Command Center with Financial Snapshot
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader />
-      
       <div className="container mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-[360px,1fr] gap-6">
           {/* Left Column - Fixed */}

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Upload as UploadIcon, FileText, CheckCircle2, AlertCircle, TrendingUp, Plus, Link2, Edit3, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -9,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { useFinancialData } from "@/contexts/FinancialDataContext";
 import type { Account, Holding, Liability, FinancialSnapshot, AccountStatus, AccountType, AssetClass, Liquidity, LiabilityType } from "@/types/financial";
 
 interface FileUploadState {
@@ -28,8 +28,12 @@ interface MockConnection {
   type: "bank" | "card" | "investment";
 }
 
-export default function Upload() {
-  const navigate = useNavigate();
+interface UploadProps {
+  onComplete?: () => void;
+}
+
+export default function Upload({ onComplete }: UploadProps = {}) {
+  const { setSnapshot } = useFinancialData();
   const [files, setFiles] = useState<FileUploadState[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -254,11 +258,13 @@ export default function Upload() {
 
     snapshot.netWorth.net = snapshot.netWorth.assets - snapshot.netWorth.liabilities;
 
-    // Store in localStorage
-    localStorage.setItem("financialSnapshot", JSON.stringify(snapshot));
+    // Store via context
+    setSnapshot(snapshot);
 
     setTimeout(() => {
-      navigate("/app");
+      if (onComplete) {
+        onComplete();
+      }
     }, 1500);
   };
 

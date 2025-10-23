@@ -3,8 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import type { Transaction, TransactionCategory, DashboardFilters } from "@/types/dashboard";
-import { AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { AlertCircle, ChevronDown, ChevronUp, Edit2, Check, X } from "lucide-react";
 
 interface TransactionsTableProps {
   transactions: Transaction[];
@@ -14,7 +15,31 @@ interface TransactionsTableProps {
 
 export const TransactionsTable = ({ transactions, onUpdate, filters }: TransactionsTableProps) => {
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [editAmount, setEditAmount] = useState("");
+  const [editMerchant, setEditMerchant] = useState("");
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const startEditing = (txn: Transaction) => {
+    setEditingId(txn.id);
+    setEditAmount(txn.amount.toString());
+    setEditMerchant(txn.merchant);
+  };
+
+  const saveEditing = () => {
+    if (editingId) {
+      onUpdate(editingId, {
+        amount: parseFloat(editAmount) || 0,
+        merchant: editMerchant,
+      });
+      setEditingId(null);
+    }
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditAmount("");
+    setEditMerchant("");
+  };
 
   const filteredTransactions = transactions
     .filter((txn) => txn.sign === "debit")
@@ -77,6 +102,7 @@ export const TransactionsTable = ({ transactions, onUpdate, filters }: Transacti
                   <th className="text-left p-3 font-medium">Category</th>
                   <th className="text-left p-3 font-medium">Subcategory</th>
                   <th className="text-right p-3 font-medium">Confidence</th>
+                  <th className="text-center p-3 font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody className="text-sm">
@@ -91,14 +117,34 @@ export const TransactionsTable = ({ transactions, onUpdate, filters }: Transacti
                       {new Date(txn.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                     </td>
                     <td className="p-3">
-                      <div className="flex items-center gap-2">
-                        {txn.confidence < 0.8 && (
-                          <AlertCircle className="w-4 h-4 text-warning flex-shrink-0" />
-                        )}
-                        <span className="truncate max-w-[200px]">{txn.merchant}</span>
-                      </div>
+                      {editingId === txn.id ? (
+                        <Input
+                          value={editMerchant}
+                          onChange={(e) => setEditMerchant(e.target.value)}
+                          className="h-7 w-full text-sm"
+                        />
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          {txn.confidence < 0.8 && (
+                            <AlertCircle className="w-4 h-4 text-warning flex-shrink-0" />
+                          )}
+                          <span className="truncate max-w-[200px]">{txn.merchant}</span>
+                        </div>
+                      )}
                     </td>
-                    <td className="p-3 text-right font-medium">${txn.amount.toFixed(2)}</td>
+                    <td className="p-3 text-right font-medium">
+                      {editingId === txn.id ? (
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={editAmount}
+                          onChange={(e) => setEditAmount(e.target.value)}
+                          className="h-7 w-24 text-sm text-right"
+                        />
+                      ) : (
+                        `$${txn.amount.toFixed(2)}`
+                      )}
+                    </td>
                     <td className="p-3">
                       <Select
                         value={txn.category}
@@ -126,6 +172,37 @@ export const TransactionsTable = ({ transactions, onUpdate, filters }: Transacti
                       >
                         {(txn.confidence * 100).toFixed(0)}%
                       </Badge>
+                    </td>
+                    <td className="p-3">
+                      {editingId === txn.id ? (
+                        <div className="flex items-center justify-center gap-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={saveEditing}
+                            className="h-7 w-7 p-0"
+                          >
+                            <Check className="w-4 h-4 text-success" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={cancelEditing}
+                            className="h-7 w-7 p-0"
+                          >
+                            <X className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => startEditing(txn)}
+                          className="h-7 w-7 p-0"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                      )}
                     </td>
                   </tr>
                 ))}
