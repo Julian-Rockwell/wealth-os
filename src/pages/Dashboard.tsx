@@ -6,7 +6,8 @@ import { FiltersCard } from "@/components/dashboard/FiltersCard";
 import { BudgetDonut } from "@/components/dashboard/BudgetDonut";
 import { MonthlyStackedBars } from "@/components/dashboard/MonthlyStackedBars";
 import { TransactionsTable } from "@/components/dashboard/TransactionsTable";
-import { QuickWins } from "@/components/dashboard/QuickWins";
+import { KeyInsights } from "@/components/dashboard/KeyInsights";
+import { PersonalizedRecommendations } from "@/components/dashboard/PersonalizedRecommendations";
 import { useDashboardData } from "@/hooks/useDashboardData";
 
 export type ViewMode = "category" | "subcategory" | "merchant" | "liquidity" | "custom";
@@ -43,7 +44,9 @@ export default function Dashboard() {
               filters={filters}
             />
 
-            <QuickWins recommendations={data.recommendations} />
+            <KeyInsights data={data} />
+
+            <PersonalizedRecommendations data={data} />
           </div>
         </div>
       </div>
