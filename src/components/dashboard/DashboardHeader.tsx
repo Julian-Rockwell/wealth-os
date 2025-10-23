@@ -1,10 +1,19 @@
-import { TrendingUp, Download } from "lucide-react";
+import { TrendingUp, Download, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 export const DashboardHeader = () => {
+  const navigate = useNavigate();
+  
   const handleExport = (format: "json" | "csv") => {
     toast.success(`Exporting data as ${format.toUpperCase()}...`);
+  };
+
+  const handleNewAnalysis = () => {
+    localStorage.removeItem("dashboardData");
+    toast.info("Restarting analysis...");
+    navigate("/");
   };
 
   return (
@@ -22,6 +31,10 @@ export const DashboardHeader = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleNewAnalysis}>
+              <RotateCcw className="w-4 h-4 mr-2" />
+              New Analysis
+            </Button>
             <Button variant="outline" size="sm" onClick={() => handleExport("csv")}>
               <Download className="w-4 h-4 mr-2" />
               Export CSV
