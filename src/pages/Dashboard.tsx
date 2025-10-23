@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
+import type { Holding, Liability } from "@/types/financial";
 
 import { KpiPanel } from "@/components/dashboard/KpiPanel";
 import { ViewToggle } from "@/components/dashboard/ViewToggle";
@@ -163,11 +164,68 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
                 </TabsList>
 
                 <TabsContent value="holdings" className="mt-6">
-                  <HoldingsTable holdings={snapshot.holdings} />
+                  <HoldingsTable 
+                    holdings={snapshot.holdings}
+                    onUpdate={(id, updates) => {
+                      const updated = snapshot.holdings.map(h => 
+                        h.id === id ? { ...h, ...updates } : h
+                      );
+                      setSnapshot({ ...snapshot, holdings: updated });
+                    }}
+                    onDelete={(id) => {
+                      const updated = snapshot.holdings.filter(h => h.id !== id);
+                      setSnapshot({ ...snapshot, holdings: updated });
+                    }}
+                    onAdd={() => {
+                      const newHolding: Holding = {
+                        id: `holding-${Date.now()}`,
+                        accountId: "manual-1",
+                        name: "New Asset",
+                        accountType: "other",
+                        assetClass: "other",
+                        liquidity: "liquid",
+                        balance: 0,
+                        currency: "USD",
+                        source: "manual",
+                      };
+                      setSnapshot({ 
+                        ...snapshot, 
+                        holdings: [...snapshot.holdings, newHolding] 
+                      });
+                    }}
+                  />
                 </TabsContent>
 
                 <TabsContent value="liabilities" className="mt-6">
-                  <LiabilitiesTable liabilities={snapshot.liabilities} />
+                  <LiabilitiesTable 
+                    liabilities={snapshot.liabilities}
+                    onUpdate={(id, updates) => {
+                      const updated = snapshot.liabilities.map(l => 
+                        l.id === id ? { ...l, ...updates } : l
+                      );
+                      setSnapshot({ ...snapshot, liabilities: updated });
+                    }}
+                    onDelete={(id) => {
+                      const updated = snapshot.liabilities.filter(l => l.id !== id);
+                      setSnapshot({ ...snapshot, liabilities: updated });
+                    }}
+                    onAdd={() => {
+                      const newLiability: Liability = {
+                        id: `liability-${Date.now()}`,
+                        accountId: "manual-1",
+                        name: "New Liability",
+                        type: "other",
+                        apr: 0,
+                        balance: 0,
+                        monthlyPayment: 0,
+                        remainingTermMonths: 0,
+                      };
+                      setSnapshot({ 
+                        ...snapshot, 
+                        liabilities: [...snapshot.liabilities, newLiability] 
+                      });
+                    }}
+                  />
                 </TabsContent>
 
                 <TabsContent value="transactions" className="mt-6">
