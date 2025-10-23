@@ -2,6 +2,7 @@ import { useState } from "react";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { KpiPanel } from "@/components/dashboard/KpiPanel";
 import { ViewToggle } from "@/components/dashboard/ViewToggle";
+import { FiltersCard } from "@/components/dashboard/FiltersCard";
 import { BudgetDonut } from "@/components/dashboard/BudgetDonut";
 import { MonthlyStackedBars } from "@/components/dashboard/MonthlyStackedBars";
 import { TransactionsTable } from "@/components/dashboard/TransactionsTable";
@@ -20,9 +21,9 @@ export default function Dashboard() {
       
       <div className="container mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-[320px,1fr] gap-6">
-          {/* Left Column - KPIs & Filters */}
+          {/* Left Column - KPIs */}
           <div className="space-y-6">
-            <KpiPanel data={data} filters={filters} setFilters={setFilters} />
+            <KpiPanel data={data} />
           </div>
 
           {/* Right Column - Visualizations & Data */}
@@ -33,6 +34,8 @@ export default function Dashboard() {
               <BudgetDonut data={data} viewMode={viewMode} />
               <MonthlyStackedBars data={data} />
             </div>
+
+            <FiltersCard data={data} filters={filters} setFilters={setFilters} />
 
             <TransactionsTable 
               transactions={data.txns} 

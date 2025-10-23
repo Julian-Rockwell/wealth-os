@@ -1,17 +1,12 @@
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TrendingUp, TrendingDown, DollarSign, Calendar } from "lucide-react";
-import type { DashboardData, DashboardFilters } from "@/types/dashboard";
+import type { DashboardData } from "@/types/dashboard";
 
 interface KpiPanelProps {
   data: DashboardData;
-  filters: DashboardFilters;
-  setFilters: (filters: DashboardFilters) => void;
 }
 
-export const KpiPanel = ({ data, filters, setFilters }: KpiPanelProps) => {
+export const KpiPanel = ({ data }: KpiPanelProps) => {
   const needsTarget = 50;
   const wantsTarget = 30;
   const savingsTarget = 20;
@@ -121,39 +116,6 @@ export const KpiPanel = ({ data, filters, setFilters }: KpiPanelProps) => {
         </div>
       </Card>
 
-      {/* Filters */}
-      <Card className="p-4 shadow-soft">
-        <h3 className="font-semibold text-sm mb-4">Filters</h3>
-        <div className="space-y-3">
-          <div>
-            <Label htmlFor="account-filter" className="text-xs">Account</Label>
-            <Select>
-              <SelectTrigger id="account-filter" className="h-9 text-sm">
-                <SelectValue placeholder="All accounts" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All accounts</SelectItem>
-                {data.accounts.map((acc) => (
-                  <SelectItem key={acc.id} value={acc.id}>
-                    {acc.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="search-filter" className="text-xs">Search Merchant</Label>
-            <Input
-              id="search-filter"
-              placeholder="Search..."
-              className="h-9 text-sm"
-              value={filters.searchTerm || ""}
-              onChange={(e) => setFilters({ ...filters, searchTerm: e.target.value })}
-            />
-          </div>
-        </div>
-      </Card>
     </div>
   );
 };
