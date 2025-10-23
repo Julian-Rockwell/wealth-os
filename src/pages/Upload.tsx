@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Upload as UploadIcon, FileText, CheckCircle2, AlertCircle, TrendingUp, Plus, Link2, Edit3, Trash2, X } from "lucide-react";
+import { Upload as UploadIcon, FileText, CheckCircle2, AlertCircle, TrendingUp, Plus, Link2, Edit3, Trash2, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -40,6 +40,8 @@ export default function Upload({ onComplete }: UploadProps = {}) {
   const [mockConnections, setMockConnections] = useState<MockConnection[]>([]);
   const [manualHoldings, setManualHoldings] = useState<Holding[]>([]);
   const [manualLiabilities, setManualLiabilities] = useState<Liability[]>([]);
+  const [editingHoldingId, setEditingHoldingId] = useState<string | null>(null);
+  const [editingLiabilityId, setEditingLiabilityId] = useState<string | null>(null);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -168,6 +170,7 @@ export default function Upload({ onComplete }: UploadProps = {}) {
       source: "manual",
     };
     setManualHoldings((prev) => [...prev, newHolding]);
+    setEditingHoldingId(newHolding.id);
   };
 
   const updateManualHolding = (id: string, updates: Partial<Holding>) => {
@@ -193,6 +196,7 @@ export default function Upload({ onComplete }: UploadProps = {}) {
       remainingTermMonths: 0,
     };
     setManualLiabilities((prev) => [...prev, newLiability]);
+    setEditingLiabilityId(newLiability.id);
   };
 
   const updateManualLiability = (id: string, updates: Partial<Liability>) => {
@@ -279,7 +283,7 @@ export default function Upload({ onComplete }: UploadProps = {}) {
           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Rockwell Wealth OS
           </h1>
-          <p className="text-xl text-muted-foreground mb-6">Financial Command Center</p>
+          <p className="text-xl text-muted-foreground mb-6">Let's Analyze Your Spending Patterns</p>
           <p className="text-base text-muted-foreground max-w-3xl mx-auto">
             Upload AT LEAST 3 months of financial statements in any format (PDF, CSV, Excel, images). 
             Connect mock accounts or enter data manually. The more data provided, the more accurate the analysis.
@@ -456,102 +460,140 @@ export default function Upload({ onComplete }: UploadProps = {}) {
                   <div className="space-y-4">
                     {manualHoldings.map((holding) => (
                       <Card key={holding.id} className="p-4">
-                        <div className="space-y-3">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1 grid grid-cols-2 gap-3">
-                              <div>
-                                <Label className="text-xs">Asset Name</Label>
-                                <Input
-                                  value={holding.name}
-                                  onChange={(e) => updateManualHolding(holding.id, { name: e.target.value })}
-                                  placeholder="e.g., My House"
-                                />
+                        {editingHoldingId === holding.id ? (
+                          <div className="space-y-3">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1 grid grid-cols-2 gap-3">
+                                <div>
+                                  <Label className="text-xs">Asset Name</Label>
+                                  <Input
+                                    value={holding.name}
+                                    onChange={(e) => updateManualHolding(holding.id, { name: e.target.value })}
+                                    placeholder="e.g., My House"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs">Balance ($)</Label>
+                                  <Input
+                                    type="number"
+                                    value={holding.balance}
+                                    onChange={(e) => updateManualHolding(holding.id, { balance: parseFloat(e.target.value) || 0 })}
+                                    placeholder="0.00"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs">Account Type</Label>
+                                  <Select
+                                    value={holding.accountType}
+                                    onValueChange={(value) => updateManualHolding(holding.id, { accountType: value as AccountType })}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="checking">Checking</SelectItem>
+                                      <SelectItem value="savings">Savings</SelectItem>
+                                      <SelectItem value="brokerage">Brokerage</SelectItem>
+                                      <SelectItem value="401k">401k</SelectItem>
+                                      <SelectItem value="IRA">IRA</SelectItem>
+                                      <SelectItem value="real_estate">Real Estate</SelectItem>
+                                      <SelectItem value="vehicle">Vehicle</SelectItem>
+                                      <SelectItem value="other">Other</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div>
+                                  <Label className="text-xs">Asset Class</Label>
+                                  <Select
+                                    value={holding.assetClass}
+                                    onValueChange={(value) => updateManualHolding(holding.id, { assetClass: value as AssetClass })}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="cash">Cash</SelectItem>
+                                      <SelectItem value="stocks">Stocks</SelectItem>
+                                      <SelectItem value="bonds">Bonds</SelectItem>
+                                      <SelectItem value="real_estate">Real Estate</SelectItem>
+                                      <SelectItem value="commodities">Commodities</SelectItem>
+                                      <SelectItem value="crypto">Crypto</SelectItem>
+                                      <SelectItem value="other">Other</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div>
+                                  <Label className="text-xs">Liquidity</Label>
+                                  <Select
+                                    value={holding.liquidity}
+                                    onValueChange={(value) => updateManualHolding(holding.id, { liquidity: value as Liquidity })}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="liquid">Liquid (&lt;1 week)</SelectItem>
+                                      <SelectItem value="semi_liquid">Semi-Liquid (1-4 weeks)</SelectItem>
+                                      <SelectItem value="illiquid">Illiquid (&gt;4 weeks)</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div>
+                                  <Label className="text-xs">Currency</Label>
+                                  <Input
+                                    value={holding.currency}
+                                    onChange={(e) => updateManualHolding(holding.id, { currency: e.target.value })}
+                                    placeholder="USD"
+                                  />
+                                </div>
                               </div>
-                              <div>
-                                <Label className="text-xs">Balance ($)</Label>
-                                <Input
-                                  type="number"
-                                  value={holding.balance}
-                                  onChange={(e) => updateManualHolding(holding.id, { balance: parseFloat(e.target.value) || 0 })}
-                                  placeholder="0.00"
-                                />
-                              </div>
-                              <div>
-                                <Label className="text-xs">Account Type</Label>
-                                <Select
-                                  value={holding.accountType}
-                                  onValueChange={(value) => updateManualHolding(holding.id, { accountType: value as AccountType })}
+                              <div className="flex flex-col gap-2 ml-2">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => setEditingHoldingId(null)}
                                 >
-                                  <SelectTrigger>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="checking">Checking</SelectItem>
-                                    <SelectItem value="savings">Savings</SelectItem>
-                                    <SelectItem value="brokerage">Brokerage</SelectItem>
-                                    <SelectItem value="401k">401k</SelectItem>
-                                    <SelectItem value="IRA">IRA</SelectItem>
-                                    <SelectItem value="real_estate">Real Estate</SelectItem>
-                                    <SelectItem value="vehicle">Vehicle</SelectItem>
-                                    <SelectItem value="other">Other</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                              <div>
-                                <Label className="text-xs">Asset Class</Label>
-                                <Select
-                                  value={holding.assetClass}
-                                  onValueChange={(value) => updateManualHolding(holding.id, { assetClass: value as AssetClass })}
+                                  <Check className="w-4 h-4 text-success" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => removeManualHolding(holding.id)}
                                 >
-                                  <SelectTrigger>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="cash">Cash</SelectItem>
-                                    <SelectItem value="stocks">Stocks</SelectItem>
-                                    <SelectItem value="bonds">Bonds</SelectItem>
-                                    <SelectItem value="real_estate">Real Estate</SelectItem>
-                                    <SelectItem value="commodities">Commodities</SelectItem>
-                                    <SelectItem value="crypto">Crypto</SelectItem>
-                                    <SelectItem value="other">Other</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                              <div>
-                                <Label className="text-xs">Liquidity</Label>
-                                <Select
-                                  value={holding.liquidity}
-                                  onValueChange={(value) => updateManualHolding(holding.id, { liquidity: value as Liquidity })}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="liquid">Liquid (&lt;1 week)</SelectItem>
-                                    <SelectItem value="semi_liquid">Semi-Liquid (1-4 weeks)</SelectItem>
-                                    <SelectItem value="illiquid">Illiquid (&gt;4 weeks)</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                              <div>
-                                <Label className="text-xs">Currency</Label>
-                                <Input
-                                  value={holding.currency}
-                                  onChange={(e) => updateManualHolding(holding.id, { currency: e.target.value })}
-                                  placeholder="USD"
-                                />
+                                  <Trash2 className="w-4 h-4 text-destructive" />
+                                </Button>
                               </div>
                             </div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => removeManualHolding(holding.id)}
-                              className="ml-2"
-                            >
-                              <X className="w-4 h-4 text-destructive" />
-                            </Button>
                           </div>
-                        </div>
+                        ) : (
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3">
+                                <p className="font-medium">{holding.name}</p>
+                                <span className="text-sm text-muted-foreground">•</span>
+                                <p className="text-sm text-muted-foreground capitalize">{holding.accountType.replace('_', ' ')}</p>
+                                <span className="text-sm text-muted-foreground">•</span>
+                                <p className="font-semibold">${holding.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setEditingHoldingId(holding.id)}
+                              >
+                                <Edit3 className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => removeManualHolding(holding.id)}
+                              >
+                                <Trash2 className="w-4 h-4 text-destructive" />
+                              </Button>
+                            </div>
+                          </div>
+                        )}
                       </Card>
                     ))}
                   </div>
@@ -574,84 +616,124 @@ export default function Upload({ onComplete }: UploadProps = {}) {
                   <div className="space-y-4">
                     {manualLiabilities.map((liability) => (
                       <Card key={liability.id} className="p-4">
-                        <div className="space-y-3">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1 grid grid-cols-2 gap-3">
-                              <div>
-                                <Label className="text-xs">Liability Name</Label>
-                                <Input
-                                  value={liability.name}
-                                  onChange={(e) => updateManualLiability(liability.id, { name: e.target.value })}
-                                  placeholder="e.g., Mortgage"
-                                />
+                        {editingLiabilityId === liability.id ? (
+                          <div className="space-y-3">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1 grid grid-cols-2 gap-3">
+                                <div>
+                                  <Label className="text-xs">Liability Name</Label>
+                                  <Input
+                                    value={liability.name}
+                                    onChange={(e) => updateManualLiability(liability.id, { name: e.target.value })}
+                                    placeholder="e.g., Mortgage"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs">Type</Label>
+                                  <Select
+                                    value={liability.type}
+                                    onValueChange={(value) => updateManualLiability(liability.id, { type: value as LiabilityType })}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="mortgage">Mortgage</SelectItem>
+                                      <SelectItem value="auto">Auto Loan</SelectItem>
+                                      <SelectItem value="student">Student Loan</SelectItem>
+                                      <SelectItem value="credit_card">Credit Card</SelectItem>
+                                      <SelectItem value="personal">Personal Loan</SelectItem>
+                                      <SelectItem value="other">Other</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div>
+                                  <Label className="text-xs">Balance ($)</Label>
+                                  <Input
+                                    type="number"
+                                    value={liability.balance}
+                                    onChange={(e) => updateManualLiability(liability.id, { balance: parseFloat(e.target.value) || 0 })}
+                                    placeholder="0.00"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs">APR (%)</Label>
+                                  <Input
+                                    type="number"
+                                    step="0.01"
+                                    value={liability.apr}
+                                    onChange={(e) => updateManualLiability(liability.id, { apr: parseFloat(e.target.value) || 0 })}
+                                    placeholder="0.00"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs">Monthly Payment ($)</Label>
+                                  <Input
+                                    type="number"
+                                    value={liability.monthlyPayment}
+                                    onChange={(e) => updateManualLiability(liability.id, { monthlyPayment: parseFloat(e.target.value) || 0 })}
+                                    placeholder="0.00"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs">Remaining Term (months)</Label>
+                                  <Input
+                                    type="number"
+                                    value={liability.remainingTermMonths}
+                                    onChange={(e) => updateManualLiability(liability.id, { remainingTermMonths: parseInt(e.target.value) || 0 })}
+                                    placeholder="0"
+                                  />
+                                </div>
                               </div>
-                              <div>
-                                <Label className="text-xs">Type</Label>
-                                <Select
-                                  value={liability.type}
-                                  onValueChange={(value) => updateManualLiability(liability.id, { type: value as LiabilityType })}
+                              <div className="flex flex-col gap-2 ml-2">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => setEditingLiabilityId(null)}
                                 >
-                                  <SelectTrigger>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="mortgage">Mortgage</SelectItem>
-                                    <SelectItem value="auto">Auto Loan</SelectItem>
-                                    <SelectItem value="student">Student Loan</SelectItem>
-                                    <SelectItem value="credit_card">Credit Card</SelectItem>
-                                    <SelectItem value="personal">Personal Loan</SelectItem>
-                                    <SelectItem value="other">Other</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                              <div>
-                                <Label className="text-xs">Balance ($)</Label>
-                                <Input
-                                  type="number"
-                                  value={liability.balance}
-                                  onChange={(e) => updateManualLiability(liability.id, { balance: parseFloat(e.target.value) || 0 })}
-                                  placeholder="0.00"
-                                />
-                              </div>
-                              <div>
-                                <Label className="text-xs">APR (%)</Label>
-                                <Input
-                                  type="number"
-                                  step="0.01"
-                                  value={liability.apr}
-                                  onChange={(e) => updateManualLiability(liability.id, { apr: parseFloat(e.target.value) || 0 })}
-                                  placeholder="0.00"
-                                />
-                              </div>
-                              <div>
-                                <Label className="text-xs">Monthly Payment ($)</Label>
-                                <Input
-                                  type="number"
-                                  value={liability.monthlyPayment}
-                                  onChange={(e) => updateManualLiability(liability.id, { monthlyPayment: parseFloat(e.target.value) || 0 })}
-                                  placeholder="0.00"
-                                />
-                              </div>
-                              <div>
-                                <Label className="text-xs">Remaining Term (months)</Label>
-                                <Input
-                                  type="number"
-                                  value={liability.remainingTermMonths}
-                                  onChange={(e) => updateManualLiability(liability.id, { remainingTermMonths: parseInt(e.target.value) || 0 })}
-                                  placeholder="0"
-                                />
+                                  <Check className="w-4 h-4 text-success" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => removeManualLiability(liability.id)}
+                                >
+                                  <Trash2 className="w-4 h-4 text-destructive" />
+                                </Button>
                               </div>
                             </div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => removeManualLiability(liability.id)}
-                              className="ml-2"
-                            >
-                              <X className="w-4 h-4 text-destructive" />
-                            </Button>
                           </div>
-                        </div>
+                        ) : (
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3">
+                                <p className="font-medium">{liability.name}</p>
+                                <span className="text-sm text-muted-foreground">•</span>
+                                <p className="text-sm text-muted-foreground capitalize">{liability.type.replace('_', ' ')}</p>
+                                <span className="text-sm text-muted-foreground">•</span>
+                                <p className="font-semibold">${liability.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
+                                <span className="text-sm text-muted-foreground">•</span>
+                                <p className="text-sm text-muted-foreground">{liability.apr}% APR</p>
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setEditingLiabilityId(liability.id)}
+                              >
+                                <Edit3 className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => removeManualLiability(liability.id)}
+                              >
+                                <Trash2 className="w-4 h-4 text-destructive" />
+                              </Button>
+                            </div>
+                          </div>
+                        )}
                       </Card>
                     ))}
                   </div>

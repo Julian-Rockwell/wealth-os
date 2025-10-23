@@ -98,7 +98,6 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
           <div className="space-y-6">
             <NetWorthKPI snapshot={snapshot} />
             <ConnectionStatus accounts={snapshot.accounts} />
-            <FiltersCard data={data} filters={filters} setFilters={setFilters} />
           </div>
 
           {/* Right Column - Scroll */}
@@ -117,6 +116,8 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
             <LiabilitiesTable liabilities={snapshot.liabilities} />
 
             <LiquidAssetsPanel holdings={snapshot.holdings} />
+
+            <FiltersCard data={data} filters={filters} setFilters={setFilters} />
 
             <TransactionsTable 
               transactions={data.txns} 
@@ -146,7 +147,7 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
                 onClick={handleContinueToAnalyzer}
                 className="gradient-primary"
               >
-                Continue to Expense Analyzer 1.2
+                Save Data Review
               </Button>
             </div>
           </div>

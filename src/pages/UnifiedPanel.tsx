@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrendingUp, Download, RotateCcw, BarChart3, PieChart, Target, TrendingDown, Lightbulb } from "lucide-react";
+import { TrendingUp, Download, RotateCcw, BarChart3, Target, TrendingDown, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
 import Upload from "./Upload";
 import Dashboard from "./Dashboard";
-import { BudgetAnalyzer } from "./BudgetAnalyzer";
 
 export default function UnifiedPanel() {
   const [activeTab, setActiveTab] = useState("intake");
@@ -59,7 +58,7 @@ export default function UnifiedPanel() {
       {/* Tabs */}
       <div className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-8 mb-6">
+          <TabsList className="grid w-full grid-cols-7 mb-6">
             <TabsTrigger value="intake" className="flex items-center gap-2">
               <Download className="w-4 h-4" />
               Data Intake
@@ -71,14 +70,6 @@ export default function UnifiedPanel() {
             >
               <BarChart3 className="w-4 h-4" />
               Command Center
-            </TabsTrigger>
-            <TabsTrigger 
-              value="budget" 
-              className="flex items-center gap-2"
-              disabled={!snapshot || !snapshot.uiFlags.reviewedIn11}
-            >
-              <PieChart className="w-4 h-4" />
-              Budget Analyzer
             </TabsTrigger>
             <TabsTrigger value="reports" disabled className="flex items-center gap-2 opacity-50">
               <BarChart3 className="w-4 h-4" />
@@ -107,11 +98,7 @@ export default function UnifiedPanel() {
           </TabsContent>
 
           <TabsContent value="command" className="mt-0">
-            <Dashboard onContinue={() => setActiveTab("budget")} />
-          </TabsContent>
-
-          <TabsContent value="budget" className="mt-0">
-            <BudgetAnalyzer />
+            <Dashboard />
           </TabsContent>
 
           <TabsContent value="reports" className="mt-0">
