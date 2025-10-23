@@ -1,19 +1,30 @@
-import { TrendingUp, Download, RotateCcw } from "lucide-react";
+import { TrendingUp, Download, RotateCcw, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useFinancialData } from "@/contexts/FinancialDataContext";
+import { SAMPLE_REYNOLDS_DATA } from "@/utils/sampleData";
 
 export const DashboardHeader = () => {
   const navigate = useNavigate();
+  const { setSnapshot, resetAllData } = useFinancialData();
   
   const handleExport = (format: "json" | "csv") => {
     toast.success(`Exporting data as ${format.toUpperCase()}...`);
   };
 
   const handleNewAnalysis = () => {
-    localStorage.removeItem("dashboardData");
+    resetAllData();
     toast.info("Restarting analysis...");
     navigate("/");
+  };
+
+  const handleLoadSampleData = () => {
+    if (confirm("Load Reynolds Family demo data? This will replace any existing data.")) {
+      resetAllData();
+      setSnapshot(SAMPLE_REYNOLDS_DATA);
+      toast.success("Sample data loaded successfully!");
+    }
   };
 
   return (
@@ -31,6 +42,10 @@ export const DashboardHeader = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleLoadSampleData}>
+              <Database className="w-4 h-4 mr-2" />
+              Load Sample Data
+            </Button>
             <Button variant="outline" size="sm" onClick={handleNewAnalysis}>
               <RotateCcw className="w-4 h-4 mr-2" />
               New Analysis

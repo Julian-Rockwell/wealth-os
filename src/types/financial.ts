@@ -1,6 +1,6 @@
 // Financial data types for Feature 1.1 Command Center
 
-export type AccountType = "checking" | "savings" | "brokerage" | "401k" | "IRA" | "real_estate" | "vehicle" | "other";
+export type AccountType = "checking" | "savings" | "brokerage" | "401k" | "IRA" | "real_estate" | "vehicle" | "credit_card" | "other";
 export type AssetClass = "cash" | "stocks" | "bonds" | "real_estate" | "commodities" | "crypto" | "other";
 export type Liquidity = "liquid" | "semi_liquid" | "illiquid";
 export type LiabilityType = "mortgage" | "auto" | "student" | "credit_card" | "personal" | "other";

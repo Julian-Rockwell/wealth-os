@@ -22,7 +22,9 @@ import type { FinancialSnapshot } from "@/types/financial";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Database } from "lucide-react";
+import { SAMPLE_REYNOLDS_DATA } from "@/utils/sampleData";
+import { toast } from "sonner";
 export type ViewMode = "category" | "subcategory" | "merchant" | "liquidity" | "custom";
 
 interface DashboardProps {
@@ -32,8 +34,16 @@ interface DashboardProps {
 export default function Dashboard({ onContinue }: DashboardProps = {}) {
   const [viewMode, setViewMode] = useState<ViewMode>("category");
   const { data, updateTransaction, deleteTransaction, filters, setFilters } = useDashboardData();
-  const { snapshot, setSnapshot } = useFinancialData();
+  const { snapshot, setSnapshot, resetAllData } = useFinancialData();
   const [reviewed, setReviewed] = useState(false);
+
+  const handleLoadSampleData = () => {
+    if (confirm("Load Reynolds Family demo data? This will replace any existing data.")) {
+      resetAllData();
+      setSnapshot(SAMPLE_REYNOLDS_DATA);
+      toast.success("Sample data loaded successfully!");
+    }
+  };
 
   const handleContinueToAnalyzer = () => {
     if (!reviewed || !snapshot) {
@@ -59,6 +69,19 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
+          {/* Empty State Banner */}
+          <div className="mb-6 p-8 rounded-lg bg-card border-2 border-dashed text-center">
+            <Database className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+            <h2 className="text-xl font-semibold mb-2">No Data Loaded</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Load the Reynolds Family demo to see a complete financial snapshot
+            </p>
+            <Button onClick={handleLoadSampleData} className="gradient-primary">
+              <Database className="w-4 h-4 mr-2" />
+              Load Sample Data
+            </Button>
+          </div>
+
           <div className="grid lg:grid-cols-[320px,1fr] gap-6">
             {/* Left Column - KPIs */}
             <div className="space-y-6">
