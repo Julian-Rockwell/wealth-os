@@ -33,13 +33,13 @@ interface UploadProps {
 }
 
 export default function Upload({ onComplete }: UploadProps = {}) {
-  const { setSnapshot } = useFinancialData();
-  const [files, setFiles] = useState<FileUploadState[]>([]);
+  const { setSnapshot, draftData, setDraftData } = useFinancialData();
+  const [files, setFiles] = useState<FileUploadState[]>(draftData.files || []);
   const [isDragging, setIsDragging] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [mockConnections, setMockConnections] = useState<MockConnection[]>([]);
-  const [manualHoldings, setManualHoldings] = useState<Holding[]>([]);
-  const [manualLiabilities, setManualLiabilities] = useState<Liability[]>([]);
+  const [mockConnections, setMockConnections] = useState<MockConnection[]>(draftData.mockConnections || []);
+  const [manualHoldings, setManualHoldings] = useState<Holding[]>(draftData.manualHoldings || []);
+  const [manualLiabilities, setManualLiabilities] = useState<Liability[]>(draftData.manualLiabilities || []);
   const [editingHoldingId, setEditingHoldingId] = useState<string | null>(null);
   const [editingLiabilityId, setEditingLiabilityId] = useState<string | null>(null);
 
@@ -126,12 +126,16 @@ export default function Upload({ onComplete }: UploadProps = {}) {
   };
 
   const removeMockConnection = (id: string) => {
-    setMockConnections((prev) => prev.filter(c => c.id !== id));
+    const updated = mockConnections.filter(c => c.id !== id);
+    setMockConnections(updated);
+    setDraftData({ ...draftData, mockConnections: updated });
     toast.success("Connection removed");
   };
 
   const removeFile = (index: number) => {
-    setFiles((prev) => prev.filter((_, i) => i !== index));
+    const updated = files.filter((_, i) => i !== index);
+    setFiles(updated);
+    setDraftData({ ...draftData, files: updated });
     toast.success("File removed");
   };
 
@@ -153,7 +157,9 @@ export default function Upload({ onComplete }: UploadProps = {}) {
       type: newAccount.type,
     };
 
-    setMockConnections((prev) => [...prev, connection]);
+    const updated = [...mockConnections, connection];
+    setMockConnections(updated);
+    setDraftData({ ...draftData, mockConnections: updated });
     toast.success(`Connected to ${newAccount.name}`);
   };
 
@@ -169,18 +175,22 @@ export default function Upload({ onComplete }: UploadProps = {}) {
       currency: "USD",
       source: "manual",
     };
-    setManualHoldings((prev) => [...prev, newHolding]);
+    const updated = [...manualHoldings, newHolding];
+    setManualHoldings(updated);
+    setDraftData({ ...draftData, manualHoldings: updated });
     setEditingHoldingId(newHolding.id);
   };
 
   const updateManualHolding = (id: string, updates: Partial<Holding>) => {
-    setManualHoldings((prev) =>
-      prev.map((h) => (h.id === id ? { ...h, ...updates } : h))
-    );
+    const updated = manualHoldings.map((h) => (h.id === id ? { ...h, ...updates } : h));
+    setManualHoldings(updated);
+    setDraftData({ ...draftData, manualHoldings: updated });
   };
 
   const removeManualHolding = (id: string) => {
-    setManualHoldings((prev) => prev.filter((h) => h.id !== id));
+    const updated = manualHoldings.filter((h) => h.id !== id);
+    setManualHoldings(updated);
+    setDraftData({ ...draftData, manualHoldings: updated });
     toast.success("Asset removed");
   };
 
@@ -195,18 +205,22 @@ export default function Upload({ onComplete }: UploadProps = {}) {
       monthlyPayment: 0,
       remainingTermMonths: 0,
     };
-    setManualLiabilities((prev) => [...prev, newLiability]);
+    const updated = [...manualLiabilities, newLiability];
+    setManualLiabilities(updated);
+    setDraftData({ ...draftData, manualLiabilities: updated });
     setEditingLiabilityId(newLiability.id);
   };
 
   const updateManualLiability = (id: string, updates: Partial<Liability>) => {
-    setManualLiabilities((prev) =>
-      prev.map((l) => (l.id === id ? { ...l, ...updates } : l))
-    );
+    const updated = manualLiabilities.map((l) => (l.id === id ? { ...l, ...updates } : l));
+    setManualLiabilities(updated);
+    setDraftData({ ...draftData, manualLiabilities: updated });
   };
 
   const removeManualLiability = (id: string) => {
-    setManualLiabilities((prev) => prev.filter((l) => l.id !== id));
+    const updated = manualLiabilities.filter((l) => l.id !== id);
+    setManualLiabilities(updated);
+    setDraftData({ ...draftData, manualLiabilities: updated });
     toast.success("Liability removed");
   };
 

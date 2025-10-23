@@ -28,35 +28,35 @@ export const ConnectionStatus = ({ accounts }: ConnectionStatusProps) => {
       </div>
 
       <div className="space-y-3">
-        {connectedCount > 0 && (
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-success/10">
+        {accounts.filter(a => a.providerStatus === "connected").map(account => (
+          <div key={account.id} className="flex items-center gap-3 p-3 rounded-lg bg-success/10">
             <CheckCircle2 className="w-5 h-5 text-success" />
             <div className="flex-1">
-              <p className="text-sm font-medium">Connected</p>
-              <p className="text-xs text-muted-foreground">{connectedCount} account(s)</p>
+              <p className="text-sm font-medium">{account.name}</p>
+              <p className="text-xs text-muted-foreground">Connected • ${account.balance.toLocaleString()}</p>
             </div>
           </div>
-        )}
+        ))}
 
-        {needsAttentionCount > 0 && (
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-warning/10">
+        {accounts.filter(a => a.providerStatus === "needs_attention").map(account => (
+          <div key={account.id} className="flex items-center gap-3 p-3 rounded-lg bg-warning/10">
             <AlertCircle className="w-5 h-5 text-warning" />
             <div className="flex-1">
-              <p className="text-sm font-medium">Needs Attention</p>
-              <p className="text-xs text-muted-foreground">{needsAttentionCount} account(s)</p>
+              <p className="text-sm font-medium">{account.name}</p>
+              <p className="text-xs text-muted-foreground">Needs Attention</p>
             </div>
           </div>
-        )}
+        ))}
 
-        {disconnectedCount > 0 && (
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-destructive/10">
+        {accounts.filter(a => a.providerStatus === "disconnected").map(account => (
+          <div key={account.id} className="flex items-center gap-3 p-3 rounded-lg bg-destructive/10">
             <XCircle className="w-5 h-5 text-destructive" />
             <div className="flex-1">
-              <p className="text-sm font-medium">Disconnected</p>
-              <p className="text-xs text-muted-foreground">{disconnectedCount} account(s)</p>
+              <p className="text-sm font-medium">{account.name}</p>
+              <p className="text-xs text-muted-foreground">Disconnected</p>
             </div>
           </div>
-        )}
+        ))}
 
         {accounts.length === 0 && (
           <p className="text-sm text-muted-foreground text-center py-4">

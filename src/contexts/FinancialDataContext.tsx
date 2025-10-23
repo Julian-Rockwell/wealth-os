@@ -2,11 +2,20 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 import type { FinancialSnapshot } from "@/types/financial";
 import type { DashboardData } from "@/types/dashboard";
 
+interface DraftData {
+  mockConnections: any[];
+  files: any[];
+  manualHoldings: any[];
+  manualLiabilities: any[];
+}
+
 interface FinancialDataContextType {
   snapshot: FinancialSnapshot | null;
   setSnapshot: (snapshot: FinancialSnapshot | null) => void;
   dashboardData: DashboardData | null;
   setDashboardData: (data: DashboardData | null) => void;
+  draftData: DraftData;
+  setDraftData: (data: DraftData) => void;
   resetAllData: () => void;
 }
 
@@ -21,6 +30,16 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
   const [dashboardData, setDashboardDataState] = useState<DashboardData | null>(() => {
     const stored = localStorage.getItem("dashboardData");
     return stored ? JSON.parse(stored) : null;
+  });
+
+  const [draftData, setDraftDataState] = useState<DraftData>(() => {
+    const stored = localStorage.getItem("draftData");
+    return stored ? JSON.parse(stored) : {
+      mockConnections: [],
+      files: [],
+      manualHoldings: [],
+      manualLiabilities: [],
+    };
   });
 
   const setSnapshot = (newSnapshot: FinancialSnapshot | null) => {
@@ -41,11 +60,23 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     }
   };
 
+  const setDraftData = (newData: DraftData) => {
+    setDraftDataState(newData);
+    localStorage.setItem("draftData", JSON.stringify(newData));
+  };
+
   const resetAllData = () => {
     setSnapshotState(null);
     setDashboardDataState(null);
+    setDraftDataState({
+      mockConnections: [],
+      files: [],
+      manualHoldings: [],
+      manualLiabilities: [],
+    });
     localStorage.removeItem("financialSnapshot");
     localStorage.removeItem("dashboardData");
+    localStorage.removeItem("draftData");
   };
 
   return (
@@ -55,6 +86,8 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
         setSnapshot,
         dashboardData,
         setDashboardData,
+        draftData,
+        setDraftData,
         resetAllData,
       }}
     >

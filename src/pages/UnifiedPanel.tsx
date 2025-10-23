@@ -61,7 +61,7 @@ export default function UnifiedPanel() {
           <TabsList className="grid w-full grid-cols-7 mb-6">
             <TabsTrigger value="intake" className="flex items-center gap-2">
               <Download className="w-4 h-4" />
-              Data Intake
+              Command Center
             </TabsTrigger>
             <TabsTrigger 
               value="command" 
@@ -69,7 +69,7 @@ export default function UnifiedPanel() {
               disabled={!snapshot}
             >
               <BarChart3 className="w-4 h-4" />
-              Command Center
+              Budget Analyzer
             </TabsTrigger>
             <TabsTrigger value="reports" disabled className="flex items-center gap-2 opacity-50">
               <BarChart3 className="w-4 h-4" />

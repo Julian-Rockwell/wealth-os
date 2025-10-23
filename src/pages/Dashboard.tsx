@@ -101,6 +101,7 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
           <div className="space-y-6">
             <NetWorthKPI snapshot={snapshot} />
             <ConnectionStatus accounts={snapshot.accounts} />
+            <LiquidAssetsPanel holdings={snapshot.holdings} />
           </div>
 
           {/* Right Column - Scroll */}
@@ -111,10 +112,6 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
               <BudgetDonut data={data} viewMode={viewMode} />
               <MonthlyStackedBars data={data} />
             </div>
-
-            <AssetAllocationView holdings={snapshot.holdings} />
-
-            <LiquidAssetsPanel holdings={snapshot.holdings} />
 
             {/* Unified Data Table Card with Tabs */}
             <Card className="p-6 shadow-soft">
@@ -148,6 +145,8 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
                 </TabsContent>
               </Tabs>
             </Card>
+
+            <AssetAllocationView holdings={snapshot.holdings} />
 
             <KeyInsights data={data} />
 
