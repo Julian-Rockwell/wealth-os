@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
 import type { Account, Holding, Liability, FinancialSnapshot, AccountStatus, AccountType, AssetClass, Liquidity, LiabilityType } from "@/types/financial";
 import { SAMPLE_REYNOLDS_DATA } from "@/utils/sampleData";
+import NetWorthDashboard from "./NetWorthDashboard";
 
 interface FileUploadState {
   file: File;
@@ -34,13 +35,14 @@ interface UploadProps {
 }
 
 export default function Upload({ onComplete }: UploadProps = {}) {
-  const { setSnapshot, draftData, setDraftData, resetAllData } = useFinancialData();
+  const { setSnapshot, draftData, setDraftData, resetAllData, snapshot } = useFinancialData();
   const [files, setFiles] = useState<FileUploadState[]>(draftData.files || []);
   const [isDragging, setIsDragging] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [mockConnections, setMockConnections] = useState<MockConnection[]>(draftData.mockConnections || []);
   const [manualHoldings, setManualHoldings] = useState<Holding[]>(draftData.manualHoldings || []);
   const [manualLiabilities, setManualLiabilities] = useState<Liability[]>(draftData.manualLiabilities || []);
+  const [activeSubTab, setActiveSubTab] = useState("aggregation");
   const [editingHoldingId, setEditingHoldingId] = useState<string | null>(null);
   const [editingLiabilityId, setEditingLiabilityId] = useState<string | null>(null);
 
@@ -289,24 +291,34 @@ export default function Upload({ onComplete }: UploadProps = {}) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-16 max-w-6xl">
-        {/* Header */}
-        <div className="text-center mb-12 animate-fade-in">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-primary mb-6 shadow-medium">
-            <TrendingUp className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Rockwell Wealth OS
-          </h1>
-          <p className="text-xl text-muted-foreground mb-6">Let's Analyze Your Spending Patterns</p>
-          <p className="text-base text-muted-foreground max-w-3xl mx-auto">
-            Upload AT LEAST 3 months of financial statements in any format (PDF, CSV, Excel, images). 
-            Connect mock accounts or enter data manually. The more data provided, the more accurate the analysis.
-          </p>
-        </div>
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Sub-tabs for Command Center */}
+        <Tabs value={activeSubTab} onValueChange={setActiveSubTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-8">
+            <TabsTrigger value="aggregation">Automatic Account Aggregation</TabsTrigger>
+            <TabsTrigger value="networth">Net Worth Dashboard</TabsTrigger>
+          </TabsList>
 
-        {/* Three Input Methods */}
-        <Tabs defaultValue="upload" className="mb-8">
+          {/* Aggregation Tab */}
+          <TabsContent value="aggregation">
+            <div className="max-w-6xl mx-auto">
+              {/* Header */}
+              <div className="text-center mb-12 animate-fade-in">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-primary mb-6 shadow-medium">
+                  <TrendingUp className="w-8 h-8 text-white" />
+                </div>
+                <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  Rockwell Wealth OS
+                </h1>
+                <p className="text-xl text-muted-foreground mb-6">Let's Analyze Your Spending Patterns</p>
+                <p className="text-base text-muted-foreground max-w-3xl mx-auto">
+                  Upload AT LEAST 3 months of financial statements in any format (PDF, CSV, Excel, images). 
+                  Connect mock accounts or enter data manually. The more data provided, the more accurate the analysis.
+                </p>
+              </div>
+
+              {/* Three Input Methods */}
+              <Tabs defaultValue="upload" className="mb-8">
           <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="mock">
               <Link2 className="w-4 h-4 mr-2" />
@@ -831,6 +843,14 @@ export default function Upload({ onComplete }: UploadProps = {}) {
             {isAnalyzing ? "Preparing..." : "Go to Command Center"}
           </Button>
         )}
+            </div>
+          </TabsContent>
+
+          {/* Net Worth Dashboard Tab */}
+          <TabsContent value="networth">
+            <NetWorthDashboard />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
