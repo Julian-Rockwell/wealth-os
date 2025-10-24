@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
 import Upload from "./Upload";
 import Dashboard from "./Dashboard";
+import Investments from "./Investments";
 
 export default function UnifiedPanel() {
   const [activeTab, setActiveTab] = useState("intake");
@@ -71,7 +72,11 @@ export default function UnifiedPanel() {
               <BarChart3 className="w-4 h-4" />
               Budget Analyzer
             </TabsTrigger>
-            <TabsTrigger value="investments" disabled className="flex items-center gap-2 opacity-50">
+            <TabsTrigger 
+              value="investments" 
+              className="flex items-center gap-2"
+              disabled={!snapshot}
+            >
               <TrendingUp className="w-4 h-4" />
               Investments
             </TabsTrigger>
@@ -102,9 +107,7 @@ export default function UnifiedPanel() {
           </TabsContent>
 
           <TabsContent value="investments" className="mt-0">
-            <div className="text-center py-20 text-muted-foreground">
-              Coming soon: Brokerage and performance widgets
-            </div>
+            <Investments />
           </TabsContent>
 
           <TabsContent value="reports" className="mt-0">
