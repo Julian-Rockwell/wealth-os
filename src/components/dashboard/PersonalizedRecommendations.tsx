@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Lightbulb, Tag, Calendar, TrendingUp } from "lucide-react";
+import { Bot, Tag, Calendar, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import type { DashboardData } from "@/types/dashboard";
 
@@ -60,7 +60,7 @@ export const PersonalizedRecommendations = ({ data }: PersonalizedRecommendation
   return (
     <Card className="p-6 shadow-soft">
       <div className="flex items-center gap-2 mb-6">
-        <Lightbulb className="w-6 h-6 text-primary" />
+        <Bot className="w-6 h-6 text-primary" />
         <h3 className="text-lg font-semibold">Personalized Recommendations</h3>
       </div>
 

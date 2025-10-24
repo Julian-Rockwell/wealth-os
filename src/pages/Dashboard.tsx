@@ -105,28 +105,35 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
           {/* View Toggle */}
           <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
           
-          {/* Budget Visualizations */}
-          <div className="grid md:grid-cols-2 gap-6">
-            <BudgetDonut data={data} viewMode={viewMode} />
-            <MonthlyStackedBars data={data} />
+          {/* Two Column Layout: Budget Visualizations + Filters & Transactions */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column: 1/3 width */}
+            <div className="lg:col-span-1 space-y-6">
+              <BudgetDonut data={data} viewMode={viewMode} />
+              <MonthlyStackedBars data={data} />
+            </div>
+
+            {/* Right Column: 2/3 width */}
+            <div className="lg:col-span-2 space-y-6">
+              <FiltersCard data={data} filters={filters} setFilters={setFilters} />
+              
+              <TransactionsTable 
+                transactions={data.txns} 
+                onUpdate={updateTransaction}
+                onDelete={deleteTransaction}
+                filters={filters}
+              />
+            </div>
           </div>
 
-          {/* Filters & Transactions */}
-          <FiltersCard data={data} filters={filters} setFilters={setFilters} />
-          
-          <TransactionsTable 
-            transactions={data.txns} 
-            onUpdate={updateTransaction}
-            onDelete={deleteTransaction}
-            filters={filters}
-          />
+          {/* Key Insights - 3 Cards */}
+          <KeyInsights data={data} />
+
+          {/* Personalized Recommendations */}
+          <PersonalizedRecommendations data={data} />
 
           {/* Asset Allocation */}
           <AssetAllocationView holdings={snapshot.holdings} />
-
-          {/* Insights & Recommendations */}
-          <KeyInsights data={data} />
-          <PersonalizedRecommendations data={data} />
         </div>
       </div>
     </div>

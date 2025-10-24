@@ -71,6 +71,10 @@ export default function UnifiedPanel() {
               <BarChart3 className="w-4 h-4" />
               Budget Analyzer
             </TabsTrigger>
+            <TabsTrigger value="investments" disabled className="flex items-center gap-2 opacity-50">
+              <TrendingUp className="w-4 h-4" />
+              Investments
+            </TabsTrigger>
             <TabsTrigger value="reports" disabled className="flex items-center gap-2 opacity-50">
               <BarChart3 className="w-4 h-4" />
               Reports
@@ -82,10 +86,6 @@ export default function UnifiedPanel() {
             <TabsTrigger value="goals" disabled className="flex items-center gap-2 opacity-50">
               <Target className="w-4 h-4" />
               Goals
-            </TabsTrigger>
-            <TabsTrigger value="investments" disabled className="flex items-center gap-2 opacity-50">
-              <TrendingUp className="w-4 h-4" />
-              Investments
             </TabsTrigger>
             <TabsTrigger value="advice" disabled className="flex items-center gap-2 opacity-50">
               <Lightbulb className="w-4 h-4" />
@@ -99,6 +99,12 @@ export default function UnifiedPanel() {
 
           <TabsContent value="command" className="mt-0">
             <Dashboard />
+          </TabsContent>
+
+          <TabsContent value="investments" className="mt-0">
+            <div className="text-center py-20 text-muted-foreground">
+              Coming soon: Brokerage and performance widgets
+            </div>
           </TabsContent>
 
           <TabsContent value="reports" className="mt-0">
@@ -116,12 +122,6 @@ export default function UnifiedPanel() {
           <TabsContent value="goals" className="mt-0">
             <div className="text-center py-20 text-muted-foreground">
               Coming soon: Milestones and RPIC tracker
-            </div>
-          </TabsContent>
-
-          <TabsContent value="investments" className="mt-0">
-            <div className="text-center py-20 text-muted-foreground">
-              Coming soon: Brokerage and performance widgets
             </div>
           </TabsContent>
 

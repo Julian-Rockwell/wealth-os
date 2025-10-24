@@ -46,8 +46,13 @@ export const TransactionsTable = ({ transactions, onUpdate, onDelete, filters }:
     .filter((txn) => txn.sign === "debit")
     .filter((txn) => {
       if (filters.searchTerm) {
-        return txn.merchant.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+        const matchesSearch = txn.merchant.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
                txn.desc.toLowerCase().includes(filters.searchTerm.toLowerCase());
+        if (!matchesSearch) return false;
+      }
+      if (filters.minConfidence !== undefined) {
+        // Filter for confidence LESS than the threshold
+        if (txn.confidence * 100 >= filters.minConfidence) return false;
       }
       return true;
     })
