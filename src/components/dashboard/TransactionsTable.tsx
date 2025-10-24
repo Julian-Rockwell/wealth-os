@@ -100,7 +100,7 @@ export const TransactionsTable = ({ transactions, onUpdate, onDelete, filters }:
         <>
           <div className="overflow-x-auto max-h-96 overflow-y-auto">
             <table className="w-full">
-              <thead className="bg-secondary/50 text-xs sticky top-0">
+              <thead className="bg-secondary text-xs sticky top-0 z-10">
                 <tr>
                   <th className="text-left p-3 font-medium">Date</th>
                   <th className="text-left p-3 font-medium">Merchant</th>
