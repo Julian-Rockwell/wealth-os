@@ -7,6 +7,7 @@ import { useFinancialData } from "@/contexts/FinancialDataContext";
 import Upload from "./Upload";
 import Dashboard from "./Dashboard";
 import Investments from "./Investments";
+import Goals from "./Goals";
 
 export default function UnifiedPanel() {
   const [activeTab, setActiveTab] = useState("intake");
@@ -88,7 +89,11 @@ export default function UnifiedPanel() {
               <TrendingDown className="w-4 h-4" />
               Cash Flow
             </TabsTrigger>
-            <TabsTrigger value="goals" disabled className="flex items-center gap-2 opacity-50">
+            <TabsTrigger 
+              value="goals" 
+              className="flex items-center gap-2"
+              disabled={!snapshot}
+            >
               <Target className="w-4 h-4" />
               Goals
             </TabsTrigger>
@@ -123,9 +128,7 @@ export default function UnifiedPanel() {
           </TabsContent>
 
           <TabsContent value="goals" className="mt-0">
-            <div className="text-center py-20 text-muted-foreground">
-              Coming soon: Milestones and RPIC tracker
-            </div>
+            <Goals />
           </TabsContent>
 
           <TabsContent value="advice" className="mt-0">
