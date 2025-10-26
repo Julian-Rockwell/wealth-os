@@ -1,50 +1,54 @@
 import { Card } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, DollarSign, Minus } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Minus, ChevronDown, ChevronUp } from "lucide-react";
 import type { DashboardData } from "@/types/dashboard";
 import { classifyTransactions } from "@/utils/transactionClassifier";
+import { useState } from "react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface IncomeExpensesKPIProps {
   data: DashboardData;
+  period: 30 | 60 | 90;
 }
 
-export const IncomeExpensesKPI = ({ data }: IncomeExpensesKPIProps) => {
-  // Classify transactions using deterministic rules
-  const classification = classifyTransactions(data.txns);
-  
-  const totalIncome = classification.totals.income;
-  const totalExpenses = classification.totals.expenses;
+export const IncomeExpensesKPI = ({ data, period }: IncomeExpensesKPIProps) => {
+  const [incomeExpanded, setIncomeExpanded] = useState(false);
+  const [expensesExpanded, setExpensesExpanded] = useState(false);
 
-  // Calculate trends (last 30 days vs previous 30 days)
+  // Calculate date ranges based on period
   const now = new Date();
-  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-  const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+  const periodDaysAgo = new Date(now.getTime() - period * 24 * 60 * 60 * 1000);
+  const doublePeriodDaysAgo = new Date(now.getTime() - (period * 2) * 24 * 60 * 60 * 1000);
 
-  // Filter transactions by date range and classification
-  const last30DaysTxns = data.txns.filter(t => {
+  // Filter transactions for current period
+  const currentPeriodTxns = data.txns.filter(t => {
     const date = new Date(t.date);
-    return date >= thirtyDaysAgo && date <= now;
+    return date >= periodDaysAgo && date <= now;
   });
 
-  const previous30DaysTxns = data.txns.filter(t => {
+  const previousPeriodTxns = data.txns.filter(t => {
     const date = new Date(t.date);
-    return date >= sixtyDaysAgo && date < thirtyDaysAgo;
+    return date >= doublePeriodDaysAgo && date < periodDaysAgo;
   });
 
-  const last30Classification = classifyTransactions(last30DaysTxns);
-  const previous30Classification = classifyTransactions(previous30DaysTxns);
-
-  const last30DaysIncome = last30Classification.totals.income;
-  const previous30DaysIncome = previous30Classification.totals.income;
-  const last30DaysExpenses = last30Classification.totals.expenses;
-  const previous30DaysExpenses = previous30Classification.totals.expenses;
+  // Classify transactions using deterministic rules
+  const currentClassification = classifyTransactions(currentPeriodTxns);
+  const previousClassification = classifyTransactions(previousPeriodTxns);
+  
+  const totalIncome = currentClassification.totals.income;
+  const totalExpenses = currentClassification.totals.expenses;
+  const incomeByCategory = currentClassification.by_category.income;
+  const expensesByCategory = currentClassification.by_category.expenses;
 
   // Calculate percentage changes
-  const incomeChange = previous30DaysIncome > 0 
-    ? ((last30DaysIncome - previous30DaysIncome) / previous30DaysIncome) * 100
+  const previousIncome = previousClassification.totals.income;
+  const previousExpenses = previousClassification.totals.expenses;
+
+  const incomeChange = previousIncome > 0 
+    ? ((totalIncome - previousIncome) / previousIncome) * 100
     : 0;
 
-  const expensesChange = previous30DaysExpenses > 0
-    ? ((last30DaysExpenses - previous30DaysExpenses) / previous30DaysExpenses) * 100
+  const expensesChange = previousExpenses > 0
+    ? ((totalExpenses - previousExpenses) / previousExpenses) * 100
     : 0;
 
   const getTrendIcon = (value: number) => {
@@ -76,36 +80,72 @@ export const IncomeExpensesKPI = ({ data }: IncomeExpensesKPIProps) => {
     <div className="grid md:grid-cols-2 gap-6">
       {/* Income Card */}
       <Card className="p-6 shadow-soft">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-medium text-muted-foreground">Income</h3>
-          <DollarSign className="w-4 h-4 text-success" />
-        </div>
-        <p className="text-3xl font-bold text-success mb-1">
-          ${totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-        </p>
-        <div className="flex items-center gap-2 text-sm">
-          {getTrendIcon(incomeChange)}
-          <span className={getTrendColor(incomeChange)}>
-            {incomeChange >= 0 ? "+" : ""}{incomeChange.toFixed(1)}% vs last 30d
-          </span>
-        </div>
+        <Collapsible open={incomeExpanded} onOpenChange={setIncomeExpanded}>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-medium text-muted-foreground">Income</h3>
+            <div className="flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-success" />
+              <CollapsibleTrigger className="p-1 hover:bg-muted rounded">
+                {incomeExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </CollapsibleTrigger>
+            </div>
+          </div>
+          <p className="text-3xl font-bold text-success mb-1">
+            ${totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          </p>
+          <div className="flex items-center gap-2 text-sm">
+            {getTrendIcon(incomeChange)}
+            <span className={getTrendColor(incomeChange)}>
+              {incomeChange >= 0 ? "+" : ""}{incomeChange.toFixed(1)}% vs prev {period}d
+            </span>
+          </div>
+          
+          <CollapsibleContent className="mt-4 pt-4 border-t space-y-2">
+            {Object.entries(incomeByCategory).map(([category, amount]) => 
+              amount > 0 && (
+                <div key={category} className="flex justify-between text-sm">
+                  <span className="text-muted-foreground capitalize">{category}</span>
+                  <span className="font-medium">${amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                </div>
+              )
+            )}
+          </CollapsibleContent>
+        </Collapsible>
       </Card>
 
       {/* Expenses Card */}
       <Card className="p-6 shadow-soft">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-medium text-muted-foreground">Expenses</h3>
-          <DollarSign className="w-4 h-4 text-destructive" />
-        </div>
-        <p className="text-3xl font-bold text-destructive mb-1">
-          ${totalExpenses.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-        </p>
-        <div className="flex items-center gap-2 text-sm">
-          {getExpenseTrendIcon(expensesChange)}
-          <span className={getExpenseTrendColor(expensesChange)}>
-            {expensesChange >= 0 ? "+" : ""}{expensesChange.toFixed(1)}% vs last 30d
-          </span>
-        </div>
+        <Collapsible open={expensesExpanded} onOpenChange={setExpensesExpanded}>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-medium text-muted-foreground">Expenses</h3>
+            <div className="flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-destructive" />
+              <CollapsibleTrigger className="p-1 hover:bg-muted rounded">
+                {expensesExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </CollapsibleTrigger>
+            </div>
+          </div>
+          <p className="text-3xl font-bold text-destructive mb-1">
+            ${totalExpenses.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          </p>
+          <div className="flex items-center gap-2 text-sm">
+            {getExpenseTrendIcon(expensesChange)}
+            <span className={getExpenseTrendColor(expensesChange)}>
+              {expensesChange >= 0 ? "+" : ""}{expensesChange.toFixed(1)}% vs prev {period}d
+            </span>
+          </div>
+          
+          <CollapsibleContent className="mt-4 pt-4 border-t space-y-2">
+            {Object.entries(expensesByCategory).map(([category, amount]) => 
+              amount > 0 && (
+                <div key={category} className="flex justify-between text-sm">
+                  <span className="text-muted-foreground capitalize">{category.replace('_', ' ')}</span>
+                  <span className="font-medium">${amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                </div>
+              )
+            )}
+          </CollapsibleContent>
+        </Collapsible>
       </Card>
     </div>
   );

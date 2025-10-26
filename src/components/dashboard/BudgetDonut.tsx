@@ -5,40 +5,67 @@ import type { ViewMode } from "@/pages/Dashboard";
 interface BudgetDonutProps {
   data: DashboardData;
   viewMode: ViewMode;
+  period: 30 | 60 | 90;
 }
 
-export const BudgetDonut = ({ data, viewMode }: BudgetDonutProps) => {
+export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
+  // Filter transactions based on period
+  const now = new Date();
+  const periodDaysAgo = new Date(now.getTime() - period * 24 * 60 * 60 * 1000);
+  
+  const filteredTxns = data.txns.filter(t => {
+    const date = new Date(t.date);
+    return date >= periodDaysAgo && date <= now;
+  });
+
   // Calculate data based on viewMode
   const getViewData = () => {
     switch (viewMode) {
       case "category":
+        // Calculate from filtered transactions
+        const categoryTotals = { needs: 0, wants: 0, savings: 0 };
+        filteredTxns.forEach(txn => {
+          if (txn.sign === "debit") {
+            categoryTotals[txn.category] += txn.amount;
+          }
+        });
+        const categoryTotal = Object.values(categoryTotals).reduce((sum, v) => sum + v, 0);
         return {
           title: "50/30/20 Distribution",
           items: [
-            { label: "Needs (50%)", value: data.expenses.needs.total, color: "bg-needs", pct: data.expenses.needs.pct },
-            { label: "Wants (30%)", value: data.expenses.wants.total, color: "bg-wants", pct: data.expenses.wants.pct },
-            { label: "Savings (20%)", value: data.expenses.savings.total, color: "bg-savings", pct: data.expenses.savings.pct },
+            { label: "Needs (50%)", value: categoryTotals.needs, color: "bg-needs", pct: categoryTotal > 0 ? (categoryTotals.needs / categoryTotal) * 100 : 0 },
+            { label: "Wants (30%)", value: categoryTotals.wants, color: "bg-wants", pct: categoryTotal > 0 ? (categoryTotals.wants / categoryTotal) * 100 : 0 },
+            { label: "Savings (20%)", value: categoryTotals.savings, color: "bg-savings", pct: categoryTotal > 0 ? (categoryTotals.savings / categoryTotal) * 100 : 0 },
           ]
         };
       
       case "subcategory":
-        const allSubs = [
-          ...Object.entries(data.expenses.needs.subs).map(([k, v]) => ({ label: k, value: v, color: "bg-needs" })),
-          ...Object.entries(data.expenses.wants.subs).map(([k, v]) => ({ label: k, value: v, color: "bg-wants" })),
-          ...Object.entries(data.expenses.savings.subs).map(([k, v]) => ({ label: k, value: v, color: "bg-savings" })),
-        ].sort((a, b) => b.value - a.value).slice(0, 5);
+        const subTotals: Record<string, { value: number; color: string }> = {};
+        filteredTxns.filter(t => t.sign === "debit").forEach(txn => {
+          if (!subTotals[txn.subcategory]) {
+            subTotals[txn.subcategory] = { 
+              value: 0, 
+              color: txn.category === "need" ? "bg-needs" : txn.category === "want" ? "bg-wants" : "bg-savings" 
+            };
+          }
+          subTotals[txn.subcategory].value += txn.amount;
+        });
+        const allSubs = Object.entries(subTotals)
+          .map(([label, data]) => ({ label, ...data }))
+          .sort((a, b) => b.value - a.value)
+          .slice(0, 5);
         const subsTotal = allSubs.reduce((sum, item) => sum + item.value, 0);
         return {
           title: "Top 5 Subcategories",
           items: allSubs.map(item => ({
             ...item,
-            pct: (item.value / subsTotal) * 100
+            pct: subsTotal > 0 ? (item.value / subsTotal) * 100 : 0
           }))
         };
       
       case "merchant":
         const merchantTotals: Record<string, number> = {};
-        data.txns.filter(t => t.sign === "debit").forEach(txn => {
+        filteredTxns.filter(t => t.sign === "debit").forEach(txn => {
           merchantTotals[txn.merchant] = (merchantTotals[txn.merchant] || 0) + txn.amount;
         });
         const topMerchants = Object.entries(merchantTotals)
@@ -51,12 +78,12 @@ export const BudgetDonut = ({ data, viewMode }: BudgetDonutProps) => {
             label: merchant,
             value,
             color: "bg-primary",
-            pct: (value / merchTotal) * 100
+            pct: merchTotal > 0 ? (value / merchTotal) * 100 : 0
           }))
         };
       
       case "liquidity":
-        const liquidityData = data.txns.filter(t => t.sign === "debit").reduce((acc, txn) => {
+        const liquidityData = filteredTxns.filter(t => t.sign === "debit").reduce((acc, txn) => {
           const category = txn.subcategory.includes("Rent") || txn.subcategory.includes("Insurance") ? "fixed" :
                           txn.subcategory.includes("Emergency") || txn.subcategory.includes("Debt") ? "committed" :
                           "discretionary";
@@ -67,9 +94,9 @@ export const BudgetDonut = ({ data, viewMode }: BudgetDonutProps) => {
         return {
           title: "Spending Liquidity",
           items: [
-            { label: "Fixed Expenses", value: liquidityData.fixed || 0, color: "bg-destructive", pct: ((liquidityData.fixed || 0) / liqTotal) * 100 },
-            { label: "Committed", value: liquidityData.committed || 0, color: "bg-warning", pct: ((liquidityData.committed || 0) / liqTotal) * 100 },
-            { label: "Discretionary", value: liquidityData.discretionary || 0, color: "bg-success", pct: ((liquidityData.discretionary || 0) / liqTotal) * 100 },
+            { label: "Fixed Expenses", value: liquidityData.fixed || 0, color: "bg-destructive", pct: liqTotal > 0 ? ((liquidityData.fixed || 0) / liqTotal) * 100 : 0 },
+            { label: "Committed", value: liquidityData.committed || 0, color: "bg-warning", pct: liqTotal > 0 ? ((liquidityData.committed || 0) / liqTotal) * 100 : 0 },
+            { label: "Discretionary", value: liquidityData.discretionary || 0, color: "bg-success", pct: liqTotal > 0 ? ((liquidityData.discretionary || 0) / liqTotal) * 100 : 0 },
           ]
         };
       
@@ -111,8 +138,8 @@ export const BudgetDonut = ({ data, viewMode }: BudgetDonutProps) => {
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-28 h-28 rounded-full bg-card flex items-center justify-center">
               <div className="text-center">
-                <p className="text-2xl font-bold">{data.period.months}</p>
-                <p className="text-xs text-muted-foreground">Months</p>
+                <p className="text-2xl font-bold">{period}</p>
+                <p className="text-xs text-muted-foreground">Days</p>
               </div>
             </div>
           </div>

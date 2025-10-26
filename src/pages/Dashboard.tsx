@@ -24,6 +24,7 @@ interface DashboardProps {
 
 export default function Dashboard({ onContinue }: DashboardProps = {}) {
   const [viewMode, setViewMode] = useState<ViewMode>("category");
+  const [period, setPeriod] = useState<30 | 60 | 90>(30);
   const { data, updateTransaction, deleteTransaction, filters, setFilters } = useDashboardData();
   const { snapshot, setSnapshot, resetAllData } = useFinancialData();
 
@@ -54,10 +55,29 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
           </div>
 
           <div className="space-y-6">
+            {/* Period Selector */}
+            <Card className="p-3 shadow-soft">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-muted-foreground">Period:</span>
+                <div className="flex gap-2">
+                  {[30, 60, 90].map((days) => (
+                    <Button
+                      key={days}
+                      variant={period === days ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setPeriod(days as 30 | 60 | 90)}
+                    >
+                      {days}d
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </Card>
+
             <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
             
             <div className="grid md:grid-cols-2 gap-6">
-              <BudgetDonut data={data} viewMode={viewMode} />
+              <BudgetDonut data={data} viewMode={viewMode} period={period} />
               <MonthlyStackedBars data={data} />
             </div>
 
@@ -99,8 +119,27 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
         )}
 
         <div className="space-y-6">
+          {/* Period Selector */}
+          <Card className="p-3 shadow-soft">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-muted-foreground">Period:</span>
+              <div className="flex gap-2">
+                {[30, 60, 90].map((days) => (
+                  <Button
+                    key={days}
+                    variant={period === days ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setPeriod(days as 30 | 60 | 90)}
+                  >
+                    {days}d
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </Card>
+
           {/* Income & Expenses KPIs */}
-          <IncomeExpensesKPI data={data} />
+          <IncomeExpensesKPI data={data} period={period} />
 
           {/* View Toggle */}
           <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
@@ -109,7 +148,7 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Column: 1/3 width */}
             <div className="lg:col-span-1 space-y-6 flex flex-col">
-              <BudgetDonut data={data} viewMode={viewMode} />
+              <BudgetDonut data={data} viewMode={viewMode} period={period} />
               <MonthlyStackedBars data={data} />
             </div>
 
