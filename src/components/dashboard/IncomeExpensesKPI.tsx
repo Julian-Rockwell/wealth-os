@@ -1,59 +1,42 @@
 import { Card } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, DollarSign, Minus } from "lucide-react";
 import type { DashboardData } from "@/types/dashboard";
+import { classifyTransactions } from "@/utils/transactionClassifier";
 
 interface IncomeExpensesKPIProps {
   data: DashboardData;
 }
 
 export const IncomeExpensesKPI = ({ data }: IncomeExpensesKPIProps) => {
-  // Calculate total income and expenses from transactions
-  const totalIncome = data.txns
-    .filter(t => t.amount > 0)
-    .reduce((sum, t) => sum + t.amount, 0);
+  // Classify transactions using deterministic rules
+  const classification = classifyTransactions(data.txns);
   
-  const totalExpenses = Math.abs(
-    data.txns
-      .filter(t => t.amount < 0)
-      .reduce((sum, t) => sum + t.amount, 0)
-  );
+  const totalIncome = classification.totals.income;
+  const totalExpenses = classification.totals.expenses;
 
   // Calculate trends (last 30 days vs previous 30 days)
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
   const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
 
-  const last30DaysIncome = data.txns
-    .filter(t => {
-      const date = new Date(t.date);
-      return t.amount > 0 && date >= thirtyDaysAgo && date <= now;
-    })
-    .reduce((sum, t) => sum + t.amount, 0);
+  // Filter transactions by date range and classification
+  const last30DaysTxns = data.txns.filter(t => {
+    const date = new Date(t.date);
+    return date >= thirtyDaysAgo && date <= now;
+  });
 
-  const previous30DaysIncome = data.txns
-    .filter(t => {
-      const date = new Date(t.date);
-      return t.amount > 0 && date >= sixtyDaysAgo && date < thirtyDaysAgo;
-    })
-    .reduce((sum, t) => sum + t.amount, 0);
+  const previous30DaysTxns = data.txns.filter(t => {
+    const date = new Date(t.date);
+    return date >= sixtyDaysAgo && date < thirtyDaysAgo;
+  });
 
-  const last30DaysExpenses = Math.abs(
-    data.txns
-      .filter(t => {
-        const date = new Date(t.date);
-        return t.amount < 0 && date >= thirtyDaysAgo && date <= now;
-      })
-      .reduce((sum, t) => sum + t.amount, 0)
-  );
+  const last30Classification = classifyTransactions(last30DaysTxns);
+  const previous30Classification = classifyTransactions(previous30DaysTxns);
 
-  const previous30DaysExpenses = Math.abs(
-    data.txns
-      .filter(t => {
-        const date = new Date(t.date);
-        return t.amount < 0 && date >= sixtyDaysAgo && date < thirtyDaysAgo;
-      })
-      .reduce((sum, t) => sum + t.amount, 0)
-  );
+  const last30DaysIncome = last30Classification.totals.income;
+  const previous30DaysIncome = previous30Classification.totals.income;
+  const last30DaysExpenses = last30Classification.totals.expenses;
+  const previous30DaysExpenses = previous30Classification.totals.expenses;
 
   // Calculate percentage changes
   const incomeChange = previous30DaysIncome > 0 

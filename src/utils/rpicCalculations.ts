@@ -1,5 +1,6 @@
 import type { FinancialSnapshot } from "@/types/financial";
 import type { DashboardData } from "@/types/dashboard";
+import { classifyTransactions } from "./transactionClassifier";
 
 export interface RpicInputs {
   currentMonthlyExpenses: number;
@@ -48,10 +49,14 @@ export interface Milestone {
 }
 
 export function calculateMonthlyExpensesFromDashboard(data: DashboardData): number {
-  const needs = data.expenses.needs.total;
-  const wants = data.expenses.wants.total;
-  const savings = data.expenses.savings.total;
-  return (needs + wants + savings) / data.period.months;
+  // Use deterministic classification to calculate expenses (excluding transfers)
+  const classification = classifyTransactions(data.txns);
+  const totalExpenses = classification.totals.expenses;
+  
+  const months = new Set(data.txns.map(t => t.date.substring(0, 7)));
+  const monthCount = months.size || data.period.months || 1;
+  
+  return totalExpenses / monthCount;
 }
 
 export function getStartingCapital(snapshot: FinancialSnapshot): number {

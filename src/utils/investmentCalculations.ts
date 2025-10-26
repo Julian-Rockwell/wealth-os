@@ -1,4 +1,5 @@
 import type { FinancialSnapshot, Holding, Liability, StagingTransaction } from "@/types/financial";
+import { classifyTransactions } from "./transactionClassifier";
 
 export interface ReadinessFactor {
   name: string;
@@ -16,15 +17,15 @@ export interface ReadinessResult {
 }
 
 export function calculateMonthlyExpenses(transactions: StagingTransaction[]): number {
-  // Calculate average monthly expenses from debits, excluding transfers
-  const debits = transactions.filter(t => t.sign === "debit" && !t.desc.toLowerCase().includes("transfer"));
+  // Use deterministic classification to calculate expenses (excluding transfers)
+  const classification = classifyTransactions(transactions);
+  const totalExpenses = classification.totals.expenses;
   
-  if (debits.length === 0) return 0;
+  // Get unique months
+  const months = new Set(transactions.map(t => t.date.substring(0, 7)));
+  const monthCount = months.size || 1;
   
-  const totalDebits = debits.reduce((sum, t) => sum + t.amount, 0);
-  const monthsSpan = 3; // Assuming 3 months of data
-  
-  return totalDebits / monthsSpan;
+  return totalExpenses / monthCount;
 }
 
 export function calculateLiquidAssets(holdings: Holding[]): number {
@@ -40,13 +41,15 @@ export function calculateHighInterestDebt(liabilities: Liability[]): number {
 }
 
 export function calculateIncomeStability(transactions: StagingTransaction[]): { status: "pass" | "warning" | "fail"; variance: number } {
-  const credits = transactions.filter(t => t.sign === "credit" && !t.desc.toLowerCase().includes("transfer"));
+  // Use classification to get only actual income (not transfers)
+  const classification = classifyTransactions(transactions);
+  const incomeTransactions = classification.transactions.filter(t => t.classification === "Income");
   
-  if (credits.length < 3) {
+  if (incomeTransactions.length < 3) {
     return { status: "fail", variance: 100 };
   }
   
-  const amounts = credits.map(t => t.amount);
+  const amounts = incomeTransactions.map(t => t.amount);
   const avg = amounts.reduce((sum, a) => sum + a, 0) / amounts.length;
   const variance = Math.sqrt(amounts.reduce((sum, a) => sum + Math.pow(a - avg, 2), 0) / amounts.length) / avg * 100;
   
@@ -56,16 +59,14 @@ export function calculateIncomeStability(transactions: StagingTransaction[]): { 
 }
 
 export function calculateMonthlyCashFlow(transactions: StagingTransaction[]): number {
-  const credits = transactions
-    .filter(t => t.sign === "credit" && !t.desc.toLowerCase().includes("transfer"))
-    .reduce((sum, t) => sum + t.amount, 0);
+  // Use classification to get actual income and expenses (excluding transfers)
+  const classification = classifyTransactions(transactions);
+  const netCashFlow = classification.totals.income - classification.totals.expenses;
   
-  const debits = transactions
-    .filter(t => t.sign === "debit" && !t.desc.toLowerCase().includes("transfer"))
-    .reduce((sum, t) => sum + t.amount, 0);
+  const months = new Set(transactions.map(t => t.date.substring(0, 7)));
+  const monthCount = months.size || 1;
   
-  const monthsSpan = 3;
-  return (credits - debits) / monthsSpan;
+  return netCashFlow / monthCount;
 }
 
 export function calculateReadinessScore(
