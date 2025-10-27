@@ -22,11 +22,14 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
   const getViewData = () => {
     switch (viewMode) {
       case "category":
-        // Calculate from filtered transactions
+        // Calculate from filtered transactions - map singular to plural
         const categoryTotals = { needs: 0, wants: 0, savings: 0 };
         filteredTxns.forEach(txn => {
           if (txn.sign === "debit") {
-            categoryTotals[txn.category] += txn.amount;
+            // Map singular category names to plural for display
+            if (txn.category === "need") categoryTotals.needs += txn.amount;
+            else if (txn.category === "want") categoryTotals.wants += txn.amount;
+            else if (txn.category === "saving") categoryTotals.savings += txn.amount;
           }
         });
         const categoryTotal = Object.values(categoryTotals).reduce((sum, v) => sum + v, 0);
