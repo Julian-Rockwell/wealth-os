@@ -11,7 +11,6 @@ import { toast } from "sonner";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
 import type { Account, Holding, Liability, FinancialSnapshot, AccountStatus, AccountType, AssetClass, Liquidity, LiabilityType } from "@/types/financial";
 import { SAMPLE_REYNOLDS_DATA } from "@/utils/sampleData";
-import NetWorthDashboard from "./NetWorthDashboard";
 
 interface FileUploadState {
   file: File;
@@ -42,7 +41,6 @@ export default function Upload({ onComplete }: UploadProps = {}) {
   const [mockConnections, setMockConnections] = useState<MockConnection[]>(draftData.mockConnections || []);
   const [manualHoldings, setManualHoldings] = useState<Holding[]>(draftData.manualHoldings || []);
   const [manualLiabilities, setManualLiabilities] = useState<Liability[]>(draftData.manualLiabilities || []);
-  const [activeSubTab, setActiveSubTab] = useState("aggregation");
   const [editingHoldingId, setEditingHoldingId] = useState<string | null>(null);
   const [editingLiabilityId, setEditingLiabilityId] = useState<string | null>(null);
 
@@ -292,18 +290,9 @@ export default function Upload({ onComplete }: UploadProps = {}) {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Sub-tabs for Command Center */}
-        <Tabs value={activeSubTab} onValueChange={setActiveSubTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
-            <TabsTrigger value="aggregation">Automatic Account Aggregation</TabsTrigger>
-            <TabsTrigger value="networth">Net Worth Dashboard</TabsTrigger>
-          </TabsList>
-
-          {/* Aggregation Tab */}
-          <TabsContent value="aggregation">
-            <div className="max-w-6xl mx-auto">
-              {/* Header */}
-              <div className="text-center mb-12 animate-fade-in">
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-12 animate-fade-in">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-primary mb-6 shadow-medium">
                   <TrendingUp className="w-8 h-8 text-white" />
                 </div>
@@ -317,9 +306,13 @@ export default function Upload({ onComplete }: UploadProps = {}) {
                 </p>
               </div>
 
-              {/* Three Input Methods */}
-              <Tabs defaultValue="upload" className="mb-8">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+              {/* Four Input Methods */}
+              <Tabs defaultValue="sample" className="mb-8">
+          <TabsList className="grid w-full grid-cols-4 mb-8">
+            <TabsTrigger value="sample">
+              <Database className="w-4 h-4 mr-2" />
+              Load Sample Data
+            </TabsTrigger>
             <TabsTrigger value="mock">
               <Link2 className="w-4 h-4 mr-2" />
               Mock Connect
@@ -333,6 +326,38 @@ export default function Upload({ onComplete }: UploadProps = {}) {
               Manual Entry
             </TabsTrigger>
           </TabsList>
+
+          {/* Load Sample Data Tab */}
+          <TabsContent value="sample">
+            <Card className="p-8">
+              <div className="text-center mb-6">
+                <h3 className="text-xl font-semibold mb-2">Load Reynolds Family Demo Data</h3>
+                <p className="text-muted-foreground">
+                  Pre-populated data with 3 months of transactions, holdings, and liabilities
+                </p>
+              </div>
+              
+              <Button 
+                onClick={() => {
+                  if (confirm("Load Reynolds Family demo data? This will replace any existing data.")) {
+                    resetAllData();
+                    setSnapshot(SAMPLE_REYNOLDS_DATA);
+                    toast.success("Sample data loaded successfully!");
+                    setTimeout(() => {
+                      if (onComplete) {
+                        onComplete();
+                      }
+                    }, 500);
+                  }
+                }} 
+                className="w-full gradient-primary" 
+                size="lg"
+              >
+                <Database className="w-4 h-4 mr-2" />
+                Load Reynolds Family Demo
+              </Button>
+            </Card>
+          </TabsContent>
 
           {/* Mock Connect Tab */}
           <TabsContent value="mock">
@@ -770,35 +795,6 @@ export default function Upload({ onComplete }: UploadProps = {}) {
           </TabsContent>
         </Tabs>
 
-        {/* Sample Data Section */}
-        <div className="text-center my-8">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="flex-1 h-px bg-border"></div>
-            <span className="text-sm text-muted-foreground">Or try with sample data</span>
-            <div className="flex-1 h-px bg-border"></div>
-          </div>
-          <Button
-            onClick={() => {
-              if (confirm("Load Reynolds Family demo data? This will replace any existing data.")) {
-                resetAllData();
-                setSnapshot(SAMPLE_REYNOLDS_DATA);
-                toast.success("Sample data loaded successfully!");
-                setTimeout(() => {
-                  if (onComplete) {
-                    onComplete();
-                  }
-                }, 500);
-              }
-            }}
-            variant="outline"
-            size="lg"
-            className="gradient-primary"
-          >
-            <Database className="w-4 h-4 mr-2" />
-            Load Reynolds Family Demo
-          </Button>
-        </div>
-
         {/* Pre-flight Summary */}
         {(files.length > 0 || mockConnections.length > 0 || manualHoldings.length > 0) && allFilesComplete && (
           <Card className="p-6 mb-8 shadow-medium border-2 border-primary/20 bg-primary/5">
@@ -843,14 +839,7 @@ export default function Upload({ onComplete }: UploadProps = {}) {
             {isAnalyzing ? "Preparing..." : "Go to Command Center"}
           </Button>
         )}
-            </div>
-          </TabsContent>
-
-          {/* Net Worth Dashboard Tab */}
-          <TabsContent value="networth">
-            <NetWorthDashboard />
-          </TabsContent>
-        </Tabs>
+        </div>
       </div>
     </div>
   );

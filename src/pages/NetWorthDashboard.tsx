@@ -8,21 +8,10 @@ import { AssetAllocationView } from "@/components/dashboard/AssetAllocationView"
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertCircle, Database } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { SAMPLE_REYNOLDS_DATA } from "@/utils/sampleData";
-import { toast } from "sonner";
 import type { Holding, Liability } from "@/types/financial";
 
 export default function NetWorthDashboard() {
-  const { snapshot, setSnapshot, resetAllData } = useFinancialData();
-
-  const handleLoadSampleData = () => {
-    if (confirm("Load Reynolds Family demo data? This will replace any existing data.")) {
-      resetAllData();
-      setSnapshot(SAMPLE_REYNOLDS_DATA);
-      toast.success("Sample data loaded successfully!");
-    }
-  };
+  const { snapshot, setSnapshot } = useFinancialData();
 
   if (!snapshot) {
     return (
@@ -31,13 +20,9 @@ export default function NetWorthDashboard() {
           <div className="mb-6 p-8 rounded-lg bg-card border-2 border-dashed text-center">
             <Database className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
             <h2 className="text-xl font-semibold mb-2">No Data Loaded</h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              Load sample data or add your financial information in the "Automatic Account Aggregation" tab
+            <p className="text-sm text-muted-foreground">
+              Add your financial information in the "Automatic Account Aggregation" tab or load sample data
             </p>
-            <Button onClick={handleLoadSampleData} className="gradient-primary">
-              <Database className="w-4 h-4 mr-2" />
-              Load Sample Data
-            </Button>
           </div>
         </div>
       </div>
