@@ -120,12 +120,22 @@ export default function Goals() {
         </p>
       </div>
 
-      {/* Two-column layout for main inputs */}
+      {/* Full-width: Expense Baseline */}
+      <ExpenseBaselineCard
+        autoMonthlyExpenses={autoMonthlyExpenses}
+        onExpensesConfirmed={setConfirmedExpenses}
+      />
+
+      {/* Two-column layout: Goal Questions & RPIC Result */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Column: Expense Baseline */}
-        <ExpenseBaselineCard
-          autoMonthlyExpenses={autoMonthlyExpenses}
-          onExpensesConfirmed={setConfirmedExpenses}
+        {/* Left Column: Goal Questions */}
+        <GoalQuestionsCard
+          timing={timing}
+          lifestyle={lifestyle}
+          geography={geography}
+          onTimingChange={setTiming}
+          onLifestyleChange={setLifestyle}
+          onGeographyChange={setGeography}
         />
 
         {/* Right Column: RPIC Result */}
@@ -133,16 +143,6 @@ export default function Goals() {
           <RpicResultCard rpic={rpicResult} foundationScore={foundationScore} />
         )}
       </div>
-
-      {/* Full-width: Goal Questions */}
-      <GoalQuestionsCard
-        timing={timing}
-        lifestyle={lifestyle}
-        geography={geography}
-        onTimingChange={setTiming}
-        onLifestyleChange={setLifestyle}
-        onGeographyChange={setGeography}
-      />
 
       {/* Timeline Comparison */}
       {rpicResult && timelineResult && (

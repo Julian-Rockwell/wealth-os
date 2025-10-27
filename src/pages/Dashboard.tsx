@@ -6,7 +6,7 @@ import { FiltersCard } from "@/components/dashboard/FiltersCard";
 import { BudgetDonut } from "@/components/dashboard/BudgetDonut";
 import { Card } from "@/components/ui/card";
 import { MonthlyStackedBars } from "@/components/dashboard/MonthlyStackedBars";
-import { TransactionsTable } from "@/components/dashboard/TransactionsTable";
+import { TransactionsList } from "@/components/dashboard/TransactionsList";
 import { KeyInsights } from "@/components/dashboard/KeyInsights";
 import { PersonalizedRecommendations } from "@/components/dashboard/PersonalizedRecommendations";
 import { IncomeExpensesKPI } from "@/components/dashboard/IncomeExpensesKPI";
@@ -82,10 +82,10 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
 
             <FiltersCard data={data} filters={filters} setFilters={setFilters} />
 
-            <TransactionsTable 
+            <TransactionsList 
+              key={snapshot?.analyzedPeriod.endDate || 'no-data'}
               transactions={data.txns} 
               onUpdate={updateTransaction}
-              onDelete={deleteTransaction}
               filters={filters}
             />
 
@@ -156,10 +156,10 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
               <FiltersCard data={data} filters={filters} setFilters={setFilters} />
               
               <div className="flex-1">
-                <TransactionsTable 
+                <TransactionsList 
+                  key={snapshot?.analyzedPeriod.endDate || 'no-data'}
                   transactions={data.txns} 
                   onUpdate={updateTransaction}
-                  onDelete={deleteTransaction}
                   filters={filters}
                 />
               </div>
