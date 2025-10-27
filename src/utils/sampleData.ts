@@ -213,9 +213,10 @@ const generateJohnsonTransactions = (): Transaction[] => {
   ];
 };
 
-// Reynolds Family: Has high-interest debt, needs foundation work
-const reynoldsTotalAssets = 40799.20 + 25000.00 + 90000.00 + 120000.00 + 43000.00 + 820000.00 + 24000.00;
-const reynoldsTotalLiabilities = 510000.00 + 18900.00 + 7800.00 + 12400.00;
+// Reynolds Family: Has high-interest debt, insufficient emergency fund - needs foundation work
+// Designed to fail investment readiness (score < 80)
+const reynoldsTotalAssets = 12500.00 + 8000.00 + 90000.00 + 120000.00 + 43000.00 + 820000.00 + 24000.00;
+const reynoldsTotalLiabilities = 510000.00 + 18900.00 + 9800.00 + 12400.00;
 const reynoldsNetWorth = reynoldsTotalAssets - reynoldsTotalLiabilities;
 
 export const SAMPLE_REYNOLDS_DATA: FinancialSnapshot = {
@@ -235,8 +236,8 @@ export const SAMPLE_REYNOLDS_DATA: FinancialSnapshot = {
     {id:"acc_cc_chase",name:"Chase Credit Card",type:"credit_card",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"}
   ],
   holdings: [
-    {id:"h_chk",accountId:"acc_chk_5724",name:"Checking Balance",accountType:"checking",assetClass:"cash",liquidity:"liquid",balance:40799.20,currency:"USD",source:"mock"},
-    {id:"h_svg",accountId:"acc_svg_001",name:"Emergency Savings",accountType:"savings",assetClass:"cash",liquidity:"liquid",balance:25000.00,currency:"USD",source:"mock"},
+    {id:"h_chk",accountId:"acc_chk_5724",name:"Checking Balance",accountType:"checking",assetClass:"cash",liquidity:"liquid",balance:12500.00,currency:"USD",source:"mock"},
+    {id:"h_svg",accountId:"acc_svg_001",name:"Emergency Savings",accountType:"savings",assetClass:"cash",liquidity:"liquid",balance:8000.00,currency:"USD",source:"mock"},
     {id:"h_brg",accountId:"acc_brg_vaa",name:"Vanguard Taxable",accountType:"brokerage",assetClass:"stocks",liquidity:"semi_liquid",balance:90000.00,currency:"USD",source:"mock"},
     {id:"h_401k",accountId:"acc_401k_fid",name:"Fidelity 401(k)",accountType:"401k",assetClass:"stocks",liquidity:"illiquid",balance:120000.00,currency:"USD",source:"mock"},
     {id:"h_roth",accountId:"acc_ira_roth",name:"Roth IRA",accountType:"IRA",assetClass:"stocks",liquidity:"illiquid",balance:43000.00,currency:"USD",source:"mock"},
@@ -246,7 +247,7 @@ export const SAMPLE_REYNOLDS_DATA: FinancialSnapshot = {
   liabilities: [
     {id:"l_mort",accountId:"acc_real_home",name:"FirstHome Mortgage",type:"mortgage",apr:4.25,balance:510000.00,monthlyPayment:3650.00,remainingTermMonths:325,notes:"FirstHome Mortgage"},
     {id:"l_auto",accountId:"acc_vehicle_1",name:"Chase Auto Loan",type:"auto",apr:5.9,balance:18900.00,monthlyPayment:540.12,remainingTermMonths:42,notes:"Chase Auto"},
-    {id:"l_cc",accountId:"acc_cc_chase",name:"Chase Credit Card",type:"credit_card",apr:22.99,balance:7800.00,monthlyPayment:250.00,remainingTermMonths:0,notes:"High priority"},
+    {id:"l_cc",accountId:"acc_cc_chase",name:"Chase Credit Card",type:"credit_card",apr:22.99,balance:9800.00,monthlyPayment:250.00,remainingTermMonths:0,notes:"High priority - needs payoff"},
     {id:"l_student",accountId:"acc_chk_5724",name:"Student Loan",type:"student",apr:4.9,balance:12400.00,monthlyPayment:180.00,remainingTermMonths:96,notes:"Nelnet"}
   ],
   trends: {

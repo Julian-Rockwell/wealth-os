@@ -120,23 +120,26 @@ export default function Goals() {
         </p>
       </div>
 
-      {/* Section 1: Expense Baseline */}
-      <ExpenseBaselineCard
-        autoMonthlyExpenses={autoMonthlyExpenses}
-        onExpensesConfirmed={setConfirmedExpenses}
-      />
+      {/* Two-column layout for main inputs */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left Column: Expense Baseline */}
+        <ExpenseBaselineCard
+          autoMonthlyExpenses={autoMonthlyExpenses}
+          onExpensesConfirmed={setConfirmedExpenses}
+        />
 
-      {/* Section 2: Goal Questions */}
-      <GoalQuestionsCard
-        timing={timing}
-        lifestyle={lifestyle}
-        geography={geography}
-        onTimingChange={setTiming}
-        onLifestyleChange={setLifestyle}
-        onGeographyChange={setGeography}
-      />
+        {/* Right Column: Goal Questions */}
+        <GoalQuestionsCard
+          timing={timing}
+          lifestyle={lifestyle}
+          geography={geography}
+          onTimingChange={setTiming}
+          onLifestyleChange={setLifestyle}
+          onGeographyChange={setGeography}
+        />
+      </div>
 
-      {/* Section 3: RPIC Result */}
+      {/* Full-width: RPIC Result */}
       {rpicResult && (
         <RpicResultCard rpic={rpicResult} foundationScore={foundationScore} />
       )}
@@ -155,25 +158,28 @@ export default function Goals() {
       {/* Visual Roadmap */}
       {milestones.length > 0 && <VisualRoadmap milestones={milestones} />}
 
-      {/* Required Capital Table */}
-      {rpicResult && timelineResult && (
-        <RequiredCapitalTable
-          rpic={rpicResult}
-          timeline={timelineResult}
-          startingCapital={startingCapital}
-        />
-      )}
+      {/* Two-column layout for detailed results */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left: Required Capital Table */}
+        {rpicResult && timelineResult && (
+          <RequiredCapitalTable
+            rpic={rpicResult}
+            timeline={timelineResult}
+            startingCapital={startingCapital}
+          />
+        )}
 
-      {/* Assumptions Panel */}
-      <AssumptionsPanel
-        activeReturn={activeReturn}
-        passiveYield={passiveYield}
-        inflation={inflation}
-        onActiveReturnChange={setActiveReturn}
-        onPassiveYieldChange={setPassiveYield}
-        onInflationChange={setInflation}
-        onReset={handleResetAssumptions}
-      />
+        {/* Right: Assumptions Panel */}
+        <AssumptionsPanel
+          activeReturn={activeReturn}
+          passiveYield={passiveYield}
+          inflation={inflation}
+          onActiveReturnChange={setActiveReturn}
+          onPassiveYieldChange={setPassiveYield}
+          onInflationChange={setInflation}
+          onReset={handleResetAssumptions}
+        />
+      </div>
     </div>
   );
 }

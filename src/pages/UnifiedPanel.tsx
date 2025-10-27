@@ -90,14 +90,6 @@ export default function UnifiedPanel() {
               <TrendingUp className="w-4 h-4" />
               Investments
             </TabsTrigger>
-            <TabsTrigger value="reports" disabled className="flex items-center gap-2 opacity-50">
-              <BarChart3 className="w-4 h-4" />
-              Reports
-            </TabsTrigger>
-            <TabsTrigger value="cashflow" disabled className="flex items-center gap-2 opacity-50">
-              <TrendingDown className="w-4 h-4" />
-              Cash Flow
-            </TabsTrigger>
             <TabsTrigger 
               value="goals" 
               className="flex items-center gap-2"
@@ -105,6 +97,14 @@ export default function UnifiedPanel() {
             >
               <Target className="w-4 h-4" />
               Goals
+            </TabsTrigger>
+            <TabsTrigger value="reports" disabled className="flex items-center gap-2 opacity-50">
+              <BarChart3 className="w-4 h-4" />
+              Reports
+            </TabsTrigger>
+            <TabsTrigger value="cashflow" disabled className="flex items-center gap-2 opacity-50">
+              <TrendingDown className="w-4 h-4" />
+              Cash Flow
             </TabsTrigger>
             <TabsTrigger value="advice" disabled className="flex items-center gap-2 opacity-50">
               <Lightbulb className="w-4 h-4" />
@@ -128,6 +128,10 @@ export default function UnifiedPanel() {
             <Investments />
           </TabsContent>
 
+          <TabsContent value="goals" className="mt-0">
+            <Goals />
+          </TabsContent>
+
           <TabsContent value="reports" className="mt-0">
             <div className="text-center py-20 text-muted-foreground">
               Coming soon: Spending by Category, Income, Trends
@@ -138,10 +142,6 @@ export default function UnifiedPanel() {
             <div className="text-center py-20 text-muted-foreground">
               Coming soon: Monthly inflow/outflow with projections
             </div>
-          </TabsContent>
-
-          <TabsContent value="goals" className="mt-0">
-            <Goals />
           </TabsContent>
 
           <TabsContent value="advice" className="mt-0">
