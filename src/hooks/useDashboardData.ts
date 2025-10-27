@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import type { DashboardData, Transaction, DashboardFilters } from "@/types/dashboard";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
 import { SAMPLE_DASHBOARD_DATA } from "@/utils/sampleData";
@@ -162,7 +162,8 @@ export const useDashboardData = () => {
   
   // Use Reynolds data if available, otherwise generate mock
   const getInitialData = (): DashboardData => {
-    if (snapshot && SAMPLE_DASHBOARD_DATA.txns.length > 0) {
+    // Only use sample data if snapshot exists AND has the Reynolds sample data loaded
+    if (snapshot && snapshot.analyzedPeriod.startDate === "2025-06-01" && SAMPLE_DASHBOARD_DATA.txns.length > 0) {
       const transactions = SAMPLE_DASHBOARD_DATA.txns;
       
       // Calculate totals from real data
@@ -261,6 +262,11 @@ export const useDashboardData = () => {
   
   const [data, setData] = useState<DashboardData>(() => getInitialData());
   const [filters, setFilters] = useState<DashboardFilters>({});
+  
+  // Re-initialize data when snapshot changes (e.g., after reset or loading sample data)
+  useEffect(() => {
+    setData(getInitialData());
+  }, [snapshot]);
 
   const updateTransaction = useCallback((id: string, updates: Partial<Transaction>) => {
     setData((prev) => {
