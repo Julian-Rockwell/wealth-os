@@ -17,15 +17,29 @@ export interface ReadinessResult {
 }
 
 export function calculateMonthlyExpenses(transactions: StagingTransaction[]): number {
+  if (!transactions || transactions.length === 0) {
+    return 0;
+  }
+
   // Use deterministic classification to calculate expenses (excluding transfers)
   const classification = classifyTransactions(transactions);
+  
+  // Calculate rolling 30-day expense average
+  // Formula: (total expenses / days in period) × 30
+  const sortedTxns = [...transactions].sort((a, b) => 
+    new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+  
+  if (sortedTxns.length === 0) return 0;
+  
+  const startDate = new Date(sortedTxns[0].date);
+  const endDate = new Date(sortedTxns[sortedTxns.length - 1].date);
+  const daysDiff = Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
+  
   const totalExpenses = classification.totals.expenses;
+  const dailyAvg = totalExpenses / daysDiff;
   
-  // Get unique months
-  const months = new Set(transactions.map(t => t.date.substring(0, 7)));
-  const monthCount = months.size || 1;
-  
-  return totalExpenses / monthCount;
+  return dailyAvg * 30; // Rolling 30-day average
 }
 
 export function calculateLiquidAssets(holdings: Holding[]): number {
@@ -35,38 +49,99 @@ export function calculateLiquidAssets(holdings: Holding[]): number {
 }
 
 export function calculateHighInterestDebt(liabilities: Liability[]): number {
+  if (!liabilities || liabilities.length === 0) {
+    return 0;
+  }
   return liabilities
     .filter(l => l.apr > 18)
     .reduce((sum, l) => sum + l.balance, 0);
 }
 
-export function calculateIncomeStability(transactions: StagingTransaction[]): { status: "pass" | "warning" | "fail"; variance: number } {
+export function calculateIncomeStability(transactions: StagingTransaction[]): { 
+  status: "pass" | "warning" | "fail"; 
+  cv: number;
+  details: string;
+} {
+  if (!transactions || transactions.length === 0) {
+    return { status: "fail", cv: 100, details: "No transaction data" };
+  }
+
   // Use classification to get only actual income (not transfers)
   const classification = classifyTransactions(transactions);
-  const incomeTransactions = classification.transactions.filter(t => t.classification === "Income");
+  const incomeTransactions = classification.transactions
+    .filter(t => t.classification === "Income" && t.subcategory === "payroll")
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   
   if (incomeTransactions.length < 3) {
-    return { status: "fail", variance: 100 };
+    return { status: "fail", cv: 100, details: "Insufficient history (<3 pay periods)" };
   }
   
+  // Calculate coefficient of variation (CV = std/mean)
   const amounts = incomeTransactions.map(t => t.amount);
-  const avg = amounts.reduce((sum, a) => sum + a, 0) / amounts.length;
-  const variance = Math.sqrt(amounts.reduce((sum, a) => sum + Math.pow(a - avg, 2), 0) / amounts.length) / avg * 100;
+  const mean = amounts.reduce((sum, a) => sum + a, 0) / amounts.length;
   
-  if (variance < 15) return { status: "pass", variance };
-  if (variance < 30) return { status: "warning", variance };
-  return { status: "fail", variance };
+  if (mean === 0) {
+    return { status: "fail", cv: 100, details: "No income detected" };
+  }
+  
+  // Remove outliers (>3σ)
+  const stdDev = Math.sqrt(amounts.reduce((sum, a) => sum + Math.pow(a - mean, 2), 0) / amounts.length);
+  const filteredAmounts = amounts.filter(a => Math.abs(a - mean) <= 3 * stdDev);
+  
+  if (filteredAmounts.length < 3) {
+    return { status: "warning", cv: 35, details: "High variance in pay amounts" };
+  }
+  
+  const filteredMean = filteredAmounts.reduce((sum, a) => sum + a, 0) / filteredAmounts.length;
+  const filteredStdDev = Math.sqrt(filteredAmounts.reduce((sum, a) => sum + Math.pow(a - filteredMean, 2), 0) / filteredAmounts.length);
+  const cv = (filteredStdDev / filteredMean) * 100;
+  
+  // Check cadence consistency
+  const intervals: number[] = [];
+  for (let i = 1; i < incomeTransactions.length; i++) {
+    const days = Math.ceil(
+      (new Date(incomeTransactions[i].date).getTime() - new Date(incomeTransactions[i - 1].date).getTime()) 
+      / (1000 * 60 * 60 * 24)
+    );
+    intervals.push(days);
+  }
+  
+  const avgInterval = intervals.reduce((sum, i) => sum + i, 0) / intervals.length;
+  const consistentIntervals = intervals.filter(i => Math.abs(i - avgInterval) <= 3).length;
+  const cadenceConsistency = (consistentIntervals / intervals.length) * 100;
+  
+  // Status determination
+  if (cv <= 15 || cadenceConsistency >= 80) {
+    return { status: "pass", cv, details: `CV: ${cv.toFixed(1)}%, Cadence: ${cadenceConsistency.toFixed(0)}% consistent` };
+  } else if (cv <= 35) {
+    return { status: "warning", cv, details: `CV: ${cv.toFixed(1)}%, Cadence: ${cadenceConsistency.toFixed(0)}% consistent` };
+  } else {
+    return { status: "fail", cv, details: `CV: ${cv.toFixed(1)}%, Cadence: ${cadenceConsistency.toFixed(0)}% consistent` };
+  }
 }
 
 export function calculateMonthlyCashFlow(transactions: StagingTransaction[]): number {
+  if (!transactions || transactions.length === 0) {
+    return 0;
+  }
+
   // Use classification to get actual income and expenses (excluding transfers)
   const classification = classifyTransactions(transactions);
   const netCashFlow = classification.totals.income - classification.totals.expenses;
   
-  const months = new Set(transactions.map(t => t.date.substring(0, 7)));
-  const monthCount = months.size || 1;
+  // Calculate based on actual days in period for accuracy
+  const sortedTxns = [...transactions].sort((a, b) => 
+    new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
   
-  return netCashFlow / monthCount;
+  if (sortedTxns.length === 0) return 0;
+  
+  const startDate = new Date(sortedTxns[0].date);
+  const endDate = new Date(sortedTxns[sortedTxns.length - 1].date);
+  const daysDiff = Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
+  
+  // Convert to monthly average
+  return (netCashFlow / daysDiff) * 30;
 }
 
 export function calculateReadinessScore(
@@ -80,50 +155,73 @@ export function calculateReadinessScore(
   const monthlyExpenses = calculateMonthlyExpenses(snapshot.stagingTxns);
   const requiredEmergencyFund = monthlyExpenses * emergencyFundMonths;
   const liquidAssets = calculateLiquidAssets(snapshot.holdings);
-  const emergencyFundCoverage = liquidAssets / requiredEmergencyFund;
   
   let efStatus: "pass" | "warning" | "fail";
   let efScore = 0;
-  if (emergencyFundCoverage >= 1) {
-    efStatus = "pass";
-    efScore = 20;
-  } else if (emergencyFundCoverage >= 0.5) {
-    efStatus = "warning";
-    efScore = 10;
-  } else {
+  let efDetails = "";
+  
+  if (monthlyExpenses === 0 || !snapshot.stagingTxns || snapshot.stagingTxns.length === 0) {
     efStatus = "fail";
     efScore = 0;
+    efDetails = "—% (confirm expenses)";
+  } else {
+    const emergencyFundCoverage = requiredEmergencyFund > 0 ? liquidAssets / requiredEmergencyFund : 0;
+    const coveragePct = Math.min(100, emergencyFundCoverage * 100);
+    
+    if (emergencyFundCoverage >= 1) {
+      efStatus = "pass";
+      efScore = 20;
+    } else if (emergencyFundCoverage >= 0.5) {
+      efStatus = "warning";
+      efScore = 10;
+    } else {
+      efStatus = "fail";
+      efScore = 0;
+    }
+    
+    efDetails = `${coveragePct.toFixed(0)}% covered (${liquidAssets.toLocaleString("en-US", { style: "currency", currency: "USD" })} / ${requiredEmergencyFund.toLocaleString("en-US", { style: "currency", currency: "USD" })})`;
   }
   
   factors.push({
     name: "Emergency Fund Coverage",
     status: efStatus,
     score: efScore,
-    details: `${(emergencyFundCoverage * 100).toFixed(0)}% covered (${liquidAssets.toLocaleString("en-US", { style: "currency", currency: "USD" })} / ${requiredEmergencyFund.toLocaleString("en-US", { style: "currency", currency: "USD" })})`,
+    details: efDetails,
     formula: `Liquid assets / (Monthly expenses × ${emergencyFundMonths} months)`
   });
   totalScore += efScore;
 
-  // Factor 2: High-Interest Debt
+  // Factor 2: High-Interest Debt Management
   const highInterestDebt = calculateHighInterestDebt(snapshot.liabilities);
   let hidStatus: "pass" | "warning" | "fail";
   let hidScore = 0;
-  if (highInterestDebt === 0) {
+  let hidDetails = "";
+  
+  if (!snapshot.liabilities || snapshot.liabilities.length === 0) {
     hidStatus = "pass";
     hidScore = 20;
-  } else if (highInterestDebt < 5000) {
-    hidStatus = "warning";
-    hidScore = 10;
+    hidDetails = "No debts on file";
   } else {
-    hidStatus = "fail";
-    hidScore = 0;
+    if (highInterestDebt === 0) {
+      hidStatus = "pass";
+      hidScore = 20;
+      hidDetails = "$0 at >18% APR";
+    } else if (highInterestDebt <= 2500) {
+      hidStatus = "warning";
+      hidScore = 10;
+      hidDetails = `${highInterestDebt.toLocaleString("en-US", { style: "currency", currency: "USD" })} at >18% APR`;
+    } else {
+      hidStatus = "fail";
+      hidScore = 0;
+      hidDetails = `${highInterestDebt.toLocaleString("en-US", { style: "currency", currency: "USD" })} at >18% APR`;
+    }
   }
   
   factors.push({
-    name: "High-Interest Debt",
+    name: "High-Interest Debt Management",
     status: hidStatus,
     score: hidScore,
-    details: `${highInterestDebt.toLocaleString("en-US", { style: "currency", currency: "USD" })} at >18% APR`,
+    details: hidDetails,
     formula: "Sum of liabilities with APR > 18%"
   });
   totalScore += hidScore;
@@ -136,8 +234,8 @@ export function calculateReadinessScore(
     name: "Income Stability",
     status: incomeStability.status,
     score: isScore,
-    details: `Variance: ${incomeStability.variance.toFixed(1)}%`,
-    formula: "Income variance over past 6 months (std dev / mean)"
+    details: incomeStability.details,
+    formula: "Coefficient of variation on paycheck amounts (last 6 months)"
   });
   totalScore += isScore;
 
@@ -145,10 +243,11 @@ export function calculateReadinessScore(
   const monthlyCashFlow = calculateMonthlyCashFlow(snapshot.stagingTxns);
   let cfStatus: "pass" | "warning" | "fail";
   let cfScore = 0;
-  if (monthlyCashFlow > 0) {
+  
+  if (monthlyCashFlow > 250) {
     cfStatus = "pass";
     cfScore = 20;
-  } else if (monthlyCashFlow >= -500) {
+  } else if (Math.abs(monthlyCashFlow) <= 250) {
     cfStatus = "warning";
     cfScore = 10;
   } else {
@@ -169,10 +268,11 @@ export function calculateReadinessScore(
   const capitalAvailable = liquidAssets - requiredEmergencyFund;
   let caStatus: "pass" | "warning" | "fail";
   let caScore = 0;
+  
   if (capitalAvailable >= 25000) {
     caStatus = "pass";
     caScore = 20;
-  } else if (capitalAvailable >= 10000) {
+  } else if (capitalAvailable >= 5000) {
     caStatus = "warning";
     caScore = 10;
   } else {
@@ -194,14 +294,14 @@ export function calculateReadinessScore(
   const actionPlan: string[] = [];
   
   if (totalScore >= 80) {
-    recommendation = "You're ready to proceed with active investing!";
+    recommendation = "Ready: Your financial foundation is solid. You can proceed with optimization.";
   } else if (totalScore >= 60) {
-    recommendation = "Consider a 90-day preparation plan to strengthen your foundation.";
+    recommendation = "Foundation: Consider a 90-day preparation plan to strengthen your base.";
     actionPlan.push("M+1: Build emergency fund to 50% target");
     actionPlan.push("M+2: Address highest-priority debt");
     actionPlan.push("M+3: Review and optimize monthly cash flow");
   } else {
-    recommendation = "A 6-month foundation-building plan is recommended before active investing.";
+    recommendation = "Significant Work: A 6-month foundation-building plan is recommended.";
     actionPlan.push("M+1-2: Focus on emergency fund (reach 25% target)");
     actionPlan.push("M+3-4: Create debt payoff strategy for high-interest accounts");
     actionPlan.push("M+5: Stabilize income streams and reduce expenses");

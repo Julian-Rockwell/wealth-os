@@ -51,7 +51,7 @@ export function ReadinessScore({ snapshot }: ReadinessScoreProps) {
             <div>
               <CardTitle>Investment Readiness Score</CardTitle>
               <CardDescription>
-                5-factor assessment of your investment preparedness
+                Assess foundation across five factors before optimizing assets
               </CardDescription>
             </div>
             <div className="flex items-center gap-4">

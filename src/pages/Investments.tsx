@@ -1,13 +1,24 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Lock } from "lucide-react";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
 import { ReadinessScore } from "@/components/investments/ReadinessScore";
 import { OptimizeAssets } from "@/components/investments/OptimizeAssets";
 import { CapitalAllocation } from "@/components/investments/CapitalAllocation";
+import { calculateReadinessScore } from "@/utils/investmentCalculations";
 
 export default function Investments() {
   const { snapshot } = useFinancialData();
   const [activeTab, setActiveTab] = useState("readiness");
+
+  // Calculate readiness score to determine gating
+  const readinessResult = useMemo(() => {
+    if (!snapshot) return null;
+    return calculateReadinessScore(snapshot, 6);
+  }, [snapshot]);
+
+  const isReady = readinessResult && readinessResult.totalScore >= 80;
 
   if (!snapshot) {
     return (
@@ -26,11 +37,30 @@ export default function Investments() {
         </p>
       </div>
 
+      {!isReady && activeTab !== "readiness" && (
+        <Alert variant="destructive">
+          <Lock className="h-4 w-4" />
+          <AlertDescription>
+            Foundation score must be 80+ to enable Optimization. Complete foundation first.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="readiness">Readiness Score</TabsTrigger>
-          <TabsTrigger value="optimize">Optimize Assets</TabsTrigger>
-          <TabsTrigger value="allocation">Capital Allocation</TabsTrigger>
+          <TabsTrigger value="optimize" disabled={!isReady}>
+            <span className="flex items-center gap-2">
+              {!isReady && <Lock className="h-3 w-3" />}
+              Optimize Assets
+            </span>
+          </TabsTrigger>
+          <TabsTrigger value="allocation" disabled={!isReady}>
+            <span className="flex items-center gap-2">
+              {!isReady && <Lock className="h-3 w-3" />}
+              Capital Allocation
+            </span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="readiness" className="mt-6">
@@ -38,11 +68,29 @@ export default function Investments() {
         </TabsContent>
 
         <TabsContent value="optimize" className="mt-6">
-          <OptimizeAssets snapshot={snapshot} />
+          {isReady ? (
+            <OptimizeAssets snapshot={snapshot} />
+          ) : (
+            <Alert>
+              <Lock className="h-4 w-4" />
+              <AlertDescription>
+                Complete the Readiness Score requirements (score ≥80) to unlock asset optimization.
+              </AlertDescription>
+            </Alert>
+          )}
         </TabsContent>
 
         <TabsContent value="allocation" className="mt-6">
-          <CapitalAllocation snapshot={snapshot} />
+          {isReady ? (
+            <CapitalAllocation snapshot={snapshot} />
+          ) : (
+            <Alert>
+              <Lock className="h-4 w-4" />
+              <AlertDescription>
+                Complete the Readiness Score requirements (score ≥80) to unlock capital allocation.
+              </AlertDescription>
+            </Alert>
+          )}
         </TabsContent>
       </Tabs>
     </div>
