@@ -163,7 +163,7 @@ export const useDashboardData = () => {
   // Use Reynolds data if available, otherwise generate mock
   const getInitialData = (): DashboardData => {
     // Only use sample data if snapshot exists AND has the Reynolds sample data loaded
-    if (snapshot && snapshot.analyzedPeriod.startDate === "2025-06-01" && SAMPLE_DASHBOARD_DATA.txns.length > 0) {
+    if (snapshot && snapshot.analyzedPeriod.startDate === "2025-08-01" && SAMPLE_DASHBOARD_DATA.txns.length > 0) {
       const transactions = SAMPLE_DASHBOARD_DATA.txns;
       
       // Calculate totals from real data
