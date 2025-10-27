@@ -11,60 +11,75 @@ export const KeyInsights = ({ data }: KeyInsightsProps) => {
   const generateInsights = () => {
     const txns = data.txns.filter(t => t.sign === "debit");
     
-    // Biggest opportunity - highest spending merchant/category
-    const merchantTotals: Record<string, { amount: number; category: string; count: number }> = {};
+    // Biggest opportunity - find category with highest spend that's reducible
+    const categoryTotals = {
+      "Dining Out": 0,
+      "Shopping": 0,
+      "Entertainment": 0,
+      "Subscriptions": 0
+    };
+    
     txns.forEach(txn => {
-      if (!merchantTotals[txn.merchant]) {
-        merchantTotals[txn.merchant] = { amount: 0, category: txn.category, count: 0 };
+      if (txn.category === "want" && categoryTotals[txn.subcategory as keyof typeof categoryTotals] !== undefined) {
+        categoryTotals[txn.subcategory as keyof typeof categoryTotals] += txn.amount;
       }
-      merchantTotals[txn.merchant].amount += txn.amount;
-      merchantTotals[txn.merchant].count += 1;
     });
     
-    const topSpending = Object.entries(merchantTotals)
-      .sort(([, a], [, b]) => b.amount - a.amount)[0];
+    const topOpportunity = Object.entries(categoryTotals)
+      .sort(([, a], [, b]) => b - a)[0];
     
-    const categoryLabel = topSpending?.[1].category === "want" ? "Wants" : 
-                         topSpending?.[1].category === "need" ? "Needs" : "Savings";
-    const monthlyAmount = Math.round((topSpending?.[1].amount || 0) / data.period.months);
+    const monthlyAmount = Math.round((topOpportunity?.[1] || 0) / data.period.months);
     const reduction = Math.round(monthlyAmount * 0.3); // Suggest 30% reduction
     
-    // Positive trend - find well-controlled category
-    const subsTotal: Record<string, number> = {};
-    Object.entries(data.expenses.needs.subs).forEach(([k, v]) => subsTotal[k] = v);
-    Object.entries(data.expenses.wants.subs).forEach(([k, v]) => subsTotal[k] = v);
-    Object.entries(data.expenses.savings.subs).forEach(([k, v]) => subsTotal[k] = v);
-    
-    const sortedSubs = Object.entries(subsTotal).sort(([, a], [, b]) => a - b);
-    const positiveSubcat = sortedSubs[Math.floor(sortedSubs.length * 0.3)]; // Pick a moderate one
-    const positiveAmount = Math.round((positiveSubcat?.[1] || 0) / data.period.months);
-    
-    // Red flag - find duplicate/excessive spending
-    const subcatCounts: Record<string, { amount: number; merchants: Set<string> }> = {};
+    // Positive trend - find well-controlled essential category
+    const essentialCategories: Record<string, number> = {};
     txns.forEach(txn => {
-      if (!subcatCounts[txn.subcategory]) {
-        subcatCounts[txn.subcategory] = { amount: 0, merchants: new Set() };
+      if (txn.category === "need" && !["Rent/Mortgage", "Insurance", "Transportation"].includes(txn.subcategory)) {
+        essentialCategories[txn.subcategory] = (essentialCategories[txn.subcategory] || 0) + txn.amount;
       }
-      subcatCounts[txn.subcategory].amount += txn.amount;
-      subcatCounts[txn.subcategory].merchants.add(txn.merchant);
     });
     
-    const redFlagSubcat = Object.entries(subcatCounts)
-      .filter(([, v]) => v.merchants.size >= 3)
+    const sortedEssentials = Object.entries(essentialCategories)
+      .filter(([, amount]) => amount > 0)
+      .sort(([, a], [, b]) => a - b);
+    
+    const positiveSubcat = sortedEssentials.length > 0 
+      ? sortedEssentials[0] 
+      : ["Groceries", 500] as [string, number];
+    const positiveAmount = Math.round((positiveSubcat[1] || 0) / data.period.months);
+    
+    // Red flag - find concerning pattern
+    const subcatDetails: Record<string, { amount: number; count: number; merchants: Set<string> }> = {};
+    txns.forEach(txn => {
+      if (!subcatDetails[txn.subcategory]) {
+        subcatDetails[txn.subcategory] = { amount: 0, count: 0, merchants: new Set() };
+      }
+      subcatDetails[txn.subcategory].amount += txn.amount;
+      subcatDetails[txn.subcategory].count += 1;
+      subcatDetails[txn.subcategory].merchants.add(txn.merchant);
+    });
+    
+    // Look for high-frequency discretionary spending
+    const redFlagSubcat = Object.entries(subcatDetails)
+      .filter(([subcat, details]) => {
+        // Focus on wants with high frequency or amount
+        const txn = txns.find(t => t.subcategory === subcat);
+        return txn?.category === "want" && (details.count >= 8 || details.amount > 200);
+      })
       .sort(([, a], [, b]) => b.amount - a.amount)[0];
     
     const redFlagAmount = Math.round((redFlagSubcat?.[1].amount || 0) / data.period.months);
-    const redFlagCount = redFlagSubcat?.[1].merchants.size || 0;
+    const redFlagCount = redFlagSubcat?.[1].count || 0;
 
     return {
       biggest_opportunity: {
-        insight: `Reduce ${topSpending?.[0] || "top spending"} (${categoryLabel}) by $${reduction}/month.`
+        insight: `${topOpportunity?.[0] || "Discretionary spending"} - save $${reduction}/mo by reducing ${Math.round(30)}%.`
       },
       positive_trend: {
-        insight: `${positiveSubcat?.[0] || "Essential spending"} is well-controlled at $${positiveAmount}/month.`
+        insight: `${positiveSubcat?.[0] || "Essential costs"} well-managed at $${positiveAmount}/mo.`
       },
       red_flag: {
-        insight: `${redFlagSubcat?.[0] || "Subscriptions"}: $${redFlagAmount}/month across ${redFlagCount} merchants.`
+        insight: `${redFlagSubcat?.[0] || "Frequent spending"}: ${redFlagCount} transactions ($${redFlagAmount}/mo) - review for savings.`
       }
     };
   };
