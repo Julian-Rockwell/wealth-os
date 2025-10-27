@@ -83,9 +83,10 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
             <FiltersCard data={data} filters={filters} setFilters={setFilters} />
 
             <TransactionsList 
-              key={snapshot?.analyzedPeriod.endDate || 'no-data'}
+              key={data.txns[0]?.id || 'no-data'}
               transactions={data.txns} 
               onUpdate={updateTransaction}
+              onDelete={deleteTransaction}
               filters={filters}
             />
 
@@ -157,9 +158,10 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
               
               <div className="flex-1">
                 <TransactionsList 
-                  key={snapshot?.analyzedPeriod.endDate || 'no-data'}
+                  key={data.txns[0]?.id || 'no-data'}
                   transactions={data.txns} 
                   onUpdate={updateTransaction}
+                  onDelete={deleteTransaction}
                   filters={filters}
                 />
               </div>

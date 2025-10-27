@@ -3,18 +3,31 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertCircle, ChevronDown, ChevronUp, Pencil, Trash2 } from "lucide-react";
 import type { Transaction, TransactionCategory, DashboardFilters } from "@/types/dashboard";
 
 interface TransactionsListProps {
   transactions: Transaction[];
   onUpdate: (id: string, updates: Partial<Transaction>) => void;
+  onDelete: (id: string) => void;
   filters: DashboardFilters;
 }
 
-export const TransactionsList = ({ transactions, onUpdate, filters }: TransactionsListProps) => {
+export const TransactionsList = ({ transactions, onUpdate, onDelete, filters }: TransactionsListProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showCount, setShowCount] = useState(15);
+  const [editing, setEditing] = useState<Transaction | null>(null);
+  const [form, setForm] = useState({
+    merchant: "",
+    desc: "",
+    date: "",
+    amount: "",
+    category: "need" as TransactionCategory,
+    subcategory: "",
+  });
 
   const filteredTransactions = transactions
     .filter((txn) => txn.sign === "debit")
@@ -93,7 +106,7 @@ export const TransactionsList = ({ transactions, onUpdate, filters }: Transactio
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3 flex-shrink-0">
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     <span className="font-semibold text-lg">
                       ${txn.amount.toFixed(2)}
                     </span>
@@ -112,6 +125,36 @@ export const TransactionsList = ({ transactions, onUpdate, filters }: Transactio
                         <SelectItem value="saving">Saving</SelectItem>
                       </SelectContent>
                     </Select>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => {
+                        setEditing(txn);
+                        setForm({
+                          merchant: txn.merchant,
+                          desc: txn.desc,
+                          date: txn.date,
+                          amount: String(txn.amount),
+                          category: txn.category,
+                          subcategory: txn.subcategory,
+                        });
+                      }}
+                      aria-label={`Edit ${txn.merchant}`}
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive"
+                      onClick={() => {
+                        if (confirm("Delete this transaction?")) onDelete(txn.id);
+                      }}
+                      aria-label={`Delete ${txn.merchant}`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -143,6 +186,74 @@ export const TransactionsList = ({ transactions, onUpdate, filters }: Transactio
           )}
         </CardContent>
       )}
+
+      {/* Edit dialog */}
+      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Transaction</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <Label htmlFor="merchant">Merchant</Label>
+              <Input id="merchant" value={form.merchant} onChange={(e) => setForm({ ...form, merchant: e.target.value })} />
+            </div>
+            <div>
+              <Label htmlFor="date">Date</Label>
+              <Input id="date" type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+            </div>
+            <div className="md:col-span-2">
+              <Label htmlFor="desc">Description</Label>
+              <Input id="desc" value={form.desc} onChange={(e) => setForm({ ...form, desc: e.target.value })} />
+            </div>
+            <div>
+              <Label htmlFor="amount">Amount</Label>
+              <Input id="amount" type="number" step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
+            </div>
+            <div>
+              <Label>Category</Label>
+              <Select
+                value={form.category}
+                onValueChange={(value) => setForm({ ...form, category: value as TransactionCategory })}
+              >
+                <SelectTrigger className="h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="need">Need</SelectItem>
+                  <SelectItem value="want">Want</SelectItem>
+                  <SelectItem value="saving">Saving</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="md:col-span-2">
+              <Label htmlFor="subcategory">Subcategory</Label>
+              <Input id="subcategory" value={form.subcategory} onChange={(e) => setForm({ ...form, subcategory: e.target.value })} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
+            <Button
+              onClick={() => {
+                if (!editing) return;
+                const amountNum = parseFloat(form.amount);
+                if (Number.isNaN(amountNum) || amountNum < 0) return;
+                onUpdate(editing.id, {
+                  merchant: form.merchant.trim(),
+                  desc: form.desc.trim(),
+                  date: form.date,
+                  amount: amountNum,
+                  category: form.category,
+                  subcategory: form.subcategory.trim(),
+                });
+                setEditing(null);
+              }}
+            >
+              Save changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       
       {isCollapsed && (
         <CardContent>

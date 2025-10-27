@@ -356,15 +356,15 @@ export default function Upload({ onComplete }: UploadProps = {}) {
                         resetAllData();
                         // Force a small delay to ensure cleanup
                         setTimeout(() => {
-                          setSnapshot(SAMPLE_REYNOLDS_DATA);
                           setDashboardData(SAMPLE_DASHBOARD_DATA);
+                          setSnapshot(SAMPLE_REYNOLDS_DATA);
                           toast.success("Reynolds Family data loaded! Check Transaction Details for Austin-based spending.");
                           setTimeout(() => {
                             if (onComplete) {
                               onComplete();
                             }
-                          }, 500);
-                        }, 100);
+                          }, 300);
+                        }, 50);
                       }
                     }}
                     className="w-full" 
@@ -393,15 +393,15 @@ export default function Upload({ onComplete }: UploadProps = {}) {
                         resetAllData();
                         // Force a small delay to ensure cleanup
                         setTimeout(() => {
-                          setSnapshot(SAMPLE_JOHNSON_DATA);
                           setDashboardData(SAMPLE_JOHNSON_DASHBOARD_DATA);
+                          setSnapshot(SAMPLE_JOHNSON_DATA);
                           toast.success("Johnson Family data loaded! Check Transaction Details for Denver-based spending.");
                           setTimeout(() => {
                             if (onComplete) {
                               onComplete();
                             }
-                          }, 500);
-                        }, 100);
+                          }, 300);
+                        }, 50);
                       }
                     }}
                     className="w-full gradient-primary" 
