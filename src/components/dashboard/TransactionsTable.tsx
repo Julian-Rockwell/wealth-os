@@ -3,6 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import type { Transaction, TransactionCategory, DashboardFilters } from "@/types/dashboard";
 import { AlertCircle, ChevronDown, ChevronUp, Edit2, Check, X, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -19,6 +20,9 @@ export const TransactionsTable = ({ transactions, onUpdate, onDelete, filters }:
   const [editAmount, setEditAmount] = useState("");
   const [editMerchant, setEditMerchant] = useState("");
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  const ITEMS_PER_PAGE = 20;
 
   const startEditing = (txn: Transaction) => {
     setEditingId(txn.id);
@@ -42,7 +46,7 @@ export const TransactionsTable = ({ transactions, onUpdate, onDelete, filters }:
     setEditMerchant("");
   };
 
-  const filteredTransactions = transactions
+  const allFilteredTransactions = transactions
     .filter((txn) => txn.sign === "debit")
     .filter((txn) => {
       if (filters.searchTerm) {
@@ -56,7 +60,12 @@ export const TransactionsTable = ({ transactions, onUpdate, onDelete, filters }:
       }
       return true;
     })
-    .slice(0, 50); // Show first 50 transactions
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); // Sort by date descending (most recent first)
+
+  const totalPages = Math.ceil(allFilteredTransactions.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const filteredTransactions = allFilteredTransactions.slice(startIndex, endIndex);
 
   const getCategoryColor = (category: TransactionCategory) => {
     switch (category) {
@@ -231,9 +240,54 @@ export const TransactionsTable = ({ transactions, onUpdate, onDelete, filters }:
             </table>
           </div>
           
-          {filteredTransactions.length === 50 && (
-            <div className="text-center text-sm text-muted-foreground border-t pt-4">
-              Showing first 50 transactions. Use filters to narrow results.
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between border-t pt-4">
+              <div className="text-sm text-muted-foreground">
+                Showing {startIndex + 1}-{Math.min(endIndex, allFilteredTransactions.length)} of {allFilteredTransactions.length} transactions
+              </div>
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                    // Show first page, last page, current page, and pages around current
+                    if (
+                      page === 1 ||
+                      page === totalPages ||
+                      (page >= currentPage - 1 && page <= currentPage + 1)
+                    ) {
+                      return (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            onClick={() => setCurrentPage(page)}
+                            isActive={currentPage === page}
+                            className="cursor-pointer"
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      );
+                    } else if (page === currentPage - 2 || page === currentPage + 2) {
+                      return (
+                        <PaginationItem key={page}>
+                          <span className="px-4">...</span>
+                        </PaginationItem>
+                      );
+                    }
+                    return null;
+                  })}
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </div>
           )}
         </>
@@ -241,7 +295,7 @@ export const TransactionsTable = ({ transactions, onUpdate, onDelete, filters }:
       
       {isCollapsed && (
         <div className="text-center text-sm text-muted-foreground py-4">
-          {filteredTransactions.length} transactions hidden. Click Expand to view.
+          {allFilteredTransactions.length} transactions hidden. Click Expand to view.
         </div>
       )}
     </div>
