@@ -1,8 +1,21 @@
-import type { FinancialSnapshot } from "@/types/financial";
+import type { FinancialSnapshot, StagingTransaction } from "@/types/financial";
 import type { Transaction, DashboardData } from "@/types/dashboard";
 
-// Generate realistic mock transactions for August-October 2025 based on typical family spending
-const generateSampleTransactions = (): Transaction[] => {
+// Helper: Convert Transaction to StagingTransaction
+const toStagingTransaction = (t: Transaction): StagingTransaction => ({
+  id: t.id,
+  date: t.date,
+  desc: t.desc,
+  amount: t.amount,
+  sign: t.sign,
+  merchant: t.merchant,
+  accountId: t.accountId,
+  source: "mock",
+  confidence: t.confidence
+});
+
+// Reynolds Family Transactions: Higher expenses, variable income patterns
+const generateReynoldsTransactions = (): Transaction[] => {
   return [
     // August 2025
     {id:"t_20250801_1",date:"2025-08-01",desc:"Payroll Deposit - Acme Corp W-2",amount:12150.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Acme Corp",accountId:"acc_chk_5724",confidence:0.99},
@@ -121,10 +134,89 @@ const generateSampleTransactions = (): Transaction[] => {
   ];
 };
 
+// Johnson Family Transactions: Lower expenses, stable income, investment-ready
+const generateJohnsonTransactions = (): Transaction[] => {
+  return [
+    // August 2025 - Stable biweekly income
+    {id:"tj_20250801_1",date:"2025-08-01",desc:"Payroll Deposit - Tech Solutions Inc",amount:5850.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Tech Solutions Inc",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250802_1",date:"2025-08-02",desc:"Mortgage Payment - Rocket Mortgage",amount:2450.00,sign:"debit",category:"need",subcategory:"Rent/Mortgage",merchant:"Rocket Mortgage",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250802_2",date:"2025-08-02",desc:"Auto Loan Payment",amount:385.00,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Honda Finance",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250803_1",date:"2025-08-03",desc:"Whole Foods Market",amount:142.30,sign:"debit",category:"need",subcategory:"Groceries",merchant:"Whole Foods",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20250805_1",date:"2025-08-05",desc:"Xcel Energy",amount:178.45,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Xcel Energy",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250806_1",date:"2025-08-06",desc:"King Soopers",amount:98.76,sign:"debit",category:"need",subcategory:"Groceries",merchant:"King Soopers",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20250807_1",date:"2025-08-07",desc:"Shell Gas Station",amount:54.20,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250808_1",date:"2025-08-08",desc:"Denver Water",amount:62.30,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Denver Water",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250810_1",date:"2025-08-10",desc:"King Soopers",amount:115.45,sign:"debit",category:"need",subcategory:"Groceries",merchant:"King Soopers",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20250812_1",date:"2025-08-12",desc:"Netflix Subscription",amount:15.49,sign:"debit",category:"want",subcategory:"Subscriptions",merchant:"Netflix",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250814_1",date:"2025-08-14",desc:"Shell Gas Station",amount:58.90,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250815_1",date:"2025-08-15",desc:"Payroll Deposit - Tech Solutions Inc",amount:5850.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Tech Solutions Inc",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250815_2",date:"2025-08-15",desc:"T-Mobile",amount:125.00,sign:"debit",category:"need",subcategory:"Utilities",merchant:"T-Mobile",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250816_1",date:"2025-08-16",desc:"Student Loan Payment",amount:125.00,sign:"debit",category:"saving",subcategory:"Extra Debt Payment",merchant:"Great Lakes",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250817_1",date:"2025-08-17",desc:"King Soopers",amount:127.89,sign:"debit",category:"need",subcategory:"Groceries",merchant:"King Soopers",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20250818_1",date:"2025-08-18",desc:"Xfinity Internet",amount:89.99,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Xfinity",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250820_1",date:"2025-08-20",desc:"Target",amount:78.34,sign:"debit",category:"want",subcategory:"Shopping",merchant:"Target",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20250821_1",date:"2025-08-21",desc:"Shell Gas Station",amount:61.15,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250823_1",date:"2025-08-23",desc:"King Soopers",amount:134.56,sign:"debit",category:"need",subcategory:"Groceries",merchant:"King Soopers",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20250826_1",date:"2025-08-26",desc:"State Farm Insurance",amount:245.00,sign:"debit",category:"need",subcategory:"Insurance",merchant:"State Farm",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250827_1",date:"2025-08-27",desc:"Chipotle",amount:32.45,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Chipotle",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20250828_1",date:"2025-08-28",desc:"Shell Gas Station",amount:57.80,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250830_1",date:"2025-08-30",desc:"King Soopers",amount:119.23,sign:"debit",category:"need",subcategory:"Groceries",merchant:"King Soopers",accountId:"acc_chk_j001",confidence:0.98},
+
+    // September 2025 - Consistent pattern continues
+    {id:"tj_20250901_1",date:"2025-09-01",desc:"Payroll Deposit - Tech Solutions Inc",amount:5850.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Tech Solutions Inc",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250902_1",date:"2025-09-02",desc:"Mortgage Payment - Rocket Mortgage",amount:2450.00,sign:"debit",category:"need",subcategory:"Rent/Mortgage",merchant:"Rocket Mortgage",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250902_2",date:"2025-09-02",desc:"Auto Loan Payment",amount:385.00,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Honda Finance",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250903_1",date:"2025-09-03",desc:"King Soopers",amount:145.67,sign:"debit",category:"need",subcategory:"Groceries",merchant:"King Soopers",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20250905_1",date:"2025-09-05",desc:"Xcel Energy",amount:195.30,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Xcel Energy",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250906_1",date:"2025-09-06",desc:"Shell Gas Station",amount:59.45,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250907_1",date:"2025-09-07",desc:"Denver Water",amount:65.80,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Denver Water",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250908_1",date:"2025-09-08",desc:"King Soopers",amount:128.34,sign:"debit",category:"need",subcategory:"Groceries",merchant:"King Soopers",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20250910_1",date:"2025-09-10",desc:"Whole Foods Market",amount:87.90,sign:"debit",category:"need",subcategory:"Groceries",merchant:"Whole Foods",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20250912_1",date:"2025-09-12",desc:"Netflix Subscription",amount:15.49,sign:"debit",category:"want",subcategory:"Subscriptions",merchant:"Netflix",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250913_1",date:"2025-09-13",desc:"Shell Gas Station",amount:62.15,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250915_1",date:"2025-09-15",desc:"Payroll Deposit - Tech Solutions Inc",amount:5850.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Tech Solutions Inc",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250915_2",date:"2025-09-15",desc:"T-Mobile",amount:125.00,sign:"debit",category:"need",subcategory:"Utilities",merchant:"T-Mobile",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250916_1",date:"2025-09-16",desc:"Student Loan Payment",amount:125.00,sign:"debit",category:"saving",subcategory:"Extra Debt Payment",merchant:"Great Lakes",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250917_1",date:"2025-09-17",desc:"King Soopers",amount:136.45,sign:"debit",category:"need",subcategory:"Groceries",merchant:"King Soopers",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20250918_1",date:"2025-09-18",desc:"Xfinity Internet",amount:89.99,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Xfinity",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250920_1",date:"2025-09-20",desc:"Target",amount:92.56,sign:"debit",category:"want",subcategory:"Shopping",merchant:"Target",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20250921_1",date:"2025-09-21",desc:"Shell Gas Station",amount:58.30,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250923_1",date:"2025-09-23",desc:"King Soopers",amount:141.78,sign:"debit",category:"need",subcategory:"Groceries",merchant:"King Soopers",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20250925_1",date:"2025-09-25",desc:"Panera Bread",amount:28.90,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Panera Bread",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20250926_1",date:"2025-09-26",desc:"State Farm Insurance",amount:245.00,sign:"debit",category:"need",subcategory:"Insurance",merchant:"State Farm",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250927_1",date:"2025-09-27",desc:"Shell Gas Station",amount:60.45,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20250928_1",date:"2025-09-28",desc:"King Soopers",amount:133.67,sign:"debit",category:"need",subcategory:"Groceries",merchant:"King Soopers",accountId:"acc_chk_j001",confidence:0.98},
+
+    // October 2025 - Continued stability
+    {id:"tj_20251001_1",date:"2025-10-01",desc:"Payroll Deposit - Tech Solutions Inc",amount:5850.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Tech Solutions Inc",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251002_1",date:"2025-10-02",desc:"Mortgage Payment - Rocket Mortgage",amount:2450.00,sign:"debit",category:"need",subcategory:"Rent/Mortgage",merchant:"Rocket Mortgage",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251002_2",date:"2025-10-02",desc:"Auto Loan Payment",amount:385.00,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Honda Finance",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251003_1",date:"2025-10-03",desc:"King Soopers",amount:138.90,sign:"debit",category:"need",subcategory:"Groceries",merchant:"King Soopers",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20251005_1",date:"2025-10-05",desc:"Xcel Energy",amount:182.20,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Xcel Energy",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251006_1",date:"2025-10-06",desc:"Shell Gas Station",amount:61.80,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251007_1",date:"2025-10-07",desc:"Denver Water",amount:63.50,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Denver Water",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251008_1",date:"2025-10-08",desc:"King Soopers",amount:142.34,sign:"debit",category:"need",subcategory:"Groceries",merchant:"King Soopers",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20251010_1",date:"2025-10-10",desc:"Whole Foods Market",amount:95.60,sign:"debit",category:"need",subcategory:"Groceries",merchant:"Whole Foods",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20251012_1",date:"2025-10-12",desc:"Netflix Subscription",amount:15.49,sign:"debit",category:"want",subcategory:"Subscriptions",merchant:"Netflix",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251013_1",date:"2025-10-13",desc:"Shell Gas Station",amount:59.25,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251015_1",date:"2025-10-15",desc:"Payroll Deposit - Tech Solutions Inc",amount:5850.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Tech Solutions Inc",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251015_2",date:"2025-10-15",desc:"T-Mobile",amount:125.00,sign:"debit",category:"need",subcategory:"Utilities",merchant:"T-Mobile",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251016_1",date:"2025-10-16",desc:"Student Loan Payment",amount:125.00,sign:"debit",category:"saving",subcategory:"Extra Debt Payment",merchant:"Great Lakes",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251017_1",date:"2025-10-17",desc:"King Soopers",amount:129.45,sign:"debit",category:"need",subcategory:"Groceries",merchant:"King Soopers",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20251018_1",date:"2025-10-18",desc:"Xfinity Internet",amount:89.99,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Xfinity",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251020_1",date:"2025-10-20",desc:"Target",amount:85.67,sign:"debit",category:"want",subcategory:"Shopping",merchant:"Target",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20251021_1",date:"2025-10-21",desc:"Shell Gas Station",amount:62.40,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251023_1",date:"2025-10-23",desc:"King Soopers",amount:135.89,sign:"debit",category:"need",subcategory:"Groceries",merchant:"King Soopers",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20251025_1",date:"2025-10-25",desc:"Sweet Basil Restaurant",amount:78.50,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Sweet Basil",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20251026_1",date:"2025-10-26",desc:"State Farm Insurance",amount:245.00,sign:"debit",category:"need",subcategory:"Insurance",merchant:"State Farm",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251027_1",date:"2025-10-27",desc:"Shell Gas Station",amount:58.75,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_j001",confidence:0.99}
+  ];
+};
+
 // Reynolds Family: Has high-interest debt, needs foundation work
-const reynoldsTotalAssets = 40799.20 + 25000.00 + 90000.00 + 120000.00 + 43000.00 + 820000.00 + 24000.00; // 1,162,799.20
-const reynoldsTotalLiabilities = 510000.00 + 18900.00 + 7800.00 + 12400.00; // 549,100.00
-const reynoldsNetWorth = reynoldsTotalAssets - reynoldsTotalLiabilities; // 613,699.20
+const reynoldsTotalAssets = 40799.20 + 25000.00 + 90000.00 + 120000.00 + 43000.00 + 820000.00 + 24000.00;
+const reynoldsTotalLiabilities = 510000.00 + 18900.00 + 7800.00 + 12400.00;
+const reynoldsNetWorth = reynoldsTotalAssets - reynoldsTotalLiabilities;
 
 export const SAMPLE_REYNOLDS_DATA: FinancialSnapshot = {
   analyzedPeriod: {
@@ -163,7 +255,7 @@ export const SAMPLE_REYNOLDS_DATA: FinancialSnapshot = {
     d90:{abs:-4741.88,pct:-1.12},
     series12m:[745000,748000,751000,752500,753000,755000,757000,760000,762000,765000,768000,770000]
   },
-  stagingTxns: [],
+  stagingTxns: generateReynoldsTransactions().map(toStagingTransaction),
   syncLog: [
     {accountId:"acc_chk_5724",status:"connected",ts:"2025-09-01T10:00:00Z"},
     {accountId:"acc_brg_vaa",status:"connected",ts:"2025-09-01T10:00:00Z"},
@@ -186,9 +278,9 @@ export const SAMPLE_REYNOLDS_DATA: FinancialSnapshot = {
 };
 
 // Johnson Family: Investment-ready (passes 5-factor assessment)
-const johnsonTotalAssets = 45000.00 + 35000.00 + 65000.00 + 95000.00 + 38000.00 + 625000.00 + 19000.00; // 922,000.00
-const johnsonTotalLiabilities = 380000.00 + 14500.00 + 8900.00; // 403,400.00
-const johnsonNetWorth = johnsonTotalAssets - johnsonTotalLiabilities; // 518,600.00
+const johnsonTotalAssets = 45000.00 + 35000.00 + 65000.00 + 95000.00 + 38000.00 + 625000.00 + 19000.00;
+const johnsonTotalLiabilities = 380000.00 + 14500.00 + 8900.00;
+const johnsonNetWorth = johnsonTotalAssets - johnsonTotalLiabilities;
 
 export const SAMPLE_JOHNSON_DATA: FinancialSnapshot = {
   analyzedPeriod: {
@@ -225,7 +317,7 @@ export const SAMPLE_JOHNSON_DATA: FinancialSnapshot = {
     d90:{abs:3720.00,pct:0.72},
     series12m:[510000,512000,514000,515500,517000,519000,521000,523000,525000,527000,529000,531000]
   },
-  stagingTxns: [],
+  stagingTxns: generateJohnsonTransactions().map(toStagingTransaction),
   syncLog: [
     {accountId:"acc_chk_j001",status:"connected",ts:"2025-09-01T10:00:00Z"},
     {accountId:"acc_svg_j002",status:"connected",ts:"2025-09-01T10:00:00Z"},
@@ -246,12 +338,40 @@ export const SAMPLE_JOHNSON_DATA: FinancialSnapshot = {
   }
 };
 
-// Export mock transactions as DashboardData
-export const SAMPLE_DASHBOARD_DATA = {
+// Export Reynolds transactions as default DashboardData
+export const SAMPLE_DASHBOARD_DATA: DashboardData = {
   period: {
     start: "2025-08-01",
     end: "2025-10-27",
     months: 3
   },
-  txns: generateSampleTransactions()
+  accounts: [],
+  income: { avgMonthly: 0, stability: "stable" },
+  expenses: {
+    needs: { total: 0, pct: 0, subs: {} },
+    wants: { total: 0, pct: 0, subs: {} },
+    savings: { total: 0, pct: 0, subs: {} }
+  },
+  cashflow: { monthlySurplus: 0 },
+  txns: generateReynoldsTransactions(),
+  recommendations: { immediate: [] }
+};
+
+// Export Johnson transactions as separate DashboardData
+export const SAMPLE_JOHNSON_DASHBOARD_DATA: DashboardData = {
+  period: {
+    start: "2025-08-01",
+    end: "2025-10-27",
+    months: 3
+  },
+  accounts: [],
+  income: { avgMonthly: 0, stability: "stable" },
+  expenses: {
+    needs: { total: 0, pct: 0, subs: {} },
+    wants: { total: 0, pct: 0, subs: {} },
+    savings: { total: 0, pct: 0, subs: {} }
+  },
+  cashflow: { monthlySurplus: 0 },
+  txns: generateJohnsonTransactions(),
+  recommendations: { immediate: [] }
 };

@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
 import type { Account, Holding, Liability, FinancialSnapshot, AccountStatus, AccountType, AssetClass, Liquidity, LiabilityType } from "@/types/financial";
-import { SAMPLE_REYNOLDS_DATA, SAMPLE_JOHNSON_DATA } from "@/utils/sampleData";
+import { SAMPLE_REYNOLDS_DATA, SAMPLE_JOHNSON_DATA, SAMPLE_DASHBOARD_DATA, SAMPLE_JOHNSON_DASHBOARD_DATA } from "@/utils/sampleData";
 
 interface FileUploadState {
   file: File;
@@ -34,7 +34,7 @@ interface UploadProps {
 }
 
 export default function Upload({ onComplete }: UploadProps = {}) {
-  const { setSnapshot, draftData, setDraftData, resetAllData, snapshot } = useFinancialData();
+  const { setSnapshot, setDashboardData, draftData, setDraftData, resetAllData, snapshot } = useFinancialData();
   const [files, setFiles] = useState<FileUploadState[]>(draftData.files || []);
   const [isDragging, setIsDragging] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -354,6 +354,7 @@ export default function Upload({ onComplete }: UploadProps = {}) {
                       if (confirm("Load Reynolds Family demo data? This will replace any existing data.")) {
                         resetAllData();
                         setSnapshot(SAMPLE_REYNOLDS_DATA);
+                        setDashboardData(SAMPLE_DASHBOARD_DATA);
                         toast.success("Reynolds Family data loaded!");
                         setTimeout(() => {
                           if (onComplete) {
@@ -361,7 +362,7 @@ export default function Upload({ onComplete }: UploadProps = {}) {
                           }
                         }, 500);
                       }
-                    }} 
+                    }}
                     className="w-full" 
                     variant="outline"
                   >
@@ -386,6 +387,7 @@ export default function Upload({ onComplete }: UploadProps = {}) {
                       if (confirm("Load Johnson Family demo data? This will replace any existing data.")) {
                         resetAllData();
                         setSnapshot(SAMPLE_JOHNSON_DATA);
+                        setDashboardData(SAMPLE_JOHNSON_DASHBOARD_DATA);
                         toast.success("Johnson Family data loaded!");
                         setTimeout(() => {
                           if (onComplete) {
@@ -393,7 +395,7 @@ export default function Upload({ onComplete }: UploadProps = {}) {
                           }
                         }, 500);
                       }
-                    }} 
+                    }}
                     className="w-full gradient-primary" 
                   >
                     <Database className="w-4 h-4 mr-2" />
