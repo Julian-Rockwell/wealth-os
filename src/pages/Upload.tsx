@@ -352,15 +352,19 @@ export default function Upload({ onComplete }: UploadProps = {}) {
                   <Button 
                     onClick={() => {
                       if (confirm("Load Reynolds Family demo data? This will replace any existing data.")) {
+                        // Clear all data first
                         resetAllData();
-                        setSnapshot(SAMPLE_REYNOLDS_DATA);
-                        setDashboardData(SAMPLE_DASHBOARD_DATA);
-                        toast.success("Reynolds Family data loaded!");
+                        // Force a small delay to ensure cleanup
                         setTimeout(() => {
-                          if (onComplete) {
-                            onComplete();
-                          }
-                        }, 500);
+                          setSnapshot(SAMPLE_REYNOLDS_DATA);
+                          setDashboardData(SAMPLE_DASHBOARD_DATA);
+                          toast.success("Reynolds Family data loaded! Check Transaction Details for Austin-based spending.");
+                          setTimeout(() => {
+                            if (onComplete) {
+                              onComplete();
+                            }
+                          }, 500);
+                        }, 100);
                       }
                     }}
                     className="w-full" 
@@ -385,15 +389,19 @@ export default function Upload({ onComplete }: UploadProps = {}) {
                   <Button 
                     onClick={() => {
                       if (confirm("Load Johnson Family demo data? This will replace any existing data.")) {
+                        // Clear all data first
                         resetAllData();
-                        setSnapshot(SAMPLE_JOHNSON_DATA);
-                        setDashboardData(SAMPLE_JOHNSON_DASHBOARD_DATA);
-                        toast.success("Johnson Family data loaded!");
+                        // Force a small delay to ensure cleanup
                         setTimeout(() => {
-                          if (onComplete) {
-                            onComplete();
-                          }
-                        }, 500);
+                          setSnapshot(SAMPLE_JOHNSON_DATA);
+                          setDashboardData(SAMPLE_JOHNSON_DASHBOARD_DATA);
+                          toast.success("Johnson Family data loaded! Check Transaction Details for Denver-based spending.");
+                          setTimeout(() => {
+                            if (onComplete) {
+                              onComplete();
+                            }
+                          }, 500);
+                        }, 100);
                       }
                     }}
                     className="w-full gradient-primary" 

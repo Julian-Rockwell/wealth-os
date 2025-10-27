@@ -128,21 +128,21 @@ export default function Goals() {
           onExpensesConfirmed={setConfirmedExpenses}
         />
 
-        {/* Right Column: Goal Questions */}
-        <GoalQuestionsCard
-          timing={timing}
-          lifestyle={lifestyle}
-          geography={geography}
-          onTimingChange={setTiming}
-          onLifestyleChange={setLifestyle}
-          onGeographyChange={setGeography}
-        />
+        {/* Right Column: RPIC Result */}
+        {rpicResult && (
+          <RpicResultCard rpic={rpicResult} foundationScore={foundationScore} />
+        )}
       </div>
 
-      {/* Full-width: RPIC Result */}
-      {rpicResult && (
-        <RpicResultCard rpic={rpicResult} foundationScore={foundationScore} />
-      )}
+      {/* Full-width: Goal Questions */}
+      <GoalQuestionsCard
+        timing={timing}
+        lifestyle={lifestyle}
+        geography={geography}
+        onTimingChange={setTiming}
+        onLifestyleChange={setLifestyle}
+        onGeographyChange={setGeography}
+      />
 
       {/* Timeline Comparison */}
       {rpicResult && timelineResult && (
