@@ -41,6 +41,9 @@ const generateSampleTransactions = (): Transaction[] => {
     {id:"t_20250827_1",date:"2025-08-27",desc:"HEB Grocery",amount:145.67,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
     {id:"t_20250828_1",date:"2025-08-28",desc:"Home Depot",amount:127.89,sign:"debit",category:"need",subcategory:"Home Maintenance",merchant:"Home Depot",accountId:"acc_chk_5724",confidence:0.98},
     {id:"t_20250829_1",date:"2025-08-29",desc:"Panera Bread",amount:28.45,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Panera Bread",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20250812_2",date:"2025-08-12",desc:"ATM Withdrawal - Cash",amount:120.00,sign:"debit",category:"want",subcategory:"Shopping",merchant:"Wells Fargo ATM",accountId:"acc_chk_5724",confidence:0.68},
+    {id:"t_20250819_2",date:"2025-08-19",desc:"Zelle Transfer - Sarah M.",amount:85.00,sign:"debit",category:"want",subcategory:"Shopping",merchant:"Zelle",accountId:"acc_chk_5724",confidence:0.72},
+    {id:"t_20250826_2",date:"2025-08-26",desc:"SQ *Local Coffee",amount:15.80,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Square Merchant",accountId:"acc_chk_5724",confidence:0.75},
 
     // September 2025
     {id:"t_20250901_1",date:"2025-09-01",desc:"Payroll Deposit - Acme Corp W-2",amount:12150.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Acme Corp",accountId:"acc_chk_5724",confidence:0.99},
@@ -110,7 +113,11 @@ const generateSampleTransactions = (): Transaction[] => {
     {id:"t_20251024_1",date:"2025-10-24",desc:"Amazon Purchase",amount:112.34,sign:"debit",category:"want",subcategory:"Shopping",merchant:"Amazon",accountId:"acc_chk_5724",confidence:0.98},
     {id:"t_20251025_1",date:"2025-10-25",desc:"Shell Gas Station",amount:72.30,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_5724",confidence:0.99},
     {id:"t_20251026_1",date:"2025-10-26",desc:"State Farm Insurance",amount:275.00,sign:"debit",category:"need",subcategory:"Insurance",merchant:"State Farm",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20251027_1",date:"2025-10-27",desc:"Starbucks Coffee",amount:10.15,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Starbucks",accountId:"acc_chk_5724",confidence:0.98}
+    {id:"t_20251027_1",date:"2025-10-27",desc:"Starbucks Coffee",amount:10.15,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Starbucks",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20251009_1",date:"2025-10-09",desc:"Online Payment - PYMT*WEB",amount:95.50,sign:"debit",category:"want",subcategory:"Shopping",merchant:"Web Payment",accountId:"acc_chk_5724",confidence:0.71},
+    {id:"t_20251016_1",date:"2025-10-16",desc:"Venmo - Mike Johnson",amount:60.00,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Venmo",accountId:"acc_chk_5724",confidence:0.65},
+    {id:"t_20251023_2",date:"2025-10-23",desc:"ATM Cash Withdrawal",amount:100.00,sign:"debit",category:"want",subcategory:"Shopping",merchant:"Chase ATM",accountId:"acc_chk_5724",confidence:0.70},
+    {id:"t_20251025_2",date:"2025-10-25",desc:"TST* Downtown Market",amount:42.30,sign:"debit",category:"need",subcategory:"Groceries",merchant:"Local Market",accountId:"acc_chk_5724",confidence:0.78}
   ];
 };
 
