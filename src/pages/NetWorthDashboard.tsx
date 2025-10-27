@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertCircle, Database } from "lucide-react";
 import type { Holding, Liability } from "@/types/financial";
+import { updateSnapshotHoldings, updateSnapshotLiabilities } from "@/utils/snapshotHelpers";
 
 export default function NetWorthDashboard() {
   const { snapshot, setSnapshot } = useFinancialData();
@@ -74,11 +75,11 @@ export default function NetWorthDashboard() {
                       const updated = snapshot.holdings.map(h => 
                         h.id === id ? { ...h, ...updates } : h
                       );
-                      setSnapshot({ ...snapshot, holdings: updated });
+                      setSnapshot(updateSnapshotHoldings(snapshot, updated));
                     }}
                     onDelete={(id) => {
                       const updated = snapshot.holdings.filter(h => h.id !== id);
-                      setSnapshot({ ...snapshot, holdings: updated });
+                      setSnapshot(updateSnapshotHoldings(snapshot, updated));
                     }}
                     onAdd={() => {
                       const newHolding: Holding = {
@@ -92,10 +93,7 @@ export default function NetWorthDashboard() {
                         currency: "USD",
                         source: "manual",
                       };
-                      setSnapshot({ 
-                        ...snapshot, 
-                        holdings: [...snapshot.holdings, newHolding] 
-                      });
+                      setSnapshot(updateSnapshotHoldings(snapshot, [...snapshot.holdings, newHolding]));
                     }}
                   />
                 </TabsContent>
@@ -107,11 +105,11 @@ export default function NetWorthDashboard() {
                       const updated = snapshot.liabilities.map(l => 
                         l.id === id ? { ...l, ...updates } : l
                       );
-                      setSnapshot({ ...snapshot, liabilities: updated });
+                      setSnapshot(updateSnapshotLiabilities(snapshot, updated));
                     }}
                     onDelete={(id) => {
                       const updated = snapshot.liabilities.filter(l => l.id !== id);
-                      setSnapshot({ ...snapshot, liabilities: updated });
+                      setSnapshot(updateSnapshotLiabilities(snapshot, updated));
                     }}
                     onAdd={() => {
                       const newLiability: Liability = {
@@ -124,10 +122,7 @@ export default function NetWorthDashboard() {
                         monthlyPayment: 0,
                         remainingTermMonths: 0,
                       };
-                      setSnapshot({ 
-                        ...snapshot, 
-                        liabilities: [...snapshot.liabilities, newLiability] 
-                      });
+                      setSnapshot(updateSnapshotLiabilities(snapshot, [...snapshot.liabilities, newLiability]));
                     }}
                   />
                 </TabsContent>
