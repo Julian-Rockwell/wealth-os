@@ -9,7 +9,6 @@ import { MonthlyStackedBars } from "@/components/dashboard/MonthlyStackedBars";
 import { TransactionsTable } from "@/components/dashboard/TransactionsTable";
 import { KeyInsights } from "@/components/dashboard/KeyInsights";
 import { PersonalizedRecommendations } from "@/components/dashboard/PersonalizedRecommendations";
-import { AssetAllocationView } from "@/components/dashboard/AssetAllocationView";
 import { IncomeExpensesKPI } from "@/components/dashboard/IncomeExpensesKPI";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { Button } from "@/components/ui/button";
@@ -172,9 +171,6 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
 
           {/* Personalized Recommendations */}
           <PersonalizedRecommendations data={data} />
-
-          {/* Asset Allocation */}
-          <AssetAllocationView holdings={snapshot.holdings} />
         </div>
       </div>
     </div>

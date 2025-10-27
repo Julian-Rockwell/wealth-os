@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrendingUp, Download, RotateCcw, BarChart3, Target, TrendingDown, Lightbulb } from "lucide-react";
+import { TrendingUp, Download, RotateCcw, BarChart3, Target, TrendingDown, Lightbulb, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
@@ -8,6 +8,7 @@ import Upload from "./Upload";
 import Dashboard from "./Dashboard";
 import Investments from "./Investments";
 import Goals from "./Goals";
+import NetWorthDashboard from "./NetWorthDashboard";
 
 export default function UnifiedPanel() {
   const [activeTab, setActiveTab] = useState("intake");
@@ -60,10 +61,18 @@ export default function UnifiedPanel() {
       {/* Tabs */}
       <div className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-7 mb-6">
+          <TabsList className="grid w-full grid-cols-8 mb-6">
             <TabsTrigger value="intake" className="flex items-center gap-2">
               <Download className="w-4 h-4" />
               Command Center
+            </TabsTrigger>
+            <TabsTrigger 
+              value="dashboard" 
+              className="flex items-center gap-2"
+              disabled={!snapshot}
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              Dashboard
             </TabsTrigger>
             <TabsTrigger 
               value="command" 
@@ -104,7 +113,11 @@ export default function UnifiedPanel() {
           </TabsList>
 
           <TabsContent value="intake" className="mt-0">
-            <Upload onComplete={() => setActiveTab("command")} />
+            <Upload onComplete={() => setActiveTab("dashboard")} />
+          </TabsContent>
+
+          <TabsContent value="dashboard" className="mt-0">
+            <NetWorthDashboard />
           </TabsContent>
 
           <TabsContent value="command" className="mt-0">
