@@ -1,5 +1,5 @@
 import type { FinancialSnapshot } from "@/types/financial";
-import type { Transaction } from "@/types/dashboard";
+import type { Transaction, DashboardData } from "@/types/dashboard";
 
 // Generate realistic mock transactions for August-October 2025 based on typical family spending
 const generateSampleTransactions = (): Transaction[] => {
@@ -121,9 +121,10 @@ const generateSampleTransactions = (): Transaction[] => {
   ];
 };
 
-const totalAssets = 40799.20 + 25000.00 + 90000.00 + 120000.00 + 43000.00 + 820000.00 + 24000.00; // 1,162,799.20
-const totalLiabilities = 510000.00 + 18900.00 + 7800.00 + 12400.00; // 549,100.00
-const netWorth = totalAssets - totalLiabilities; // 613,699.20
+// Reynolds Family: Has high-interest debt, needs foundation work
+const reynoldsTotalAssets = 40799.20 + 25000.00 + 90000.00 + 120000.00 + 43000.00 + 820000.00 + 24000.00; // 1,162,799.20
+const reynoldsTotalLiabilities = 510000.00 + 18900.00 + 7800.00 + 12400.00; // 549,100.00
+const reynoldsNetWorth = reynoldsTotalAssets - reynoldsTotalLiabilities; // 613,699.20
 
 export const SAMPLE_REYNOLDS_DATA: FinancialSnapshot = {
   analyzedPeriod: {
@@ -174,9 +175,70 @@ export const SAMPLE_REYNOLDS_DATA: FinancialSnapshot = {
     {accountId:"acc_cc_chase",status:"connected",ts:"2025-09-01T10:00:00Z"}
   ],
   netWorth: {
-    assets: totalAssets,
-    liabilities: totalLiabilities,
-    net: netWorth
+    assets: reynoldsTotalAssets,
+    liabilities: reynoldsTotalLiabilities,
+    net: reynoldsNetWorth
+  },
+  uiFlags: {
+    reviewedIn11: true,
+    readyFor12: true
+  }
+};
+
+// Johnson Family: Investment-ready (passes 5-factor assessment)
+const johnsonTotalAssets = 45000.00 + 35000.00 + 65000.00 + 95000.00 + 38000.00 + 625000.00 + 19000.00; // 922,000.00
+const johnsonTotalLiabilities = 380000.00 + 14500.00 + 8900.00; // 403,400.00
+const johnsonNetWorth = johnsonTotalAssets - johnsonTotalLiabilities; // 518,600.00
+
+export const SAMPLE_JOHNSON_DATA: FinancialSnapshot = {
+  analyzedPeriod: {
+    startDate: "2025-08-01",
+    endDate: "2025-10-27",
+    totalMonths: 3
+  },
+  accounts: [
+    {id:"acc_chk_j001",name:"Wells Fargo Checking •••4892",type:"checking",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"},
+    {id:"acc_svg_j002",name:"Ally Savings — Emergency Reserve",type:"savings",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"},
+    {id:"acc_brg_j003",name:"Schwab Brokerage",type:"brokerage",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"},
+    {id:"acc_401k_j004",name:"Vanguard 401(k) — Sarah",type:"401k",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"},
+    {id:"acc_ira_j005",name:"Fidelity Roth IRA — Michael",type:"IRA",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"},
+    {id:"acc_real_j006",name:"Primary Residence — Denver, CO",type:"real_estate",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"},
+    {id:"acc_vehicle_j007",name:"2020 Honda CR-V",type:"vehicle",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"}
+  ],
+  holdings: [
+    {id:"h_chk_j",accountId:"acc_chk_j001",name:"Checking Balance",accountType:"checking",assetClass:"cash",liquidity:"liquid",balance:45000.00,currency:"USD",source:"mock"},
+    {id:"h_svg_j",accountId:"acc_svg_j002",name:"Emergency Savings",accountType:"savings",assetClass:"cash",liquidity:"liquid",balance:35000.00,currency:"USD",source:"mock"},
+    {id:"h_brg_j",accountId:"acc_brg_j003",name:"Schwab Taxable",accountType:"brokerage",assetClass:"stocks",liquidity:"semi_liquid",balance:65000.00,currency:"USD",source:"mock"},
+    {id:"h_401k_j",accountId:"acc_401k_j004",name:"Vanguard 401(k)",accountType:"401k",assetClass:"stocks",liquidity:"illiquid",balance:95000.00,currency:"USD",source:"mock"},
+    {id:"h_roth_j",accountId:"acc_ira_j005",name:"Roth IRA",accountType:"IRA",assetClass:"stocks",liquidity:"illiquid",balance:38000.00,currency:"USD",source:"mock"},
+    {id:"h_home_j",accountId:"acc_real_j006",name:"Home Valuation (Redfin)",accountType:"real_estate",assetClass:"real_estate",liquidity:"illiquid",balance:625000.00,currency:"USD",source:"mock"},
+    {id:"h_vehicle_j",accountId:"acc_vehicle_j007",name:"Vehicle Value (KBB)",accountType:"vehicle",assetClass:"other",liquidity:"semi_liquid",balance:19000.00,currency:"USD",source:"mock"}
+  ],
+  liabilities: [
+    {id:"l_mort_j",accountId:"acc_real_j006",name:"Rocket Mortgage",type:"mortgage",apr:3.5,balance:380000.00,monthlyPayment:2450.00,remainingTermMonths:285,notes:"Rocket Mortgage"},
+    {id:"l_auto_j",accountId:"acc_vehicle_j007",name:"Honda Finance",type:"auto",apr:4.5,balance:14500.00,monthlyPayment:385.00,remainingTermMonths:38,notes:"Honda Finance"},
+    {id:"l_student_j",accountId:"acc_chk_j001",name:"Federal Student Loan",type:"student",apr:3.8,balance:8900.00,monthlyPayment:125.00,remainingTermMonths:72,notes:"Great Lakes"}
+  ],
+  trends: {
+    d30:{abs:1250.00,pct:0.24},
+    d60:{abs:2480.00,pct:0.48},
+    d90:{abs:3720.00,pct:0.72},
+    series12m:[510000,512000,514000,515500,517000,519000,521000,523000,525000,527000,529000,531000]
+  },
+  stagingTxns: [],
+  syncLog: [
+    {accountId:"acc_chk_j001",status:"connected",ts:"2025-09-01T10:00:00Z"},
+    {accountId:"acc_svg_j002",status:"connected",ts:"2025-09-01T10:00:00Z"},
+    {accountId:"acc_brg_j003",status:"connected",ts:"2025-09-01T10:00:00Z"},
+    {accountId:"acc_401k_j004",status:"connected",ts:"2025-09-01T10:00:00Z"},
+    {accountId:"acc_ira_j005",status:"connected",ts:"2025-09-01T10:00:00Z"},
+    {accountId:"acc_real_j006",status:"connected",ts:"2025-09-01T10:00:00Z"},
+    {accountId:"acc_vehicle_j007",status:"connected",ts:"2025-09-01T10:00:00Z"}
+  ],
+  netWorth: {
+    assets: johnsonTotalAssets,
+    liabilities: johnsonTotalLiabilities,
+    net: johnsonNetWorth
   },
   uiFlags: {
     reviewedIn11: true,

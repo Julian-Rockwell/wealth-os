@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
 import type { Account, Holding, Liability, FinancialSnapshot, AccountStatus, AccountType, AssetClass, Liquidity, LiabilityType } from "@/types/financial";
-import { SAMPLE_REYNOLDS_DATA } from "@/utils/sampleData";
+import { SAMPLE_REYNOLDS_DATA, SAMPLE_JOHNSON_DATA } from "@/utils/sampleData";
 
 interface FileUploadState {
   file: File;
@@ -331,31 +331,76 @@ export default function Upload({ onComplete }: UploadProps = {}) {
           <TabsContent value="sample">
             <Card className="p-8">
               <div className="text-center mb-6">
-                <h3 className="text-xl font-semibold mb-2">Load Reynolds Family Demo Data</h3>
+                <h3 className="text-xl font-semibold mb-2">Choose Demo Family</h3>
                 <p className="text-muted-foreground">
-                  Pre-populated data with 3 months of transactions, holdings, and liabilities
+                  Select a pre-populated dataset to explore the platform
                 </p>
               </div>
               
-              <Button 
-                onClick={() => {
-                  if (confirm("Load Reynolds Family demo data? This will replace any existing data.")) {
-                    resetAllData();
-                    setSnapshot(SAMPLE_REYNOLDS_DATA);
-                    toast.success("Sample data loaded successfully!");
-                    setTimeout(() => {
-                      if (onComplete) {
-                        onComplete();
+              <div className="space-y-4">
+                {/* Reynolds Family - Foundation Work Needed */}
+                <div className="border rounded-lg p-6 hover:border-primary/50 transition-colors">
+                  <div className="mb-4">
+                    <h4 className="font-semibold text-lg mb-1">Reynolds Family</h4>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      (High-interest debt $7.8k @ 22.99% APR, liquid assets $65.8k, net worth $613.7k)
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Requires foundation work before Investment Planning. Shows Budget Analyzer and Foundation Score workflows.
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={() => {
+                      if (confirm("Load Reynolds Family demo data? This will replace any existing data.")) {
+                        resetAllData();
+                        setSnapshot(SAMPLE_REYNOLDS_DATA);
+                        toast.success("Reynolds Family data loaded!");
+                        setTimeout(() => {
+                          if (onComplete) {
+                            onComplete();
+                          }
+                        }, 500);
                       }
-                    }, 500);
-                  }
-                }} 
-                className="w-full gradient-primary" 
-                size="lg"
-              >
-                <Database className="w-4 h-4 mr-2" />
-                Load Reynolds Family Demo
-              </Button>
+                    }} 
+                    className="w-full" 
+                    variant="outline"
+                  >
+                    <Database className="w-4 h-4 mr-2" />
+                    Load Reynolds Family
+                  </Button>
+                </div>
+
+                {/* Johnson Family - Investment Ready */}
+                <div className="border rounded-lg p-6 hover:border-primary/50 transition-colors">
+                  <div className="mb-4">
+                    <h4 className="font-semibold text-lg mb-1">Johnson Family</h4>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      (No high-interest debt, liquid assets $80k, capital available $50k, net worth $518.6k)
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Passes 5-Factor Assessment (score ≥80). Ready for Investment Planning: Optimize Assets & Capital Allocation.
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={() => {
+                      if (confirm("Load Johnson Family demo data? This will replace any existing data.")) {
+                        resetAllData();
+                        setSnapshot(SAMPLE_JOHNSON_DATA);
+                        toast.success("Johnson Family data loaded!");
+                        setTimeout(() => {
+                          if (onComplete) {
+                            onComplete();
+                          }
+                        }, 500);
+                      }
+                    }} 
+                    className="w-full gradient-primary" 
+                  >
+                    <Database className="w-4 h-4 mr-2" />
+                    Load Johnson Family (Investment-Ready)
+                  </Button>
+                </div>
+              </div>
             </Card>
           </TabsContent>
 
