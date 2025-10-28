@@ -1,6 +1,10 @@
 import { Card } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertTriangle, CheckCircle } from "lucide-react";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
 import type { DashboardData } from "@/types/dashboard";
 import type { ViewMode } from "@/pages/Dashboard";
+import { validate50_30_20 } from "@/utils/transactionClassifier";
 
 interface BudgetDonutProps {
   data: DashboardData;
@@ -118,6 +122,20 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
   const viewData = getViewData();
   const total = viewData.items.reduce((sum, item) => sum + item.value, 0);
 
+  // Validate 50/30/20 rule when in category view
+  const budgetValidation = viewMode === "category" ? (() => {
+    // Calculate total income from credits
+    const totalIncome = filteredTxns
+      .filter(t => t.sign === "credit")
+      .reduce((sum, t) => sum + t.amount, 0);
+    
+    const needs = viewData.items.find(i => i.label.includes("Needs"))?.value || 0;
+    const wants = viewData.items.find(i => i.label.includes("Wants"))?.value || 0;
+    const savings = viewData.items.find(i => i.label.includes("Savings"))?.value || 0;
+    
+    return validate50_30_20(totalIncome, needs, wants, savings);
+  })() : null;
+
   // Calculate angles for conic gradient
   let currentAngle = 0;
   const gradientStops = viewData.items.map((item, index) => {
@@ -131,7 +149,19 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
 
   return (
     <Card className="p-6 shadow-soft">
-      <h3 className="font-semibold mb-4">{viewData.title}</h3>
+      <div className="flex items-center gap-2 mb-4">
+        <h3 className="font-semibold">{viewData.title}</h3>
+        {viewMode === "category" && (
+          <InfoTooltip content={
+            <div className="space-y-2">
+              <p><strong>50/30/20 Budget Rule:</strong></p>
+              <p className="text-xs">• <strong>50% Needs:</strong> Essential expenses (housing, utilities, groceries, insurance)</p>
+              <p className="text-xs">• <strong>30% Wants:</strong> Discretionary spending (dining out, entertainment, shopping)</p>
+              <p className="text-xs">• <strong>20% Savings:</strong> Emergency fund, investments, debt repayment</p>
+            </div>
+          } />
+        )}
+      </div>
       
       <div className="relative w-48 h-48 mx-auto mb-6">
         <div
@@ -150,19 +180,64 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
       </div>
 
       <div className="space-y-3 max-h-64 overflow-y-auto">
-        {viewData.items.map((item, index) => (
-          <div key={index} className="flex items-center justify-between">
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              <div className={`w-3 h-3 rounded-full flex-shrink-0 ${item.color}`} />
-              <span className="text-sm truncate">{item.label}</span>
+        {viewData.items.map((item, index) => {
+          // Determine validation status for category view
+          let isValid: boolean | null = null;
+          let targetPct: number | null = null;
+          
+          if (viewMode === "category" && budgetValidation) {
+            if (item.label.includes("Needs")) {
+              isValid = budgetValidation.needsValid;
+              targetPct = 50;
+            } else if (item.label.includes("Wants")) {
+              isValid = budgetValidation.wantsValid;
+              targetPct = 30;
+            } else if (item.label.includes("Savings")) {
+              isValid = budgetValidation.savingsValid;
+              targetPct = 20;
+            }
+          }
+
+          return (
+            <div key={index} className="flex items-center justify-between">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <div className={`w-3 h-3 rounded-full flex-shrink-0 ${item.color}`} />
+                <span className="text-sm truncate">{item.label}</span>
+                {isValid !== null && (
+                  isValid ? (
+                    <CheckCircle className="w-4 h-4 text-success flex-shrink-0" />
+                  ) : (
+                    <AlertTriangle className="w-4 h-4 text-destructive flex-shrink-0" />
+                  )
+                )}
+              </div>
+              <div className="text-right ml-2">
+                <p className="text-sm font-semibold">
+                  {targetPct !== null && (
+                    <span className="text-xs text-muted-foreground mr-1">{targetPct}% →</span>
+                  )}
+                  {item.pct.toFixed(1)}%
+                </p>
+                <p className="text-xs text-muted-foreground">${item.value.toFixed(0)}</p>
+              </div>
             </div>
-            <div className="text-right ml-2">
-              <p className="text-sm font-semibold">{item.pct.toFixed(1)}%</p>
-              <p className="text-xs text-muted-foreground">${item.value.toFixed(0)}</p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+
+      {/* Show 50/30/20 alerts when in category view */}
+      {viewMode === "category" && budgetValidation && budgetValidation.alerts.length > 0 && (
+        <div className="mt-4 space-y-2">
+          {budgetValidation.alerts.map((alert, idx) => (
+            <Alert key={idx} variant="destructive" className="py-2">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription className="text-xs ml-2">
+                {alert}
+              </AlertDescription>
+            </Alert>
+          ))}
+        </div>
+      )}
     </Card>
   );
 };

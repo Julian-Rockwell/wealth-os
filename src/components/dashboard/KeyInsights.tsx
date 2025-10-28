@@ -12,43 +12,81 @@ export const KeyInsights = ({ data }: KeyInsightsProps) => {
   const generateInsights = () => {
     const txns = data.txns.filter(t => t.sign === "debit");
     
-    // Biggest opportunity - find category with highest spend that's reducible
-    const categoryTotals = {
-      "Dining Out": 0,
-      "Shopping": 0,
-      "Entertainment": 0,
-      "Subscriptions": 0
-    };
-    
+    // 1. Analyze ALL subcategories with intelligent savings calculation
+    const subcatAnalysis: Record<string, {
+      amount: number;
+      category: 'need' | 'want' | 'saving';
+      count: number;
+      merchants: Set<string>;
+      potentialSavings: number;
+      reductionPct: number;
+    }> = {};
+
     txns.forEach(txn => {
-      if (txn.category === "want" && categoryTotals[txn.subcategory as keyof typeof categoryTotals] !== undefined) {
-        categoryTotals[txn.subcategory as keyof typeof categoryTotals] += txn.amount;
+      if (!subcatAnalysis[txn.subcategory]) {
+        subcatAnalysis[txn.subcategory] = {
+          amount: 0,
+          category: txn.category,
+          count: 0,
+          merchants: new Set(),
+          potentialSavings: 0,
+          reductionPct: 0
+        };
+      }
+      subcatAnalysis[txn.subcategory].amount += txn.amount;
+      subcatAnalysis[txn.subcategory].count += 1;
+      subcatAnalysis[txn.subcategory].merchants.add(txn.merchant);
+    });
+
+    // 2. Calculate potential savings INTELLIGENTLY
+    const optimizableNeeds = ['Groceries', 'Utilities', 'Phone/Internet', 'Healthcare'];
+    
+    Object.keys(subcatAnalysis).forEach(subcat => {
+      const item = subcatAnalysis[subcat];
+      const monthlyAmount = item.amount / data.period.months;
+      
+      // Smart reduction logic by category
+      if (item.category === 'want') {
+        // Wants: 30% reduction is realistic
+        item.potentialSavings = monthlyAmount * 0.3;
+        item.reductionPct = 30;
+      } else if (item.category === 'need' && optimizableNeeds.includes(subcat)) {
+        // Optimizable Needs: 15% reduction
+        item.potentialSavings = monthlyAmount * 0.15;
+        item.reductionPct = 15;
+      } else if (subcat === 'Subscriptions') {
+        // Subscriptions: 50% elimination (many are unused)
+        item.potentialSavings = monthlyAmount * 0.5;
+        item.reductionPct = 50;
       }
     });
-    
-    // Only show opportunities > $50/month
-    const validOpportunities = Object.entries(categoryTotals)
-      .map(([subcat, total]) => ({
+
+    // 3. Filter and sort opportunities (>$50/mo savings)
+    const opportunities = Object.entries(subcatAnalysis)
+      .map(([subcat, item]) => ({
         subcat,
-        monthlyAmount: Math.round(total / data.period.months),
-        reduction: Math.round((total / data.period.months) * 0.3)
+        monthlyAmount: Math.round(item.amount / data.period.months),
+        potentialSavings: Math.round(item.potentialSavings),
+        category: item.category,
+        count: item.count,
+        reductionPct: item.reductionPct
       }))
-      .filter(opp => opp.reduction >= 50)
-      .sort((a, b) => b.reduction - a.reduction);
-    
-    const topOpportunity = validOpportunities.length > 0 ? validOpportunities[0] : null;
-    
-    // If multiple opportunities, group them
+      .filter(opp => opp.potentialSavings >= 50)
+      .sort((a, b) => b.potentialSavings - a.potentialSavings);
+
+    // 4. Generate grouped insight
     let opportunityText = "";
-    if (validOpportunities.length > 1) {
-      const top3 = validOpportunities.slice(0, 3);
-      const totalSave = top3.reduce((sum, opp) => sum + opp.reduction, 0);
-      const categories = top3.map(o => o.subcat).join(", ");
-      opportunityText = `Save $${totalSave}/mo by reducing ${categories} (30% each)`;
-    } else if (topOpportunity) {
-      opportunityText = `${topOpportunity.subcat} - save $${topOpportunity.reduction}/mo by reducing 30%`;
+    if (opportunities.length === 0) {
+      opportunityText = "Your spending is well-optimized. Keep monitoring for new opportunities!";
+    } else if (opportunities.length === 1) {
+      const opp = opportunities[0];
+      opportunityText = `${opp.subcat}: Save $${opp.potentialSavings}/mo (${opp.reductionPct}% reduction from $${opp.monthlyAmount}/mo)`;
     } else {
-      opportunityText = "No significant savings opportunities detected. Keep monitoring!";
+      // Group top opportunities for maximum impact
+      const top = opportunities.slice(0, Math.min(5, opportunities.length));
+      const totalSavings = top.reduce((sum, opp) => sum + opp.potentialSavings, 0);
+      const categories = top.map(o => `${o.subcat} ($${o.potentialSavings})`).join(", ");
+      opportunityText = `Save $${totalSavings}/mo by optimizing: ${categories}`;
     }
     
     // Positive trend - find well-controlled essential category
@@ -121,8 +159,11 @@ export const KeyInsights = ({ data }: KeyInsightsProps) => {
               <InfoTooltip content={
                 <div className="space-y-2">
                   <p><strong>How it's calculated:</strong></p>
-                  <p className="text-xs">We analyze your "Wants" spending categories and identify the highest opportunities where a 30% reduction would save you $50+/month.</p>
-                  <p className="text-xs">If multiple opportunities exist, we group the top 3 for maximum impact.</p>
+                  <p className="text-xs">We analyze ALL your spending categories and calculate realistic savings:</p>
+                  <p className="text-xs">• <strong>Wants</strong> (Dining, Shopping, Entertainment): 30% reduction</p>
+                  <p className="text-xs">• <strong>Optimizable Needs</strong> (Groceries, Utilities): 15% reduction</p>
+                  <p className="text-xs">• <strong>Subscriptions</strong>: 50% elimination</p>
+                  <p className="text-xs mt-1">Only shows opportunities that save $50+/month.</p>
                 </div>
               } />
             </div>
