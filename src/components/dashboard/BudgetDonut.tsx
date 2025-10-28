@@ -4,7 +4,7 @@ import { AlertTriangle, CheckCircle } from "lucide-react";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import type { DashboardData } from "@/types/dashboard";
 import type { ViewMode } from "@/pages/Dashboard";
-import { validate50_30_20 } from "@/utils/transactionClassifier";
+import { validate50_30_20, filterOperationalTransactions } from "@/utils/transactionClassifier";
 
 interface BudgetDonutProps {
   data: DashboardData;
@@ -26,21 +26,20 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
   const getViewData = () => {
     switch (viewMode) {
       case "category":
-        // Calculate from filtered transactions - map singular to plural
+        // Filter only operational transactions (exclude transfers, refunds, etc.)
+        const { operationalDebits, operationalCredits } = filterOperationalTransactions(filteredTxns);
+        
+        // Calculate category totals from operational debits only
         const categoryTotals = { needs: 0, wants: 0, savings: 0 };
-        filteredTxns.forEach(txn => {
-          if (txn.sign === "debit") {
-            // Map singular category names to plural for display
-            if (txn.category === "need") categoryTotals.needs += txn.amount;
-            else if (txn.category === "want") categoryTotals.wants += txn.amount;
-            else if (txn.category === "saving") categoryTotals.savings += txn.amount;
-          }
+        operationalDebits.forEach(txn => {
+          // Map singular category names to plural for display
+          if (txn.category === "need") categoryTotals.needs += txn.amount;
+          else if (txn.category === "want") categoryTotals.wants += txn.amount;
+          else if (txn.category === "saving") categoryTotals.savings += txn.amount;
         });
         
-        // Calculate total income for 50/30/20 rule
-        const totalIncome = filteredTxns
-          .filter(t => t.sign === "credit")
-          .reduce((sum, t) => sum + t.amount, 0);
+        // Calculate total NET income from operational credits only
+        const totalIncome = operationalCredits.reduce((sum, t) => sum + t.amount, 0);
         
         return {
           title: "50/30/20 Distribution",

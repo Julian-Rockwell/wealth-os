@@ -316,6 +316,73 @@ export function validate50_30_20(
   };
 }
 
+/**
+ * Filters transactions for 50/30/20 budget calculation
+ * Excludes: transfers, card payments, refunds, non-operational flows
+ * Returns only operational debits (true expenses) and credits (true income)
+ */
+export function filterOperationalTransactions(
+  transactions: Transaction[]
+): { 
+  operationalDebits: Transaction[]; 
+  operationalCredits: Transaction[]; 
+} {
+  const operationalDebits: Transaction[] = [];
+  const operationalCredits: Transaction[] = [];
+
+  transactions.forEach(txn => {
+    const desc = txn.desc.toLowerCase();
+    const merchant = txn.merchant.toLowerCase();
+    const subcategory = txn.subcategory.toLowerCase();
+
+    // EXCLUDE from operational flow:
+    const isTransfer = 
+      desc.includes('transfer') ||
+      desc.includes('zelle') ||
+      desc.includes('venmo') ||
+      desc.includes('atm withdrawal') ||
+      desc.includes('credit card payment') ||
+      desc.includes('loan payment') ||
+      desc.includes('mortgage payment') ||
+      merchant.includes('credit card') ||
+      subcategory.includes('transfer') ||
+      subcategory.includes('payment');
+
+    const isRefund = 
+      desc.includes('refund') ||
+      desc.includes('chargeback') ||
+      desc.includes('return') ||
+      subcategory.includes('refund');
+
+    // INCLUDE only operational debits (true expenses)
+    if (txn.sign === 'debit' && !isTransfer && !isRefund) {
+      // Exclude transactions with "Income" subcategory (data quality issue)
+      if (subcategory !== 'income') {
+        operationalDebits.push(txn);
+      }
+    }
+
+    // INCLUDE only operational credits (true income, not transfers/refunds)
+    if (txn.sign === 'credit' && !isTransfer && !isRefund) {
+      // Only include if it's actual income
+      if (
+        desc.includes('payroll') ||
+        desc.includes('deposit') ||
+        desc.includes('salary') ||
+        desc.includes('income') ||
+        merchant.includes('payroll') ||
+        merchant.includes('acme corp') ||
+        subcategory.includes('payroll') ||
+        subcategory.includes('salary')
+      ) {
+        operationalCredits.push(txn);
+      }
+    }
+  });
+
+  return { operationalDebits, operationalCredits };
+}
+
 export function classifyTransactions(
   transactions: (Transaction | StagingTransaction)[]
 ): ClassificationResult {
