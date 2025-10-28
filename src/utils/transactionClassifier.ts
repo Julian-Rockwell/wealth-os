@@ -266,6 +266,56 @@ function aggregateByCategory(
   return result;
 }
 
+export interface BudgetValidation {
+  needsValid: boolean; // needs <= 50%
+  wantsValid: boolean; // wants <= 30%
+  savingsValid: boolean; // savings >= 20%
+  needsPct: number;
+  wantsPct: number;
+  savingsPct: number;
+  alerts: string[];
+}
+
+export function validate50_30_20(
+  totalIncome: number,
+  needs: number,
+  wants: number,
+  savings: number
+): BudgetValidation {
+  const alerts: string[] = [];
+  
+  // Calculate percentages based on income
+  const needsPct = totalIncome > 0 ? (needs / totalIncome) * 100 : 0;
+  const wantsPct = totalIncome > 0 ? (wants / totalIncome) * 100 : 0;
+  const savingsPct = totalIncome > 0 ? (savings / totalIncome) * 100 : 0;
+  
+  // Validate against targets
+  const needsValid = needsPct <= 50;
+  const wantsValid = wantsPct <= 30;
+  const savingsValid = savingsPct >= 20;
+  
+  // Generate alerts
+  if (!needsValid) {
+    alerts.push(`Needs (${needsPct.toFixed(1)}%) exceed 50% target. Consider reducing essential expenses.`);
+  }
+  if (!wantsValid) {
+    alerts.push(`Wants (${wantsPct.toFixed(1)}%) exceed 30% target. Review discretionary spending.`);
+  }
+  if (!savingsValid) {
+    alerts.push(`Savings (${savingsPct.toFixed(1)}%) below 20% target. Increase savings/investments rate.`);
+  }
+  
+  return {
+    needsValid,
+    wantsValid,
+    savingsValid,
+    needsPct,
+    wantsPct,
+    savingsPct,
+    alerts
+  };
+}
+
 export function classifyTransactions(
   transactions: (Transaction | StagingTransaction)[]
 ): ClassificationResult {

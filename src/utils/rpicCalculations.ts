@@ -20,6 +20,7 @@ export interface RpicResult {
   annualRpic: number;
   targetCapitalPassive: number; // For 4% withdrawal
   targetCapitalActive: number; // For wealth OS hybrid
+  rpicIndex: number; // (monthlyRpic / currentMonthlyExpenses) * 100
 }
 
 export interface TimelineResult {
@@ -80,11 +81,18 @@ export function calculateRpic(inputs: RpicInputs): RpicResult {
   // Wealth OS: higher yield allows lower capital
   const targetCapitalActive = annualRpic / inputs.passiveYield;
   
+  // RPIC Index: (Monthly RPIC / Current Monthly Expenses) * 100
+  // Target: 120% - means your passive income can cover 120% of current expenses
+  const rpicIndex = inputs.currentMonthlyExpenses > 0 
+    ? (monthlyRpic / inputs.currentMonthlyExpenses) * 100 
+    : 0;
+  
   return {
     monthlyRpic,
     annualRpic,
     targetCapitalPassive,
     targetCapitalActive,
+    rpicIndex,
   };
 }
 

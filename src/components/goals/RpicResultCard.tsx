@@ -41,6 +41,24 @@ export function RpicResultCard({ rpic, foundationScore }: RpicResultCardProps) {
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* RPIC Index */}
+        <div className="p-4 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm font-semibold text-muted-foreground">RPIC Index</p>
+            <Badge variant={rpic.rpicIndex >= 120 ? "default" : "outline"}>
+              Target: 120%
+            </Badge>
+          </div>
+          <p className="text-4xl font-bold text-primary">
+            {rpic.rpicIndex.toFixed(0)}%
+          </p>
+          <p className="text-xs text-muted-foreground mt-2">
+            {rpic.rpicIndex >= 120 
+              ? "✅ On track! Your passive income can cover your lifestyle with buffer"
+              : `Need ${(120 - rpic.rpicIndex).toFixed(0)}% more to reach target (6-8 year goal)`}
+          </p>
+        </div>
+
         {/* RPIC Values */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2 p-4 rounded-lg bg-primary/5 border border-primary/20">
@@ -73,7 +91,7 @@ export function RpicResultCard({ rpic, foundationScore }: RpicResultCardProps) {
               </p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Wealth OS (10% yield)</p>
+              <p className="text-xs text-muted-foreground">Wealth OS (12-15% yield)</p>
               <p className="text-xl font-bold text-success">
                 ${(rpic.targetCapitalActive / 1000).toFixed(0)}K
               </p>

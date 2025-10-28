@@ -385,7 +385,9 @@ export function calculateDebtPayoffScenarios(liabilities: Liability[]) {
 
 export function calculateAllocationWaterfall(
   snapshot: FinancialSnapshot,
-  emergencyFundMonths: number = 6
+  emergencyFundMonths: number = 6,
+  maxTradingAccountCap: number = 100000,
+  currentTradingAccountValue: number = 0
 ) {
   const liquidAssets = calculateLiquidAssets(snapshot.holdings);
   const monthlyExpenses = calculateMonthlyExpenses(snapshot.stagingTxns);
@@ -394,8 +396,23 @@ export function calculateAllocationWaterfall(
   
   const afterEmergencyFund = Math.max(0, liquidAssets - emergencyFundRequired);
   const afterDebtPayoff = Math.max(0, afterEmergencyFund - highInterestDebt);
-  const activeAccountRecommended = afterDebtPayoff * 0.6;
-  const reserveRecommended = afterDebtPayoff * 0.4;
+  
+  // NEW LOGIC: 100% to trading until cap is reached
+  const feedingToPassive = currentTradingAccountValue >= maxTradingAccountCap;
+  
+  let activeAccountRecommended: number;
+  let reserveRecommended: number;
+  
+  if (feedingToPassive) {
+    // Once cap reached, feed 100% of new capital to passive/reserve
+    activeAccountRecommended = 0;
+    reserveRecommended = afterDebtPayoff;
+  } else {
+    // Before cap: 100% to active trading account
+    const remainingCapacity = maxTradingAccountCap - currentTradingAccountValue;
+    activeAccountRecommended = Math.min(afterDebtPayoff, remainingCapacity);
+    reserveRecommended = Math.max(0, afterDebtPayoff - activeAccountRecommended);
+  }
   
   return {
     totalLiquid: liquidAssets,
@@ -404,12 +421,15 @@ export function calculateAllocationWaterfall(
     availableForInvesting: afterDebtPayoff,
     activeAccount: activeAccountRecommended,
     reserve: reserveRecommended,
+    maxTradingAccountCap,
+    currentTradingAccountValue,
+    feedingToPassive,
     steps: [
       { label: "Total Liquid Assets", amount: liquidAssets, color: "blue" },
       { label: "Emergency Fund", amount: -Math.min(liquidAssets, emergencyFundRequired), color: "red" },
       { label: "Debt Payoff", amount: -Math.min(afterEmergencyFund, highInterestDebt), color: "orange" },
       { label: "Active Trading Account", amount: activeAccountRecommended, color: "green" },
-      { label: "Liquid Reserve", amount: reserveRecommended, color: "yellow" }
+      { label: feedingToPassive ? "Passive Income Reserve" : "Liquid Reserve", amount: reserveRecommended, color: "yellow" }
     ]
   };
 }

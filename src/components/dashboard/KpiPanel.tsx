@@ -1,6 +1,8 @@
 import { Card } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, DollarSign, Calendar } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { TrendingUp, TrendingDown, DollarSign, Calendar, AlertTriangle } from "lucide-react";
 import type { DashboardData } from "@/types/dashboard";
+import { validate50_30_20 } from "@/utils/transactionClassifier";
 
 interface KpiPanelProps {
   data: DashboardData;
@@ -14,6 +16,14 @@ export const KpiPanel = ({ data }: KpiPanelProps) => {
   const needsDiff = data.expenses.needs.pct - needsTarget;
   const wantsDiff = data.expenses.wants.pct - wantsTarget;
   const savingsDiff = data.expenses.savings.pct - savingsTarget;
+
+  // Validate 50/30/20 rule
+  const validation = validate50_30_20(
+    data.income.avgMonthly * data.period.months,
+    data.expenses.needs.total,
+    data.expenses.wants.total,
+    data.expenses.savings.total
+  );
 
   return (
     <div className="space-y-4 lg:sticky lg:top-24">
@@ -64,6 +74,20 @@ export const KpiPanel = ({ data }: KpiPanelProps) => {
           {data.cashflow.monthlySurplus >= 0 ? "+" : ""}${data.cashflow.monthlySurplus.toFixed(0)}
         </p>
       </Card>
+
+      {/* Budget Validation Alerts */}
+      {validation.alerts.length > 0 && (
+        <Alert variant="destructive" className="shadow-soft">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            <div className="space-y-1">
+              {validation.alerts.map((alert, idx) => (
+                <p key={idx} className="text-xs">{alert}</p>
+              ))}
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* 50/30/20 Gauge */}
       <Card className="p-4 shadow-soft">

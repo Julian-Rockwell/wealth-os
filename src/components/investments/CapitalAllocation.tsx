@@ -1,13 +1,17 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Info } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Info, AlertTriangle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import type { FinancialSnapshot } from "@/types/financial";
+import type { TradingStrategy } from "@/types/trading";
 import { calculateAllocationWaterfall } from "@/utils/investmentCalculations";
+import { StrategySelector } from "./StrategySelector";
 
 interface CapitalAllocationProps {
   snapshot: FinancialSnapshot;
@@ -15,13 +19,19 @@ interface CapitalAllocationProps {
 
 export function CapitalAllocation({ snapshot }: CapitalAllocationProps) {
   const [emergencyFundMonths, setEmergencyFundMonths] = useState<number>(6);
-  const [activeAccountPercent, setActiveAccountPercent] = useState<number>(60);
+  const [emergencyFundInstrument, setEmergencyFundInstrument] = useState<string>("TBIL");
+  const [maxTradingAccountCap, setMaxTradingAccountCap] = useState<number>(100000);
+  const [currentTradingAccountValue, setCurrentTradingAccountValue] = useState<number>(0);
+  const [selectedStrategy, setSelectedStrategy] = useState<TradingStrategy | null>(null);
   
-  const allocation = calculateAllocationWaterfall(snapshot, emergencyFundMonths);
-  const reservePercent = 100 - activeAccountPercent;
+  const allocation = calculateAllocationWaterfall(
+    snapshot,
+    emergencyFundMonths,
+    maxTradingAccountCap,
+    currentTradingAccountValue
+  );
   
-  const customActiveAccount = allocation.availableForInvesting * (activeAccountPercent / 100);
-  const customReserve = allocation.availableForInvesting * (reservePercent / 100);
+  const multiStrategyUnlocked = currentTradingAccountValue >= 50000;
 
   const handleAcceptRecommendation = () => {
     toast.success("Allocation saved successfully");
@@ -47,9 +57,20 @@ export function CapitalAllocation({ snapshot }: CapitalAllocationProps) {
       <div>
         <h3 className="text-lg font-semibold mb-2">Capital Allocation Strategy</h3>
         <p className="text-sm text-muted-foreground">
-          Systematic waterfall from liquid assets to active investment capital
+          100% to active trading until cap, then feeding to passive income
         </p>
       </div>
+
+      {/* Feeding Status Alert */}
+      {allocation.feedingToPassive && (
+        <Alert className="border-success bg-success/10">
+          <AlertTriangle className="h-4 w-4 text-success" />
+          <AlertDescription className="text-success-foreground">
+            <strong>Feeding Mode Active:</strong> Trading account has reached cap (${maxTradingAccountCap.toLocaleString()}). 
+            All new capital flows to passive income reserve.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Two-column layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -64,12 +85,12 @@ export function CapitalAllocation({ snapshot }: CapitalAllocationProps) {
             <CardContent>
               <div className="space-y-6">
                 <div>
-                  <div className="text-sm font-medium mb-2">Emergency Fund Target</div>
+                  <Label className="text-sm font-medium">Emergency Fund Target</Label>
                   <Select
                     value={emergencyFundMonths.toString()}
                     onValueChange={(v) => setEmergencyFundMonths(Number(v))}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="mt-2">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -82,22 +103,56 @@ export function CapitalAllocation({ snapshot }: CapitalAllocationProps) {
                 </div>
                 
                 <div>
-                  <div className="text-sm font-medium mb-2">
-                    Active Account Allocation: {activeAccountPercent}%
-                  </div>
-                  <Slider
-                    value={[activeAccountPercent]}
-                    onValueChange={(v) => setActiveAccountPercent(v[0])}
-                    min={40}
-                    max={60}
-                    step={5}
+                  <Label className="text-sm font-medium">Emergency Fund Instrument</Label>
+                  <Select
+                    value={emergencyFundInstrument}
+                    onValueChange={setEmergencyFundInstrument}
+                  >
+                    <SelectTrigger className="mt-2">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="TBIL">T-Bills (TBIL)</SelectItem>
+                      <SelectItem value="HYSA">High-Yield Savings (HYSA)</SelectItem>
+                      <SelectItem value="Money Market">Money Market Fund</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    ⚠️ Never use emergency fund for trading
+                  </p>
+                </div>
+
+                <Separator />
+                
+                <div>
+                  <Label className="text-sm font-medium">Trading Account Cap</Label>
+                  <Input
+                    type="number"
+                    value={maxTradingAccountCap}
+                    onChange={(e) => setMaxTradingAccountCap(Number(e.target.value))}
                     className="mt-2"
+                    min={10000}
+                    step={10000}
                   />
-                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                    <span>40%</span>
-                    <span>50%</span>
-                    <span>60%</span>
-                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Max capital for active trading (default: $100K)
+                  </p>
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium">Current Trading Account Value</Label>
+                  <Input
+                    type="number"
+                    value={currentTradingAccountValue}
+                    onChange={(e) => setCurrentTradingAccountValue(Number(e.target.value))}
+                    className="mt-2"
+                    min={0}
+                    step={1000}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Current value of your active trading account
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -114,30 +169,40 @@ export function CapitalAllocation({ snapshot }: CapitalAllocationProps) {
             <CardContent>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="p-4 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
                     <div className="text-sm text-muted-foreground mb-1">Active Trading Account</div>
-                    <div className="text-2xl font-bold text-green-700">
-                      {customActiveAccount.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                    <div className="text-2xl font-bold text-green-700 dark:text-green-400">
+                      {allocation.activeAccount.toLocaleString("en-US", { style: "currency", currency: "USD" })}
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">
-                      {activeAccountPercent}% of available capital
+                      {allocation.feedingToPassive ? "Cap reached" : "100% until cap"}
                     </div>
                   </div>
                   
-                  <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <div className="text-sm text-muted-foreground mb-1">Liquid Reserve</div>
-                    <div className="text-2xl font-bold text-yellow-700">
-                      {customReserve.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                  <div className="p-4 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                    <div className="text-sm text-muted-foreground mb-1">
+                      {allocation.feedingToPassive ? "Passive Income Reserve" : "Liquid Reserve"}
+                    </div>
+                    <div className="text-2xl font-bold text-yellow-700 dark:text-yellow-400">
+                      {allocation.reserve.toLocaleString("en-US", { style: "currency", currency: "USD" })}
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">
-                      {reservePercent}% for opportunities
+                      {allocation.feedingToPassive ? "Receiving 100% of utilities" : "For opportunities"}
                     </div>
                   </div>
                 </div>
 
+                <div className="p-3 bg-muted rounded-lg">
+                  <p className="text-xs text-muted-foreground">
+                    <strong>Strategy:</strong> {allocation.feedingToPassive 
+                      ? "Feed all profits to passive income account until 12+ months stable at ≥20% return"
+                      : "Allocate 100% to trading until account reaches cap"}
+                  </p>
+                </div>
+
                 <div className="flex gap-3">
-                  <Button onClick={handleAcceptRecommendation}>
-                    Accept Recommendation
+                  <Button onClick={handleAcceptRecommendation} disabled={!selectedStrategy}>
+                    {selectedStrategy ? "Accept Recommendation" : "Select Strategy First"}
                   </Button>
                   <Button variant="outline" onClick={handleLearnMore}>
                     Learn More
@@ -146,6 +211,14 @@ export function CapitalAllocation({ snapshot }: CapitalAllocationProps) {
               </div>
             </CardContent>
           </Card>
+
+          {/* Strategy Selector */}
+          <StrategySelector
+            selectedStrategy={selectedStrategy}
+            onStrategySelect={setSelectedStrategy}
+            currentTradingAccountValue={currentTradingAccountValue}
+            multiStrategyUnlocked={multiStrategyUnlocked}
+          />
         </div>
 
         {/* Right column: Waterfall Visualization */}
@@ -228,13 +301,17 @@ export function CapitalAllocation({ snapshot }: CapitalAllocationProps) {
               {/* Active Account */}
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Active Trading Account ({activeAccountPercent}%)</span>
+                  <span className="text-sm font-medium">
+                    Active Trading Account {allocation.feedingToPassive ? "(Capped)" : "(100%)"}
+                  </span>
                   <span className="font-bold text-green-600">
-                    {customActiveAccount.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                    {allocation.activeAccount.toLocaleString("en-US", { style: "currency", currency: "USD" })}
                   </span>
                 </div>
-                <div className="h-12 bg-green-500 rounded-lg flex items-center justify-center text-white font-semibold">
-                  For Active Trading
+                <div className={`h-12 rounded-lg flex items-center justify-center text-white font-semibold ${
+                  allocation.feedingToPassive ? "bg-green-700" : "bg-green-500"
+                }`}>
+                  {allocation.feedingToPassive ? "Cap Reached" : "For Active Trading"}
                 </div>
               </div>
 
@@ -242,16 +319,20 @@ export function CapitalAllocation({ snapshot }: CapitalAllocationProps) {
                 <div className="w-1 h-8 bg-gradient-to-b from-green-500 to-yellow-500" />
               </div>
 
-              {/* Liquid Reserve */}
+              {/* Liquid/Passive Reserve */}
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Liquid Reserve ({reservePercent}%)</span>
+                  <span className="text-sm font-medium">
+                    {allocation.feedingToPassive ? "Passive Income Reserve" : "Liquid Reserve"}
+                  </span>
                   <span className="font-bold text-yellow-600">
-                    {customReserve.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                    {allocation.reserve.toLocaleString("en-US", { style: "currency", currency: "USD" })}
                   </span>
                 </div>
-                <div className="h-12 bg-yellow-500 rounded-lg flex items-center justify-center text-white font-semibold">
-                  Opportunity Fund
+                <div className={`h-12 rounded-lg flex items-center justify-center text-white font-semibold ${
+                  allocation.feedingToPassive ? "bg-yellow-600" : "bg-yellow-500"
+                }`}>
+                  {allocation.feedingToPassive ? "Receiving Profits" : "Opportunity Fund"}
                 </div>
               </div>
             </div>

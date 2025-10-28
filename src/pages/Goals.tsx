@@ -37,7 +37,7 @@ export default function Goals() {
   const [geography, setGeography] = useState<number>(1.0);
   const [inflationBuffer, setInflationBuffer] = useState<number>(1.15);
   const [activeReturn, setActiveReturn] = useState<number>(25);
-  const [passiveYield, setPassiveYield] = useState<number>(10);
+  const [passiveYield, setPassiveYield] = useState<number>(13);
   const [inflation, setInflation] = useState<number>(3);
   const [startingCapital, setStartingCapital] = useState<number>(autoStartingCapital);
   const [monthlyContribution, setMonthlyContribution] = useState<number>(500);
@@ -93,7 +93,7 @@ export default function Goals() {
 
   const handleResetAssumptions = () => {
     setActiveReturn(25);
-    setPassiveYield(10);
+    setPassiveYield(13);
     setInflation(3);
   };
 

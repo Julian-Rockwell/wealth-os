@@ -24,9 +24,9 @@ export function AssumptionsPanel({
   onReset,
 }: AssumptionsPanelProps) {
   const presets = [
-    { label: "Conservative", active: 18, passive: 8, inflation: 3.5 },
-    { label: "Default", active: 25, passive: 10, inflation: 3 },
-    { label: "Aggressive", active: 35, passive: 12, inflation: 2.5 },
+    { label: "Conservative", active: 20, passive: 12, inflation: 3.5 },
+    { label: "Default", active: 25, passive: 13, inflation: 3 },
+    { label: "Aggressive", active: 30, passive: 15, inflation: 2.5 },
   ];
 
   const applyPreset = (preset: typeof presets[0]) => {
@@ -83,14 +83,14 @@ export function AssumptionsPanel({
           </div>
           <Slider
             id="active-return"
-            min={10}
-            max={50}
+            min={20}
+            max={30}
             step={1}
             value={[activeReturn]}
             onValueChange={([value]) => onActiveReturnChange(value)}
           />
           <p className="text-xs text-muted-foreground">
-            Target return for active trading phase (default: 25%)
+            Target return for active trading phase: 20-30% (default: 25%)
           </p>
         </div>
 
@@ -104,14 +104,14 @@ export function AssumptionsPanel({
           </div>
           <Slider
             id="passive-yield"
-            min={4}
+            min={12}
             max={15}
             step={0.5}
             value={[passiveYield]}
             onValueChange={([value]) => onPassiveYieldChange(value)}
           />
           <p className="text-xs text-muted-foreground">
-            Target yield for passive income phase (default: 10%)
+            Target yield for passive income phase: 12-15% (default: 13%)
           </p>
         </div>
 
