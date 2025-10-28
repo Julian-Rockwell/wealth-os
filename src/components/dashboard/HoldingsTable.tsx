@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Edit3, Trash2, Check, X, Plus } from "lucide-react";
 import type { Holding, AccountType, AssetClass, Liquidity } from "@/types/financial";
 import { toast } from "sonner";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
 
 interface HoldingsTableProps {
   holdings: Holding[];
@@ -83,7 +84,38 @@ export const HoldingsTable = ({ holdings, onUpdate, onDelete, onAdd }: HoldingsT
                 <TableHead>Name</TableHead>
                 <TableHead>Account Type</TableHead>
                 <TableHead>Asset Class</TableHead>
-                <TableHead>Liquidity</TableHead>
+                <TableHead>
+                  <div className="flex items-center gap-1">
+                    Liquidity
+                    <InfoTooltip
+                      content={
+                        <div className="space-y-2">
+                          <div className="font-semibold mb-2">Liquidity Classification:</div>
+                          <div className="space-y-1">
+                            <div>
+                              <span className="text-success">● Liquid</span> (&lt;1 week)
+                              <div className="text-xs text-muted-foreground ml-4">
+                                Checking, Savings, Money market
+                              </div>
+                            </div>
+                            <div>
+                              <span className="text-warning">● Semi-Liquid</span> (1-4 weeks)
+                              <div className="text-xs text-muted-foreground ml-4">
+                                Brokerage stocks/bonds, Taxable investments
+                              </div>
+                            </div>
+                            <div>
+                              <span className="text-destructive">● Illiquid</span> (&gt;4 weeks)
+                              <div className="text-xs text-muted-foreground ml-4">
+                                Real estate, Vehicles, 401(k)/IRA
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    />
+                  </div>
+                </TableHead>
                 <TableHead className="text-right">Balance</TableHead>
                 <TableHead>Source</TableHead>
                 <TableHead className="text-right">Actions</TableHead>

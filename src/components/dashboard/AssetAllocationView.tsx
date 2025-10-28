@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import type { Holding } from "@/types/financial";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
 
 interface AssetAllocationViewProps {
   holdings: Holding[];
@@ -132,7 +133,29 @@ export const AssetAllocationView = ({ holdings }: AssetAllocationViewProps) => {
         <TabsList className="grid w-full grid-cols-4 mb-6">
           <TabsTrigger value="account-type">By Account Type</TabsTrigger>
           <TabsTrigger value="asset-class">By Asset Class</TabsTrigger>
-          <TabsTrigger value="liquidity">By Liquidity</TabsTrigger>
+          <TabsTrigger value="liquidity">
+            <div className="flex items-center gap-1">
+              By Liquidity
+              <InfoTooltip
+                content={
+                  <div className="space-y-2">
+                    <div className="font-semibold">Why these classifications?</div>
+                    <div className="text-xs space-y-1">
+                      <div>
+                        <strong>Vehicles:</strong> Considered illiquid due to typical 4+ week sale timeline, depreciation considerations, and market volatility.
+                      </div>
+                      <div>
+                        <strong>Retirement accounts:</strong> Illiquid due to tax penalties before age 59.5 and withdrawal restrictions.
+                      </div>
+                      <div>
+                        <strong>Real estate:</strong> Requires extensive time for listing, negotiation, and closing process.
+                      </div>
+                    </div>
+                  </div>
+                }
+              />
+            </div>
+          </TabsTrigger>
           <TabsTrigger value="custom">Custom</TabsTrigger>
         </TabsList>
 

@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Droplet } from "lucide-react";
 import { useState } from "react";
 import type { Holding } from "@/types/financial";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
 
 interface LiquidAssetsPanelProps {
   holdings: Holding[];
@@ -34,7 +35,28 @@ export const LiquidAssetsPanel = ({ holdings }: LiquidAssetsPanelProps) => {
 
       <div className="space-y-4">
         <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
-          <p className="text-sm text-muted-foreground mb-1">Total Liquid Assets</p>
+          <div className="flex items-center gap-1 mb-1">
+            <p className="text-sm text-muted-foreground">Total Liquid Assets</p>
+            <InfoTooltip
+              content={
+                <div className="space-y-2">
+                  <div className="font-semibold">Only includes assets accessible within 1 week:</div>
+                  <div className="text-xs space-y-1">
+                    <div>✓ Checking accounts</div>
+                    <div>✓ Savings accounts</div>
+                    <div>✓ Money market funds</div>
+                  </div>
+                  <div className="font-semibold mt-2">Excludes:</div>
+                  <div className="text-xs space-y-1">
+                    <div>✗ Brokerage (semi-liquid)</div>
+                    <div>✗ Vehicles (illiquid)</div>
+                    <div>✗ Real estate (illiquid)</div>
+                    <div>✗ Retirement accounts (illiquid)</div>
+                  </div>
+                </div>
+              }
+            />
+          </div>
           <p className="text-2xl font-bold text-primary">
             ${liquidAssets.toLocaleString('en-US', { minimumFractionDigits: 2 })}
           </p>

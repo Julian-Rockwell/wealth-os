@@ -243,7 +243,7 @@ export const SAMPLE_REYNOLDS_DATA: FinancialSnapshot = {
     {id:"h_401k",accountId:"acc_401k_fid",name:"Fidelity 401(k)",accountType:"401k",assetClass:"stocks",liquidity:"illiquid",balance:120000.00,currency:"USD",source:"mock"},
     {id:"h_roth",accountId:"acc_ira_roth",name:"Roth IRA",accountType:"IRA",assetClass:"stocks",liquidity:"illiquid",balance:43000.00,currency:"USD",source:"mock"},
     {id:"h_home",accountId:"acc_real_home",name:"Home Valuation (Zillow)",accountType:"real_estate",assetClass:"real_estate",liquidity:"illiquid",balance:820000.00,currency:"USD",source:"mock"},
-    {id:"h_vehicle",accountId:"acc_vehicle_1",name:"Vehicle Value (KBB)",accountType:"vehicle",assetClass:"other",liquidity:"semi_liquid",balance:24000.00,currency:"USD",source:"mock"}
+    {id:"h_vehicle",accountId:"acc_vehicle_1",name:"Vehicle Value (KBB)",accountType:"vehicle",assetClass:"other",liquidity:"illiquid",balance:24000.00,currency:"USD",source:"mock"}
   ],
   liabilities: [
     {id:"l_mort",accountId:"acc_real_home",name:"FirstHome Mortgage",type:"mortgage",apr:4.25,balance:510000.00,monthlyPayment:3650.00,remainingTermMonths:325,notes:"FirstHome Mortgage"},
@@ -306,7 +306,7 @@ export const SAMPLE_JOHNSON_DATA: FinancialSnapshot = {
     {id:"h_401k_j",accountId:"acc_401k_j004",name:"Vanguard 401(k)",accountType:"401k",assetClass:"stocks",liquidity:"illiquid",balance:95000.00,currency:"USD",source:"mock"},
     {id:"h_roth_j",accountId:"acc_ira_j005",name:"Roth IRA",accountType:"IRA",assetClass:"stocks",liquidity:"illiquid",balance:38000.00,currency:"USD",source:"mock"},
     {id:"h_home_j",accountId:"acc_real_j006",name:"Home Valuation (Redfin)",accountType:"real_estate",assetClass:"real_estate",liquidity:"illiquid",balance:625000.00,currency:"USD",source:"mock"},
-    {id:"h_vehicle_j",accountId:"acc_vehicle_j007",name:"Vehicle Value (KBB)",accountType:"vehicle",assetClass:"other",liquidity:"semi_liquid",balance:19000.00,currency:"USD",source:"mock"}
+    {id:"h_vehicle_j",accountId:"acc_vehicle_j007",name:"Vehicle Value (KBB)",accountType:"vehicle",assetClass:"other",liquidity:"illiquid",balance:19000.00,currency:"USD",source:"mock"}
   ],
   liabilities: [
     {id:"l_mort_j",accountId:"acc_real_j006",name:"Rocket Mortgage",type:"mortgage",apr:3.5,balance:380000.00,monthlyPayment:2450.00,remainingTermMonths:285,notes:"Rocket Mortgage"},

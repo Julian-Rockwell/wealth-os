@@ -2,6 +2,13 @@
 
 export type AccountType = "checking" | "savings" | "brokerage" | "401k" | "IRA" | "real_estate" | "vehicle" | "credit_card" | "other";
 export type AssetClass = "cash" | "stocks" | "bonds" | "real_estate" | "commodities" | "crypto" | "other";
+
+/**
+ * Asset liquidity classification based on conversion to cash timeline:
+ * - liquid: <1 week (checking, savings, money market)
+ * - semi_liquid: 1-4 weeks (brokerage, taxable investments)
+ * - illiquid: >4 weeks (real estate, vehicles, retirement accounts)
+ */
 export type Liquidity = "liquid" | "semi_liquid" | "illiquid";
 export type LiabilityType = "mortgage" | "auto" | "student" | "credit_card" | "personal" | "other";
 export type AccountStatus = "connected" | "needs_attention" | "disconnected";
