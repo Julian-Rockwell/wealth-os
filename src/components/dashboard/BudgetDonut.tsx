@@ -45,9 +45,9 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
         return {
           title: "50/30/20 Distribution",
           items: [
-            { label: "Needs (50%)", value: categoryTotals.needs, color: "bg-needs", pct: totalIncome > 0 ? (categoryTotals.needs / totalIncome) * 100 : 0 },
-            { label: "Wants (30%)", value: categoryTotals.wants, color: "bg-wants", pct: totalIncome > 0 ? (categoryTotals.wants / totalIncome) * 100 : 0 },
-            { label: "Savings (20%)", value: categoryTotals.savings, color: "bg-savings", pct: totalIncome > 0 ? (categoryTotals.savings / totalIncome) * 100 : 0 },
+            { label: "Needs", value: categoryTotals.needs, color: "bg-needs", pct: totalIncome > 0 ? (categoryTotals.needs / totalIncome) * 100 : 0, target: 50 },
+            { label: "Wants", value: categoryTotals.wants, color: "bg-wants", pct: totalIncome > 0 ? (categoryTotals.wants / totalIncome) * 100 : 0, target: 30 },
+            { label: "Savings", value: categoryTotals.savings, color: "bg-savings", pct: totalIncome > 0 ? (categoryTotals.savings / totalIncome) * 100 : 0, target: 20 },
           ]
         };
       
@@ -71,7 +71,8 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
           title: "Top 5 Subcategories",
           items: allSubs.map(item => ({
             ...item,
-            pct: subsTotal > 0 ? (item.value / subsTotal) * 100 : 0
+            pct: subsTotal > 0 ? (item.value / subsTotal) * 100 : 0,
+            target: undefined
           }))
         };
       
@@ -90,7 +91,8 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
             label: merchant,
             value,
             color: "bg-primary",
-            pct: merchTotal > 0 ? (value / merchTotal) * 100 : 0
+            pct: merchTotal > 0 ? (value / merchTotal) * 100 : 0,
+            target: undefined
           }))
         };
       
@@ -106,9 +108,9 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
         return {
           title: "Spending Liquidity",
           items: [
-            { label: "Fixed Expenses", value: liquidityData.fixed || 0, color: "bg-destructive", pct: liqTotal > 0 ? ((liquidityData.fixed || 0) / liqTotal) * 100 : 0 },
-            { label: "Committed", value: liquidityData.committed || 0, color: "bg-warning", pct: liqTotal > 0 ? ((liquidityData.committed || 0) / liqTotal) * 100 : 0 },
-            { label: "Discretionary", value: liquidityData.discretionary || 0, color: "bg-success", pct: liqTotal > 0 ? ((liquidityData.discretionary || 0) / liqTotal) * 100 : 0 },
+            { label: "Fixed Expenses", value: liquidityData.fixed || 0, color: "bg-destructive", pct: liqTotal > 0 ? ((liquidityData.fixed || 0) / liqTotal) * 100 : 0, target: undefined },
+            { label: "Committed", value: liquidityData.committed || 0, color: "bg-warning", pct: liqTotal > 0 ? ((liquidityData.committed || 0) / liqTotal) * 100 : 0, target: undefined },
+            { label: "Discretionary", value: liquidityData.discretionary || 0, color: "bg-success", pct: liqTotal > 0 ? ((liquidityData.discretionary || 0) / liqTotal) * 100 : 0, target: undefined },
           ]
         };
       
@@ -116,9 +118,9 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
         return {
           title: "Budget Distribution",
           items: [
-            { label: "Needs", value: data.expenses.needs.total, color: "bg-needs", pct: data.expenses.needs.pct },
-            { label: "Wants", value: data.expenses.wants.total, color: "bg-wants", pct: data.expenses.wants.pct },
-            { label: "Savings", value: data.expenses.savings.total, color: "bg-savings", pct: data.expenses.savings.pct },
+            { label: "Needs", value: data.expenses.needs.total, color: "bg-needs", pct: data.expenses.needs.pct, target: undefined },
+            { label: "Wants", value: data.expenses.wants.total, color: "bg-wants", pct: data.expenses.wants.pct, target: undefined },
+            { label: "Savings", value: data.expenses.savings.total, color: "bg-savings", pct: data.expenses.savings.pct, target: undefined },
           ]
         };
     }
@@ -218,10 +220,11 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
               </div>
               <div className="text-right ml-2">
                 <p className="text-sm font-semibold">
-                  {targetPct !== null && (
-                    <span className="text-xs text-muted-foreground mr-1">{targetPct}% →</span>
+                  {targetPct !== null ? (
+                    <>{item.pct.toFixed(1)}% / {targetPct}%</>
+                  ) : (
+                    <>{item.pct.toFixed(1)}%</>
                   )}
-                  {item.pct.toFixed(1)}%
                 </p>
                 <p className="text-xs text-muted-foreground">${item.value.toFixed(0)}</p>
               </div>
