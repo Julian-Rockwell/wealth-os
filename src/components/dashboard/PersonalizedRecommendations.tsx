@@ -14,18 +14,82 @@ export const PersonalizedRecommendations = ({ data }: PersonalizedRecommendation
     toast.success(`Applied recommendation: ${title}`);
   };
 
+  // Generate Quick Wins dynamically from transaction data
+  const generateQuickWins = () => {
+    const txns = data.txns.filter(t => t.sign === "debit");
+    
+    // Analyze "wants" subcategories for savings opportunities
+    const wantsSubs: Record<string, { total: number; count: number }> = {};
+    
+    txns.forEach(txn => {
+      if (txn.category === "want") {
+        if (!wantsSubs[txn.subcategory]) {
+          wantsSubs[txn.subcategory] = { total: 0, count: 0 };
+        }
+        wantsSubs[txn.subcategory].total += txn.amount;
+        wantsSubs[txn.subcategory].count += 1;
+      }
+    });
+    
+    // Sort by highest spending
+    const sortedWants = Object.entries(wantsSubs)
+      .sort(([, a], [, b]) => b.total - a.total);
+    
+    const recommendations: Array<{title: string; estMonthlySave: number; category: string}> = [];
+    
+    // Top 3 categories with highest savings potential
+    sortedWants.slice(0, 3).forEach(([subcat, subcatData]) => {
+      const monthlyAvg = subcatData.total / data.period.months;
+      const potentialSave = Math.round(monthlyAvg * 0.25); // 25% reduction estimate
+      
+      if (potentialSave > 20) { // Only if savings are significant
+        recommendations.push({
+          title: `Reduce ${subcat} spending`,
+          estMonthlySave: potentialSave,
+          category: "wants"
+        });
+      }
+    });
+    
+    // Analyze subscriptions specifically
+    const subscriptionTotal = wantsSubs["Subscriptions"]?.total || 0;
+    if (subscriptionTotal > 0) {
+      const monthlySubcost = subscriptionTotal / data.period.months;
+      recommendations.push({
+        title: "Review and cancel unused subscriptions",
+        estMonthlySave: Math.round(monthlySubcost * 0.30),
+        category: "wants"
+      });
+    }
+    
+    // Analyze groceries if they exceed threshold
+    const groceriesTotal = data.expenses.needs.subs["Groceries"] || 0;
+    const monthlyGroceries = groceriesTotal / data.period.months;
+    
+    if (monthlyGroceries > 500) { // If spending more than $500/month on groceries
+      recommendations.push({
+        title: "Optimize grocery shopping with meal planning",
+        estMonthlySave: Math.round(monthlyGroceries * 0.15),
+        category: "needs"
+      });
+    }
+    
+    return recommendations.slice(0, 3); // Maximum 3 quick wins
+  };
+
   // Generate dynamic recommendations
   const generateRecommendations = () => {
     const monthlyExpenses = (data.expenses.needs.total + data.expenses.wants.total + data.expenses.savings.total) / data.period.months;
     const wantsMonthly = data.expenses.wants.total / data.period.months;
     const savingsRate = data.expenses.savings.pct;
     
+    const quickWins = generateQuickWins();
     const totalSavings = Math.round(
-      data.recommendations.immediate.reduce((sum, rec) => sum + rec.estMonthlySave, 0)
+      quickWins.reduce((sum, rec) => sum + rec.estMonthlySave, 0)
     );
 
     return {
-      quickWins: data.recommendations.immediate,
+      quickWins,
       totalSavings,
       thisWeek: [
         `Review and optimize ${Object.keys(data.expenses.wants.subs).length} spending categories`,

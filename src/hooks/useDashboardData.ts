@@ -209,7 +209,7 @@ export const useDashboardData = () => {
         },
         cashflow: { monthlySurplus: (avgIncomeAmount || 0) - totalExpenses / (source.period.months || 1) },
         txns: transactions,
-        recommendations: { immediate: [] },
+        recommendations: { immediate: [] }, // Generated dynamically in PersonalizedRecommendations component
       };
     }
 

@@ -355,7 +355,7 @@ export const SAMPLE_DASHBOARD_DATA: DashboardData = {
   },
   cashflow: { monthlySurplus: 0 },
   txns: generateReynoldsTransactions(),
-  recommendations: { immediate: [] }
+  recommendations: { immediate: [] } // Generated dynamically in PersonalizedRecommendations component
 };
 
 // Export Johnson transactions as separate DashboardData
@@ -374,5 +374,5 @@ export const SAMPLE_JOHNSON_DASHBOARD_DATA: DashboardData = {
   },
   cashflow: { monthlySurplus: 0 },
   txns: generateJohnsonTransactions(),
-  recommendations: { immediate: [] }
+  recommendations: { immediate: [] } // Generated dynamically in PersonalizedRecommendations component
 };
