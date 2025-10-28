@@ -36,13 +36,18 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
             else if (txn.category === "saving") categoryTotals.savings += txn.amount;
           }
         });
-        const categoryTotal = Object.values(categoryTotals).reduce((sum, v) => sum + v, 0);
+        
+        // Calculate total income for 50/30/20 rule
+        const totalIncome = filteredTxns
+          .filter(t => t.sign === "credit")
+          .reduce((sum, t) => sum + t.amount, 0);
+        
         return {
           title: "50/30/20 Distribution",
           items: [
-            { label: "Needs (50%)", value: categoryTotals.needs, color: "bg-needs", pct: categoryTotal > 0 ? (categoryTotals.needs / categoryTotal) * 100 : 0 },
-            { label: "Wants (30%)", value: categoryTotals.wants, color: "bg-wants", pct: categoryTotal > 0 ? (categoryTotals.wants / categoryTotal) * 100 : 0 },
-            { label: "Savings (20%)", value: categoryTotals.savings, color: "bg-savings", pct: categoryTotal > 0 ? (categoryTotals.savings / categoryTotal) * 100 : 0 },
+            { label: "Needs (50%)", value: categoryTotals.needs, color: "bg-needs", pct: totalIncome > 0 ? (categoryTotals.needs / totalIncome) * 100 : 0 },
+            { label: "Wants (30%)", value: categoryTotals.wants, color: "bg-wants", pct: totalIncome > 0 ? (categoryTotals.wants / totalIncome) * 100 : 0 },
+            { label: "Savings (20%)", value: categoryTotals.savings, color: "bg-savings", pct: totalIncome > 0 ? (categoryTotals.savings / totalIncome) * 100 : 0 },
           ]
         };
       
