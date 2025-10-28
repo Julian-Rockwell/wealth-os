@@ -7,7 +7,7 @@ import { LiabilitiesTable } from "@/components/dashboard/LiabilitiesTable";
 import { AssetAllocationView } from "@/components/dashboard/AssetAllocationView";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, Database } from "lucide-react";
+import { AlertCircle, Database, LayoutDashboard } from "lucide-react";
 import type { Holding, Liability } from "@/types/financial";
 import { updateSnapshotHoldings, updateSnapshotLiabilities } from "@/utils/snapshotHelpers";
 
@@ -18,6 +18,25 @@ export default function NetWorthDashboard() {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
+          {/* Page Description */}
+          <div className="mb-6 bg-gradient-to-r from-primary/10 to-accent/10 p-6 rounded-lg border">
+            <div className="flex items-start gap-4">
+              <div className="p-3 rounded-lg bg-primary/20">
+                <LayoutDashboard className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold mb-2">Net Worth Dashboard</h2>
+                <p className="text-muted-foreground leading-relaxed">
+                  <strong>What you'll find here:</strong> A comprehensive view of your <strong>net worth</strong> 
+                  (assets minus liabilities). Track all your holdings (checking, savings, brokerage, real estate, vehicles) 
+                  and liabilities (mortgage, auto loans, credit cards). See asset allocation by class (cash, stocks, bonds, 
+                  real estate), liquid assets breakdown, and connection status for each account. This is your financial 
+                  snapshot—the foundation for all other analyses.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div className="mb-6 p-8 rounded-lg bg-card border-2 border-dashed text-center">
             <Database className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
             <h2 className="text-xl font-semibold mb-2">No Data Loaded</h2>
@@ -33,6 +52,24 @@ export default function NetWorthDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
+        {/* Page Description */}
+        <div className="mb-6 bg-gradient-to-r from-primary/10 to-accent/10 p-6 rounded-lg border">
+          <div className="flex items-start gap-4">
+            <div className="p-3 rounded-lg bg-primary/20">
+              <LayoutDashboard className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold mb-2">Net Worth Dashboard</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                <strong>What you'll find here:</strong> A comprehensive view of your <strong>net worth</strong> 
+                (assets minus liabilities). Track all your holdings (checking, savings, brokerage, real estate, vehicles) 
+                and liabilities (mortgage, auto loans, credit cards). See asset allocation by class (cash, stocks, bonds, 
+                real estate), liquid assets breakdown, and connection status for each account. This is your financial 
+                snapshot—the foundation for all other analyses.
+              </p>
+            </div>
+          </div>
+        </div>
         {/* Backfill Alert */}
         {snapshot.analyzedPeriod.totalMonths < 3 && (
           <div className="mb-6 p-4 rounded-lg bg-warning/10 border border-warning/20">

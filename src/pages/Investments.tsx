@@ -1,17 +1,16 @@
 import { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Lock } from "lucide-react";
+import { Lock, TrendingUp } from "lucide-react";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
 import { ReadinessScore } from "@/components/investments/ReadinessScore";
 import { OptimizeAssets } from "@/components/investments/OptimizeAssets";
 import { CapitalAllocation } from "@/components/investments/CapitalAllocation";
 import { PaperTradingProgress } from "@/components/investments/PaperTradingProgress";
 import { calculateReadinessScore } from "@/utils/investmentCalculations";
-import type { PaperTradingProgress as PaperTradingProgressType } from "@/types/trading";
 
 export default function Investments() {
-  const { snapshot } = useFinancialData();
+  const { snapshot, paperTradingData } = useFinancialData();
   const [activeTab, setActiveTab] = useState("readiness");
 
   // Calculate readiness score to determine gating
@@ -22,19 +21,8 @@ export default function Investments() {
 
   const isReady = readinessResult && readinessResult.totalScore >= 80;
 
-  // Mock paper trading progress (in production, this would come from database/context)
-  const paperTradingProgress: PaperTradingProgressType = {
-    totalTrades: 35,
-    requiredTrades: 40,
-    adherenceRate: 92,
-    requiredAdherence: 95,
-    checklist: [],
-    checklistScore: 65,
-    requiredChecklistScore: 70,
-    isReadyForLiveTrading: false,
-  };
-
-  const isPaperTradingComplete = paperTradingProgress.isReadyForLiveTrading;
+  // Use paper trading data from context
+  const isPaperTradingComplete = paperTradingData?.isReadyForLiveTrading || false;
 
   if (!snapshot) {
     return (
@@ -46,11 +34,24 @@ export default function Investments() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Investment Planning</h2>
-        <p className="text-muted-foreground mt-1">
-          Assess readiness, optimize assets, and allocate capital strategically
-        </p>
+      {/* Page Description */}
+      <div className="bg-gradient-to-r from-primary/10 to-accent/10 p-6 rounded-lg border">
+        <div className="flex items-start gap-4">
+          <div className="p-3 rounded-lg bg-primary/20">
+            <TrendingUp className="w-6 h-6 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold mb-2">Investment Planning</h2>
+            <p className="text-muted-foreground leading-relaxed">
+              <strong>What you'll find here:</strong> A comprehensive 4-step process to prepare for active trading. 
+              Start by assessing your financial foundation with the <strong>Readiness Score</strong>, then identify 
+              opportunities to <strong>Optimize Assets</strong> (liquidate equity or pay off high-interest debt). 
+              Complete <strong>Paper Trading gates</strong> (40 trades, 95% adherence, 70% checklist) before unlocking 
+              <strong>Capital Allocation</strong> where you'll define your trading account cap, emergency fund, 
+              and feeding strategy for passive income.
+            </p>
+          </div>
+        </div>
       </div>
 
       {!isReady && activeTab !== "readiness" && (
@@ -113,7 +114,16 @@ export default function Investments() {
 
         <TabsContent value="paper-trading" className="mt-6">
           {isReady ? (
-            <PaperTradingProgress progress={paperTradingProgress} />
+            paperTradingData ? (
+              <PaperTradingProgress progress={paperTradingData} />
+            ) : (
+              <Alert>
+                <Lock className="h-4 w-4" />
+                <AlertDescription>
+                  No paper trading data available. Load sample data to see your progress.
+                </AlertDescription>
+              </Alert>
+            )
           ) : (
             <Alert>
               <Lock className="h-4 w-4" />

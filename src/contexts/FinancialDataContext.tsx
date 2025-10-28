@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import type { FinancialSnapshot } from "@/types/financial";
 import type { DashboardData } from "@/types/dashboard";
+import type { PaperTradingProgress } from "@/types/trading";
 
 interface DraftData {
   mockConnections: any[];
@@ -14,6 +15,8 @@ interface FinancialDataContextType {
   setSnapshot: (snapshot: FinancialSnapshot | null) => void;
   dashboardData: DashboardData | null;
   setDashboardData: (data: DashboardData | null) => void;
+  paperTradingData: PaperTradingProgress | null;
+  setPaperTradingData: (data: PaperTradingProgress | null) => void;
   draftData: DraftData;
   setDraftData: (data: DraftData) => void;
   resetAllData: () => void;
@@ -29,6 +32,11 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
 
   const [dashboardData, setDashboardDataState] = useState<DashboardData | null>(() => {
     const stored = localStorage.getItem("dashboardData");
+    return stored ? JSON.parse(stored) : null;
+  });
+
+  const [paperTradingData, setPaperTradingDataState] = useState<PaperTradingProgress | null>(() => {
+    const stored = localStorage.getItem("paperTradingData");
     return stored ? JSON.parse(stored) : null;
   });
 
@@ -60,6 +68,15 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     }
   };
 
+  const setPaperTradingData = (newData: PaperTradingProgress | null) => {
+    setPaperTradingDataState(newData);
+    if (newData) {
+      localStorage.setItem("paperTradingData", JSON.stringify(newData));
+    } else {
+      localStorage.removeItem("paperTradingData");
+    }
+  };
+
   const setDraftData = (newData: DraftData) => {
     setDraftDataState(newData);
     localStorage.setItem("draftData", JSON.stringify(newData));
@@ -68,6 +85,7 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
   const resetAllData = () => {
     setSnapshotState(null);
     setDashboardDataState(null);
+    setPaperTradingDataState(null);
     setDraftDataState({
       mockConnections: [],
       files: [],
@@ -76,6 +94,7 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     });
     localStorage.removeItem("financialSnapshot");
     localStorage.removeItem("dashboardData");
+    localStorage.removeItem("paperTradingData");
     localStorage.removeItem("draftData");
   };
 
@@ -86,6 +105,8 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
         setSnapshot,
         dashboardData,
         setDashboardData,
+        paperTradingData,
+        setPaperTradingData,
         draftData,
         setDraftData,
         resetAllData,

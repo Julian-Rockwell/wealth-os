@@ -1,5 +1,6 @@
 import type { FinancialSnapshot, StagingTransaction } from "@/types/financial";
 import type { Transaction, DashboardData } from "@/types/dashboard";
+import type { PaperTradingProgress } from "@/types/trading";
 
 // Helper: Convert Transaction to StagingTransaction
 const toStagingTransaction = (t: Transaction): StagingTransaction => ({
@@ -375,4 +376,28 @@ export const SAMPLE_JOHNSON_DASHBOARD_DATA: DashboardData = {
   cashflow: { monthlySurplus: 0 },
   txns: generateJohnsonTransactions(),
   recommendations: { immediate: [] } // Generated dynamically in PersonalizedRecommendations component
+};
+
+// Paper Trading Progress Data for Reynolds Family (more aggressive, closer to ready)
+export const REYNOLDS_PAPER_TRADING_DATA: PaperTradingProgress = {
+  totalTrades: 38,
+  requiredTrades: 40,
+  adherenceRate: 94,
+  requiredAdherence: 95,
+  checklist: [],
+  checklistScore: 68,
+  requiredChecklistScore: 70,
+  isReadyForLiveTrading: false,
+};
+
+// Paper Trading Progress Data for Johnson Family (more conservative, further from ready)
+export const JOHNSON_PAPER_TRADING_DATA: PaperTradingProgress = {
+  totalTrades: 22,
+  requiredTrades: 40,
+  adherenceRate: 88,
+  requiredAdherence: 95,
+  checklist: [],
+  checklistScore: 52,
+  requiredChecklistScore: 70,
+  isReadyForLiveTrading: false,
 };

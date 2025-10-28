@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
 import type { Account, Holding, Liability, FinancialSnapshot, AccountStatus, AccountType, AssetClass, Liquidity, LiabilityType } from "@/types/financial";
-import { SAMPLE_REYNOLDS_DATA, SAMPLE_JOHNSON_DATA, SAMPLE_DASHBOARD_DATA, SAMPLE_JOHNSON_DASHBOARD_DATA } from "@/utils/sampleData";
+import { SAMPLE_REYNOLDS_DATA, SAMPLE_JOHNSON_DATA, SAMPLE_DASHBOARD_DATA, SAMPLE_JOHNSON_DASHBOARD_DATA, REYNOLDS_PAPER_TRADING_DATA, JOHNSON_PAPER_TRADING_DATA } from "@/utils/sampleData";
 
 interface FileUploadState {
   file: File;
@@ -34,7 +34,7 @@ interface UploadProps {
 }
 
 export default function Upload({ onComplete }: UploadProps = {}) {
-  const { setSnapshot, setDashboardData, draftData, setDraftData, resetAllData, snapshot } = useFinancialData();
+  const { setSnapshot, setDashboardData, setPaperTradingData, draftData, setDraftData, resetAllData, snapshot } = useFinancialData();
   const [files, setFiles] = useState<FileUploadState[]>(draftData.files || []);
   const [isDragging, setIsDragging] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -292,19 +292,40 @@ export default function Upload({ onComplete }: UploadProps = {}) {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-12 animate-fade-in">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-primary mb-6 shadow-medium">
-                  <TrendingUp className="w-8 h-8 text-white" />
-                </div>
-                <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Rockwell Wealth OS
-                </h1>
-                <p className="text-xl text-muted-foreground mb-6">Let's Analyze Your Spending Patterns</p>
-                <p className="text-base text-muted-foreground max-w-3xl mx-auto">
-                  Upload AT LEAST 3 months of financial statements in any format (PDF, CSV, Excel, images). 
-                  Connect mock accounts or enter data manually. The more data provided, the more accurate the analysis.
+          <div className="text-center mb-8 animate-fade-in">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-primary mb-6 shadow-medium">
+              <TrendingUp className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Rockwell Wealth OS
+            </h1>
+            <p className="text-xl text-muted-foreground mb-6">Let's Analyze Your Spending Patterns</p>
+          </div>
+
+          {/* Page Description */}
+          <div className="mb-8 bg-gradient-to-r from-primary/10 to-accent/10 p-6 rounded-lg border">
+            <div className="flex items-start gap-4">
+              <div className="p-3 rounded-lg bg-primary/20">
+                <UploadIcon className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold mb-2">Command Center</h2>
+                <p className="text-muted-foreground leading-relaxed">
+                  <strong>What you'll do here:</strong> This is your data intake hub. Choose one of four methods: 
+                  <strong> (1) Load sample families</strong> (Reynolds or Johnson) to explore the app, 
+                  <strong> (2) Upload bank statements</strong> (PDF, CSV, Excel—minimum 3 months for accurate analysis), 
+                  <strong> (3) Mock connect</strong> to simulated banks, or 
+                  <strong> (4) Manually enter</strong> accounts, holdings, and liabilities. Once data is loaded, 
+                  proceed to Budget Analyzer, Net Worth Dashboard, Goals, or Investments.
                 </p>
               </div>
+            </div>
+          </div>
+
+          <p className="text-base text-muted-foreground max-w-3xl mx-auto text-center mb-8">
+            Upload AT LEAST 3 months of financial statements in any format (PDF, CSV, Excel, images). 
+            Connect mock accounts or enter data manually. The more data provided, the more accurate the analysis.
+          </p>
 
               {/* Four Input Methods */}
               <Tabs defaultValue="sample" className="mb-8">
@@ -358,6 +379,7 @@ export default function Upload({ onComplete }: UploadProps = {}) {
                         setTimeout(() => {
                           setDashboardData(SAMPLE_DASHBOARD_DATA);
                           setSnapshot(SAMPLE_REYNOLDS_DATA);
+                          setPaperTradingData(REYNOLDS_PAPER_TRADING_DATA);
                           toast.success("Reynolds Family data loaded! Check Transaction Details for Austin-based spending.");
                           setTimeout(() => {
                             if (onComplete) {
@@ -395,6 +417,7 @@ export default function Upload({ onComplete }: UploadProps = {}) {
                         setTimeout(() => {
                           setDashboardData(SAMPLE_JOHNSON_DASHBOARD_DATA);
                           setSnapshot(SAMPLE_JOHNSON_DATA);
+                          setPaperTradingData(JOHNSON_PAPER_TRADING_DATA);
                           toast.success("Johnson Family data loaded! Check Transaction Details for Denver-based spending.");
                           setTimeout(() => {
                             if (onComplete) {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
+import { Target } from "lucide-react";
 import { ExpenseBaselineCard } from "@/components/goals/ExpenseBaselineCard";
 import { GoalQuestionsCard } from "@/components/goals/GoalQuestionsCard";
 import { RpicResultCard } from "@/components/goals/RpicResultCard";
@@ -100,8 +101,25 @@ export default function Goals() {
   if (!dashboardData) {
     return (
       <div className="container mx-auto p-6">
+        {/* Page Description */}
+        <div className="mb-6 bg-gradient-to-r from-primary/10 to-accent/10 p-6 rounded-lg border">
+          <div className="flex items-start gap-4">
+            <div className="p-3 rounded-lg bg-primary/20">
+              <Target className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold mb-2">RPIC Calculator</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                <strong>What you'll find here:</strong> Calculate your <strong>Retirement Passive Income Capital (RPIC)</strong>—the 
+                lump sum needed to generate your target monthly passive income. Answer 3 simple questions (timing, lifestyle, geography), 
+                adjust assumptions (active/passive returns), and visualize your roadmap with milestones. See timelines for different 
+                contribution levels and track your <strong>RPIC Index</strong> (current progress toward 120% of monthly expenses).
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div className="text-center space-y-4">
-          <h1 className="text-3xl font-bold">RPIC Calculator</h1>
           <p className="text-muted-foreground">
             Please complete Budget Analyzer first to calculate your RPIC target.
           </p>
@@ -112,12 +130,22 @@ export default function Goals() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Find Your RPIC</h1>
-        <p className="text-muted-foreground">
-          Your target monthly passive income. Goal-based. 3 questions. Clear roadmap.
-        </p>
+      {/* Page Description */}
+      <div className="bg-gradient-to-r from-primary/10 to-accent/10 p-6 rounded-lg border">
+        <div className="flex items-start gap-4">
+          <div className="p-3 rounded-lg bg-primary/20">
+            <Target className="w-6 h-6 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold mb-2">RPIC Calculator</h2>
+            <p className="text-muted-foreground leading-relaxed">
+              <strong>What you'll find here:</strong> Calculate your <strong>Retirement Passive Income Capital (RPIC)</strong>—the 
+              lump sum needed to generate your target monthly passive income. Answer 3 simple questions (timing, lifestyle, geography), 
+              adjust assumptions (active/passive returns), and visualize your roadmap with milestones. See timelines for different 
+              contribution levels and track your <strong>RPIC Index</strong> (current progress toward 120% of monthly expenses).
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Full-width: Expense Baseline */}

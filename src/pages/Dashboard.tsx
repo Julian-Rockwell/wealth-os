@@ -12,7 +12,7 @@ import { PersonalizedRecommendations } from "@/components/dashboard/Personalized
 import { IncomeExpensesKPI } from "@/components/dashboard/IncomeExpensesKPI";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, Database } from "lucide-react";
+import { AlertCircle, Database, BarChart3 } from "lucide-react";
 import { SAMPLE_REYNOLDS_DATA } from "@/utils/sampleData";
 import { toast } from "sonner";
 export type ViewMode = "category" | "subcategory" | "merchant" | "liquidity" | "custom";
@@ -40,6 +40,25 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
+          {/* Page Description */}
+          <div className="mb-6 bg-gradient-to-r from-primary/10 to-accent/10 p-6 rounded-lg border">
+            <div className="flex items-start gap-4">
+              <div className="p-3 rounded-lg bg-primary/20">
+                <BarChart3 className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold mb-2">Budget Analyzer</h2>
+                <p className="text-muted-foreground leading-relaxed">
+                  <strong>What you'll find here:</strong> Comprehensive transaction analysis with the 
+                  <strong> 50/30/20 rule</strong> (Needs/Wants/Savings). View your income vs. expenses over 30/60/90-day periods, 
+                  categorize transactions, track spending patterns by merchant or subcategory, and get 
+                  <strong> Quick Wins recommendations</strong> to optimize your budget. This is your starting point to understand 
+                  your cash flow before moving to Goals or Investments.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Empty State Banner */}
           <div className="mb-6 p-8 rounded-lg bg-card border-2 border-dashed text-center">
             <Database className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
@@ -103,6 +122,25 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
+        {/* Page Description */}
+        <div className="mb-6 bg-gradient-to-r from-primary/10 to-accent/10 p-6 rounded-lg border">
+          <div className="flex items-start gap-4">
+            <div className="p-3 rounded-lg bg-primary/20">
+              <BarChart3 className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold mb-2">Budget Analyzer</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                <strong>What you'll find here:</strong> Comprehensive transaction analysis with the 
+                <strong> 50/30/20 rule</strong> (Needs/Wants/Savings). View your income vs. expenses over 30/60/90-day periods, 
+                categorize transactions, track spending patterns by merchant or subcategory, and get 
+                <strong> Quick Wins recommendations</strong> to optimize your budget. This is your starting point to understand 
+                your cash flow before moving to Goals or Investments.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Backfill Alert */}
         {snapshot.analyzedPeriod.totalMonths < 3 && (
           <div className="mb-6 p-4 rounded-lg bg-warning/10 border border-warning/20">
