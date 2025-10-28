@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { TrendingUp, CheckCircle, AlertTriangle } from "lucide-react";
 import type { DashboardData } from "@/types/dashboard";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
 
 interface KeyInsightsProps {
   data: DashboardData;
@@ -25,11 +26,30 @@ export const KeyInsights = ({ data }: KeyInsightsProps) => {
       }
     });
     
-    const topOpportunity = Object.entries(categoryTotals)
-      .sort(([, a], [, b]) => b - a)[0];
+    // Only show opportunities > $50/month
+    const validOpportunities = Object.entries(categoryTotals)
+      .map(([subcat, total]) => ({
+        subcat,
+        monthlyAmount: Math.round(total / data.period.months),
+        reduction: Math.round((total / data.period.months) * 0.3)
+      }))
+      .filter(opp => opp.reduction >= 50)
+      .sort((a, b) => b.reduction - a.reduction);
     
-    const monthlyAmount = Math.round((topOpportunity?.[1] || 0) / data.period.months);
-    const reduction = Math.round(monthlyAmount * 0.3); // Suggest 30% reduction
+    const topOpportunity = validOpportunities.length > 0 ? validOpportunities[0] : null;
+    
+    // If multiple opportunities, group them
+    let opportunityText = "";
+    if (validOpportunities.length > 1) {
+      const top3 = validOpportunities.slice(0, 3);
+      const totalSave = top3.reduce((sum, opp) => sum + opp.reduction, 0);
+      const categories = top3.map(o => o.subcat).join(", ");
+      opportunityText = `Save $${totalSave}/mo by reducing ${categories} (30% each)`;
+    } else if (topOpportunity) {
+      opportunityText = `${topOpportunity.subcat} - save $${topOpportunity.reduction}/mo by reducing 30%`;
+    } else {
+      opportunityText = "No significant savings opportunities detected. Keep monitoring!";
+    }
     
     // Positive trend - find well-controlled essential category
     const essentialCategories: Record<string, number> = {};
@@ -73,7 +93,7 @@ export const KeyInsights = ({ data }: KeyInsightsProps) => {
 
     return {
       biggest_opportunity: {
-        insight: `${topOpportunity?.[0] || "Discretionary spending"} - save $${reduction}/mo by reducing ${Math.round(30)}%.`
+        insight: opportunityText
       },
       positive_trend: {
         insight: `${positiveSubcat?.[0] || "Essential costs"} well-managed at $${positiveAmount}/mo.`
@@ -94,9 +114,18 @@ export const KeyInsights = ({ data }: KeyInsightsProps) => {
             <TrendingUp className="w-5 h-5 text-primary" />
           </div>
           <div className="flex-1">
-            <h4 className="text-sm font-semibold text-muted-foreground mb-2">
-              Biggest Opportunity
-            </h4>
+            <div className="flex items-center gap-1 mb-2">
+              <h4 className="text-sm font-semibold text-muted-foreground">
+                Biggest Opportunity
+              </h4>
+              <InfoTooltip content={
+                <div className="space-y-2">
+                  <p><strong>How it's calculated:</strong></p>
+                  <p className="text-xs">We analyze your "Wants" spending categories and identify the highest opportunities where a 30% reduction would save you $50+/month.</p>
+                  <p className="text-xs">If multiple opportunities exist, we group the top 3 for maximum impact.</p>
+                </div>
+              } />
+            </div>
             <p className="text-sm font-medium leading-relaxed">
               {insights.biggest_opportunity.insight}
             </p>

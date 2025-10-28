@@ -5,19 +5,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Info, AlertTriangle } from "lucide-react";
+import { Info, AlertTriangle, DollarSign } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import type { FinancialSnapshot } from "@/types/financial";
 import type { TradingStrategy } from "@/types/trading";
 import { calculateAllocationWaterfall } from "@/utils/investmentCalculations";
 import { StrategySelector } from "./StrategySelector";
+import { useFinancialData } from "@/contexts/FinancialDataContext";
 
 interface CapitalAllocationProps {
   snapshot: FinancialSnapshot;
 }
 
 export function CapitalAllocation({ snapshot }: CapitalAllocationProps) {
+  const { availableCapital } = useFinancialData();
   const [emergencyFundMonths, setEmergencyFundMonths] = useState<number>(6);
   const [emergencyFundInstrument, setEmergencyFundInstrument] = useState<string>("TBIL");
   const [maxTradingAccountCap, setMaxTradingAccountCap] = useState<number>(100000);
@@ -60,6 +62,17 @@ export function CapitalAllocation({ snapshot }: CapitalAllocationProps) {
           100% to active trading until cap, then feeding to passive income
         </p>
       </div>
+
+      {/* Available Capital from Dashboard */}
+      {availableCapital > 0 && (
+        <Alert className="border-primary bg-primary/10">
+          <DollarSign className="h-4 w-4 text-primary" />
+          <AlertDescription className="text-primary-foreground">
+            <strong>Liquid Assets Available:</strong> ${availableCapital.toLocaleString('en-US', { minimumFractionDigits: 2 })} 
+            {" "}(from Dashboard → Liquid Assets Panel)
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Feeding Status Alert */}
       {allocation.feedingToPassive && (

@@ -32,6 +32,9 @@ export const TransactionsList = ({ transactions, onUpdate, onDelete, filters }: 
   const filteredTransactions = transactions
     .filter((txn) => txn.sign === "debit")
     .filter((txn) => {
+      if (filters.category && filters.category !== "all") {
+        if (txn.category !== filters.category) return false;
+      }
       if (filters.searchTerm) {
         const matchesSearch = 
           txn.merchant.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||

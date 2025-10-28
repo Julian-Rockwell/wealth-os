@@ -1,7 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Lightbulb, Tag } from "lucide-react";
+import { Lightbulb, Tag, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { useState } from "react";
 
 interface QuickWinsProps {
   recommendations: {
@@ -11,11 +12,18 @@ interface QuickWinsProps {
       category: string;
     }>;
   };
+  onApply?: (recommendation: { title: string; estMonthlySave: number; category: string }) => void;
 }
 
-export const QuickWins = ({ recommendations }: QuickWinsProps) => {
-  const handleApply = (title: string) => {
-    toast.success(`Applied recommendation: ${title}`);
+export const QuickWins = ({ recommendations, onApply }: QuickWinsProps) => {
+  const [appliedRecs, setAppliedRecs] = useState<Set<string>>(new Set());
+
+  const handleApply = (rec: { title: string; estMonthlySave: number; category: string }) => {
+    setAppliedRecs(prev => new Set(prev).add(rec.title));
+    toast.success(`Applied: ${rec.title}`, {
+      description: `This recommendation is now tracked. Review related transactions to implement changes.`
+    });
+    onApply?.(rec);
   };
 
   return (
@@ -43,12 +51,22 @@ export const QuickWins = ({ recommendations }: QuickWinsProps) => {
             </div>
             <Button
               size="sm"
-              variant="outline"
-              onClick={() => handleApply(rec.title)}
+              variant={appliedRecs.has(rec.title) ? "default" : "outline"}
+              onClick={() => handleApply(rec)}
               className="ml-4"
+              disabled={appliedRecs.has(rec.title)}
             >
-              <Tag className="w-3 h-3 mr-2" />
-              Apply
+              {appliedRecs.has(rec.title) ? (
+                <>
+                  <CheckCircle2 className="w-3 h-3 mr-2" />
+                  Applied
+                </>
+              ) : (
+                <>
+                  <Tag className="w-3 h-3 mr-2" />
+                  Apply
+                </>
+              )}
             </Button>
           </div>
         ))}

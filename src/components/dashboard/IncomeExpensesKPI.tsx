@@ -1,9 +1,11 @@
 import { Card } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, DollarSign, Minus, ChevronDown, ChevronUp } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Minus, ChevronDown, ChevronUp, AlertTriangle } from "lucide-react";
 import type { DashboardData } from "@/types/dashboard";
-import { classifyTransactions } from "@/utils/transactionClassifier";
+import { classifyTransactions, validate50_30_20 } from "@/utils/transactionClassifier";
 import { useState } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
 
 interface IncomeExpensesKPIProps {
   data: DashboardData;
@@ -35,7 +37,7 @@ export const IncomeExpensesKPI = ({ data, period }: IncomeExpensesKPIProps) => {
   const previousClassification = classifyTransactions(previousPeriodTxns);
   
   const totalIncome = currentClassification.totals.income;
-  const totalExpenses = currentClassification.totals.expenses;
+  const currentExpenses = currentClassification.totals.expenses;
   const incomeByCategory = currentClassification.by_category.income;
   const expensesByCategory = currentClassification.by_category.expenses;
 
@@ -48,7 +50,7 @@ export const IncomeExpensesKPI = ({ data, period }: IncomeExpensesKPIProps) => {
     : 0;
 
   const expensesChange = previousExpenses > 0
-    ? ((totalExpenses - previousExpenses) / previousExpenses) * 100
+    ? ((currentExpenses - previousExpenses) / previousExpenses) * 100
     : 0;
 
   const getTrendIcon = (value: number) => {
@@ -76,8 +78,108 @@ export const IncomeExpensesKPI = ({ data, period }: IncomeExpensesKPIProps) => {
     return <Minus className="w-4 h-4 text-warning" />;
   };
 
+  // Calculate 50/30/20 validation
+  const totalExpenses = data.expenses.needs.total + data.expenses.wants.total + data.expenses.savings.total;
+  const validation = validate50_30_20(
+    data.income.avgMonthly * data.period.months,
+    data.expenses.needs.total,
+    data.expenses.wants.total,
+    data.expenses.savings.total
+  );
+
   return (
-    <div className="grid md:grid-cols-2 gap-6">
+    <div className="space-y-4">
+      {/* 50/30/20 Budget Alerts */}
+      {validation.alerts.length > 0 && (
+        <Alert variant="destructive" className="shadow-soft">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            <div className="space-y-2">
+              <p className="font-semibold text-sm">Budget Rule Violations (50/30/20)</p>
+              {validation.alerts.map((alert, idx) => (
+                <p key={idx} className="text-xs">{alert}</p>
+              ))}
+              <div className="mt-3 p-3 bg-background/50 rounded text-xs space-y-1">
+                <p><strong>Recommended Actions:</strong></p>
+                {data.expenses.needs.pct > 50 && (
+                  <p>• Review Needs: Focus on Rent/Mortgage, Groceries, and Utilities for optimization</p>
+                )}
+                {data.expenses.wants.pct > 30 && (
+                  <p>• Reduce Wants: Cut discretionary spending in Dining Out, Entertainment, Shopping</p>
+                )}
+                {data.expenses.savings.pct < 20 && (
+                  <p>• Increase Savings: Aim to save at least 20% by reducing expenses or increasing income</p>
+                )}
+              </div>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* 50/30/20 Progress Card */}
+      <Card className="p-6 shadow-soft">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-semibold flex items-center gap-2">
+            50/30/20 Budget Rule
+            <InfoTooltip content={
+              <div className="space-y-2">
+                <p><strong>The 50/30/20 Rule:</strong></p>
+                <p>• <strong>50% Needs:</strong> Essential expenses (rent, groceries, utilities, insurance)</p>
+                <p>• <strong>30% Wants:</strong> Discretionary spending (dining out, entertainment, hobbies)</p>
+                <p>• <strong>20% Savings:</strong> Emergency fund, investments, retirement, debt payoff</p>
+              </div>
+            } />
+          </h3>
+        </div>
+        <div className="space-y-3">
+          <div>
+            <div className="flex justify-between text-xs mb-1">
+              <span>Needs</span>
+              <span className={data.expenses.needs.pct > 55 ? "text-destructive" : data.expenses.needs.pct < 45 ? "text-success" : "text-muted-foreground"}>
+                {data.expenses.needs.pct.toFixed(1)}% / 50%
+              </span>
+            </div>
+            <div className="h-2 bg-secondary rounded-full overflow-hidden">
+              <div
+                className="h-full bg-needs rounded-full transition-all"
+                style={{ width: `${Math.min(data.expenses.needs.pct * 2, 100)}%` }}
+              />
+            </div>
+          </div>
+
+          <div>
+            <div className="flex justify-between text-xs mb-1">
+              <span>Wants</span>
+              <span className={data.expenses.wants.pct > 35 ? "text-destructive" : data.expenses.wants.pct < 25 ? "text-warning" : "text-muted-foreground"}>
+                {data.expenses.wants.pct.toFixed(1)}% / 30%
+              </span>
+            </div>
+            <div className="h-2 bg-secondary rounded-full overflow-hidden">
+              <div
+                className="h-full bg-wants rounded-full transition-all"
+                style={{ width: `${Math.min((data.expenses.wants.pct / 30) * 100, 100)}%` }}
+              />
+            </div>
+          </div>
+
+          <div>
+            <div className="flex justify-between text-xs mb-1">
+              <span>Savings</span>
+              <span className={data.expenses.savings.pct < 15 ? "text-destructive" : data.expenses.savings.pct > 25 ? "text-success" : "text-muted-foreground"}>
+                {data.expenses.savings.pct.toFixed(1)}% / 20%
+              </span>
+            </div>
+            <div className="h-2 bg-secondary rounded-full overflow-hidden">
+              <div
+                className="h-full bg-savings rounded-full transition-all"
+                style={{ width: `${Math.min((data.expenses.savings.pct / 20) * 100, 100)}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <div className="grid md:grid-cols-2 gap-6">
       {/* Income Card */}
       <Card className="p-6 shadow-soft">
         <Collapsible open={incomeExpanded} onOpenChange={setIncomeExpanded}>
@@ -126,7 +228,7 @@ export const IncomeExpensesKPI = ({ data, period }: IncomeExpensesKPIProps) => {
             </div>
           </div>
           <p className="text-3xl font-bold text-destructive mb-1">
-            ${totalExpenses.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            ${currentExpenses.toLocaleString('en-US', { minimumFractionDigits: 2 })}
           </p>
           <div className="flex items-center gap-2 text-sm">
             {getExpenseTrendIcon(expensesChange)}
@@ -147,6 +249,7 @@ export const IncomeExpensesKPI = ({ data, period }: IncomeExpensesKPIProps) => {
           </CollapsibleContent>
         </Collapsible>
       </Card>
+      </div>
     </div>
   );
 };

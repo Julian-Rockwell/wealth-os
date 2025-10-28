@@ -24,7 +24,7 @@ interface DashboardProps {
 export default function Dashboard({ onContinue }: DashboardProps = {}) {
   const [viewMode, setViewMode] = useState<ViewMode>("category");
   const [period, setPeriod] = useState<30 | 60 | 90>(30);
-  const { data, updateTransaction, deleteTransaction, filters, setFilters } = useDashboardData();
+  const { data, updateTransaction, deleteTransaction, filters, setFilters } = useDashboardData(period);
   const { snapshot, setSnapshot, resetAllData } = useFinancialData();
 
   const handleLoadSampleData = () => {

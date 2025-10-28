@@ -157,14 +157,22 @@ const generateMockData = (): DashboardData => {
   };
 };
 
-export const useDashboardData = () => {
+export const useDashboardData = (period?: 30 | 60 | 90) => {
   const { snapshot, dashboardData } = useFinancialData();
+  
+  // Filter transactions by period
+  const filterByPeriod = (txns: Transaction[]) => {
+    if (!period) return txns;
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - period);
+    return txns.filter(t => new Date(t.date) >= cutoffDate);
+  };
   
   // Prefer dashboardData from context (set on sample load), otherwise generate mock
   const getInitialData = (): DashboardData => {
     const source = dashboardData;
     if (source && source.txns && source.txns.length > 0) {
-      const transactions = source.txns;
+      const transactions = filterByPeriod(source.txns);
       
       // Calculate totals from provided data
       const totalNeeds = transactions
@@ -219,10 +227,10 @@ export const useDashboardData = () => {
   const [data, setData] = useState<DashboardData>(() => getInitialData());
   const [filters, setFilters] = useState<DashboardFilters>({});
   
-  // Re-initialize data when snapshot or dashboardData changes
+  // Re-initialize data when snapshot, dashboardData, or period changes
   useEffect(() => {
     setData(getInitialData());
-  }, [snapshot, dashboardData]);
+  }, [snapshot, dashboardData, period]);
 
   const updateTransaction = useCallback((id: string, updates: Partial<Transaction>) => {
     setData((prev) => {

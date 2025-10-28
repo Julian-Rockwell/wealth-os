@@ -2,9 +2,10 @@ import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Droplet } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Holding } from "@/types/financial";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
+import { useFinancialData } from "@/contexts/FinancialDataContext";
 
 interface LiquidAssetsPanelProps {
   holdings: Holding[];
@@ -12,6 +13,7 @@ interface LiquidAssetsPanelProps {
 
 export const LiquidAssetsPanel = ({ holdings }: LiquidAssetsPanelProps) => {
   const [includeRetirement, setIncludeRetirement] = useState(false);
+  const { setAvailableCapital } = useFinancialData();
 
   const liquidAssets = holdings
     .filter(h => h.liquidity === "liquid")
@@ -25,6 +27,11 @@ export const LiquidAssetsPanel = ({ holdings }: LiquidAssetsPanelProps) => {
     .reduce((sum, h) => sum + h.balance, 0);
 
   const totalAvailable = includeRetirement ? availableToInvest + retirementAssets : availableToInvest;
+
+  // Update context whenever totalAvailable changes
+  useEffect(() => {
+    setAvailableCapital(totalAvailable);
+  }, [totalAvailable, setAvailableCapital]);
 
   return (
     <Card className="p-6 shadow-soft">

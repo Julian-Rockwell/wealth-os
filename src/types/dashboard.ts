@@ -59,4 +59,5 @@ export interface DashboardFilters {
   accounts?: string[];
   minConfidence?: number;
   searchTerm?: string;
+  category?: TransactionCategory | "all";
 }

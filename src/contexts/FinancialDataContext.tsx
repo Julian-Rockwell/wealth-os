@@ -19,6 +19,8 @@ interface FinancialDataContextType {
   setPaperTradingData: (data: PaperTradingProgress | null) => void;
   draftData: DraftData;
   setDraftData: (data: DraftData) => void;
+  availableCapital: number;
+  setAvailableCapital: (amount: number) => void;
   resetAllData: () => void;
 }
 
@@ -48,6 +50,11 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
       manualHoldings: [],
       manualLiabilities: [],
     };
+  });
+
+  const [availableCapital, setAvailableCapitalState] = useState<number>(() => {
+    const stored = localStorage.getItem("availableCapital");
+    return stored ? JSON.parse(stored) : 0;
   });
 
   const setSnapshot = (newSnapshot: FinancialSnapshot | null) => {
@@ -82,6 +89,11 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     localStorage.setItem("draftData", JSON.stringify(newData));
   };
 
+  const setAvailableCapital = (amount: number) => {
+    setAvailableCapitalState(amount);
+    localStorage.setItem("availableCapital", JSON.stringify(amount));
+  };
+
   const resetAllData = () => {
     setSnapshotState(null);
     setDashboardDataState(null);
@@ -92,10 +104,12 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
       manualHoldings: [],
       manualLiabilities: [],
     });
+    setAvailableCapitalState(0);
     localStorage.removeItem("financialSnapshot");
     localStorage.removeItem("dashboardData");
     localStorage.removeItem("paperTradingData");
     localStorage.removeItem("draftData");
+    localStorage.removeItem("availableCapital");
   };
 
   return (
@@ -106,11 +120,13 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
         dashboardData,
         setDashboardData,
         paperTradingData,
-        setPaperTradingData,
-        draftData,
-        setDraftData,
-        resetAllData,
-      }}
+      setPaperTradingData,
+      draftData,
+      setDraftData,
+      availableCapital,
+      setAvailableCapital,
+      resetAllData,
+    }}
     >
       {children}
     </FinancialDataContext.Provider>

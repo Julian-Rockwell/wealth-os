@@ -32,7 +32,28 @@ export const FiltersCard = ({ data, filters, setFilters }: FiltersCardProps) => 
         </Button>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <Label htmlFor="category-filter" className="text-xs">Category</Label>
+          <Select 
+            value={filters.category || "all"}
+            onValueChange={(value) => setFilters({ 
+              ...filters, 
+              category: value === "all" ? undefined : value as any
+            })}
+          >
+            <SelectTrigger id="category-filter" className="h-9 text-sm mt-1">
+              <SelectValue placeholder="All categories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Categories</SelectItem>
+              <SelectItem value="need">Needs Only</SelectItem>
+              <SelectItem value="want">Wants Only</SelectItem>
+              <SelectItem value="saving">Savings Only</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         <div>
           <Label htmlFor="account-filter" className="text-xs">Account</Label>
           <Select>
