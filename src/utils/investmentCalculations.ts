@@ -1,5 +1,6 @@
 import type { FinancialSnapshot, Holding, Liability, StagingTransaction } from "@/types/financial";
 import { classifyTransactions } from "./transactionClassifier";
+import { generateFoundationPlan } from "./foundationPlan";
 
 export interface ReadinessFactor {
   name: string;
@@ -296,8 +297,7 @@ export function calculateReadinessScore(
   if (totalScore >= 80) {
     recommendation = "Ready: Your financial foundation is solid. You can proceed with optimization.";
   } else {
-    // Import and use the enhanced foundation plan generator
-    const { generateFoundationPlan } = require("./foundationPlan");
+    // Use the enhanced foundation plan generator
     actionPlan = generateFoundationPlan(factors, snapshot, emergencyFundMonths);
     
     if (totalScore >= 60) {

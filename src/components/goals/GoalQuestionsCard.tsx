@@ -34,7 +34,7 @@ export function GoalQuestionsCard({
         {/* Question 1: Timing */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <Label className="text-base font-semibold">1. When do you want to reach RPIC?</Label>
+            <Label className="text-base font-semibold">1. Target years to reach RPIC?</Label>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -42,36 +42,42 @@ export function GoalQuestionsCard({
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="max-w-xs">
-                    Your timeline affects the strategy: aggressive growth for ASAP, 
-                    balanced for 10 years, conservative for 15-20 years.
+                    Your timeline affects the strategy: aggressive growth for 5-10 years, 
+                    balanced for 10-15 years, conservative for 15-20+ years.
                   </p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
-          <RadioGroup value={timing} onValueChange={onTimingChange}>
+          <RadioGroup value={timing.toString()} onValueChange={(v) => onTimingChange(parseInt(v))}>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="asap" id="asap" />
-              <Label htmlFor="asap" className="font-normal cursor-pointer">
-                ASAP (Aggressive growth strategy)
+              <RadioGroupItem value="5" id="timing-5" />
+              <Label htmlFor="timing-5" className="font-normal cursor-pointer">
+                5 years (Aggressive)
               </Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="10y" id="10y" />
-              <Label htmlFor="10y" className="font-normal cursor-pointer">
-                10 years (Balanced approach)
+              <RadioGroupItem value="10" id="timing-10" />
+              <Label htmlFor="timing-10" className="font-normal cursor-pointer">
+                10 years (Balanced)
               </Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="15-20y" id="15-20y" />
-              <Label htmlFor="15-20y" className="font-normal cursor-pointer">
-                15-20 years (Conservative path)
+              <RadioGroupItem value="15" id="timing-15" />
+              <Label htmlFor="timing-15" className="font-normal cursor-pointer">
+                15 years (Moderate)
               </Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="flexible" id="flexible" />
-              <Label htmlFor="flexible" className="font-normal cursor-pointer">
-                Flexible timeline
+              <RadioGroupItem value="20" id="timing-20" />
+              <Label htmlFor="timing-20" className="font-normal cursor-pointer">
+                20 years (Conservative)
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="25" id="timing-25" />
+              <Label htmlFor="timing-25" className="font-normal cursor-pointer">
+                25+ years (Flexible)
               </Label>
             </div>
           </RadioGroup>
