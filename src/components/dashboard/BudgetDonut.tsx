@@ -38,16 +38,38 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
           else if (txn.category === "saving") categoryTotals.savings += txn.amount;
         });
         
-        // Calculate total NET income from operational credits only
+        // Calculate total NET income from VALIDATED operational credits only
         const totalIncome = operationalCredits.reduce((sum, t) => sum + t.amount, 0);
+        
+        // Validate income
+        if (totalIncome < 500) {
+          return {
+            title: "50/30/20 Distribution",
+            items: [],
+            insufficientIncome: true,
+            totalIncome
+          };
+        }
+
+        // Calculate percentages using totalIncome as denominator
+        const needsPct = (categoryTotals.needs / totalIncome) * 100;
+        const wantsPct = (categoryTotals.wants / totalIncome) * 100;
+        const savingsPct = (categoryTotals.savings / totalIncome) * 100;
+        
+        // Validate total percentages
+        const totalPct = needsPct + wantsPct + savingsPct;
+        if (Math.abs(totalPct - 100) > 5) {
+          console.warn(`⚠️ Budget percentages don't sum to 100%: ${totalPct.toFixed(1)}% (Income: $${totalIncome.toFixed(0)}, Expenses: $${(categoryTotals.needs + categoryTotals.wants + categoryTotals.savings).toFixed(0)})`);
+        }
         
         return {
           title: "50/30/20 Distribution",
           items: [
-            { label: "Needs", value: categoryTotals.needs, color: "bg-needs", pct: totalIncome > 0 ? (categoryTotals.needs / totalIncome) * 100 : 0, target: 50 },
-            { label: "Wants", value: categoryTotals.wants, color: "bg-wants", pct: totalIncome > 0 ? (categoryTotals.wants / totalIncome) * 100 : 0, target: 30 },
-            { label: "Savings", value: categoryTotals.savings, color: "bg-savings", pct: totalIncome > 0 ? (categoryTotals.savings / totalIncome) * 100 : 0, target: 20 },
-          ]
+            { label: "Needs", value: categoryTotals.needs, color: "bg-needs", pct: needsPct, target: 50 },
+            { label: "Wants", value: categoryTotals.wants, color: "bg-wants", pct: wantsPct, target: 30 },
+            { label: "Savings", value: categoryTotals.savings, color: "bg-savings", pct: savingsPct, target: 20 },
+          ],
+          totalIncome
         };
       
       case "subcategory":
@@ -126,15 +148,29 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
   };
 
   const viewData = getViewData();
-  const total = viewData.items.reduce((sum, item) => sum + item.value, 0);
+  
+  // Handle insufficient income warning for category view
+  if (viewMode === "category" && (viewData as any).insufficientIncome) {
+    return (
+      <Card className="p-6 shadow-soft">
+        <div className="flex items-center gap-2 mb-4">
+          <h3 className="font-semibold">{viewData.title}</h3>
+        </div>
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            No se puede calcular la distribución 50/30/20. Ingreso neto insuficiente o no detectado en el período seleccionado (${((viewData as any).totalIncome || 0).toFixed(0)}).
+          </AlertDescription>
+        </Alert>
+      </Card>
+    );
+  }
 
-  // Validate 50/30/20 rule when in category view
+  const total = (viewData.items as Array<{value: number}>).reduce((sum, item) => sum + item.value, 0);
+
+  // Validate 50/30/20 rule when in category view using the CORRECT totalIncome
   const budgetValidation = viewMode === "category" ? (() => {
-    // Calculate total income from credits
-    const totalIncome = filteredTxns
-      .filter(t => t.sign === "credit")
-      .reduce((sum, t) => sum + t.amount, 0);
-    
+    const totalIncome = (viewData as any).totalIncome || 0;
     const needs = viewData.items.find(i => i.label.includes("Needs"))?.value || 0;
     const wants = viewData.items.find(i => i.label.includes("Wants"))?.value || 0;
     const savings = viewData.items.find(i => i.label.includes("Savings"))?.value || 0;

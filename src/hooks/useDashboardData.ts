@@ -186,13 +186,35 @@ export const useDashboardData = (period?: 30 | 60 | 90) => {
         .reduce((sum, t) => sum + t.amount, 0);
       
       const totalExpenses = totalNeeds + totalWants + totalSavings;
-      const avgIncome = Math.max(
-        1,
-        transactions.filter((t) => t.sign === "credit").length / (source.period.months || 1)
-      );
-      const avgIncomeAmount = transactions
+      
+      // Calculate REAL income (exclude transfers, card payments, refunds)
+      const validIncomeTransactions = transactions
         .filter((t) => t.sign === "credit")
-        .reduce((sum, t) => sum + t.amount, 0) / avgIncome;
+        .filter(t => {
+          const desc = t.desc.toLowerCase();
+          const merchant = t.merchant.toLowerCase();
+          
+          // Exclude non-income credits
+          const isTransfer = desc.includes('transfer') || desc.includes('zelle') || desc.includes('venmo');
+          const isCardPayment = desc.includes('credit card payment') || desc.includes('payment thank you');
+          const isRefund = desc.includes('refund') || desc.includes('return');
+          
+          if (isTransfer || isCardPayment || isRefund) return false;
+          
+          // Include only real income
+          return (
+            desc.includes('payroll') ||
+            desc.includes('salary') ||
+            desc.includes('direct dep') ||
+            desc.includes('interest') ||
+            desc.includes('dividend') ||
+            merchant.includes('payroll') ||
+            merchant.includes('acme corp')
+          );
+        });
+
+      const totalIncomeAmount = validIncomeTransactions.reduce((sum, t) => sum + t.amount, 0);
+      const avgIncomeAmount = totalIncomeAmount / (source.period.months || 1); // CORRECT: divide by MONTHS, not transactions
       
       // Subcategory breakdowns
       const needsSubs: Record<string, number> = {};

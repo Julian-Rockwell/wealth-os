@@ -59,6 +59,12 @@ const MORTGAGE_KEYWORDS = ["MORTGAGE", "FirstHome Mortgage"];
 const LOAN_KEYWORDS = ["LOAN", "Chase Auto", "Nelnet", "Student Loan"];
 const UTILITY_KEYWORDS = ["ELECTRIC", "ENERGY", "WATER", "GAS", "INTERNET", "WIRELESS", "Austin Energy", "AT&T"];
 const FOOD_KEYWORDS = ["GROCERY", "HEB", "WHOLE FOODS", "SAFEWAY", "RESTAURANT", "BBQ", "FOOD"];
+const CHILDCARE_KEYWORDS = ["CHILDCARE", "DAYCARE", "PRESCHOOL", "BABYSITTER", "CHILD CARE"];
+const INSURANCE_KEYWORDS = ["INSURANCE", "GEICO", "STATE FARM", "ALLSTATE", "PROGRESSIVE"];
+const GROCERY_KEYWORDS = ["GROCERY", "GROCERIES", "HEB", "WHOLE FOODS", "SAFEWAY", "TRADER JOE", "KROGER", "PUBLIX"];
+const HOUSING_KEYWORDS = ["MORTGAGE", "RENT", "HOA", "FirstHome Mortgage", "LANDLORD"];
+const HEALTHCARE_KEYWORDS = ["PHARMACY", "DOCTOR", "HOSPITAL", "MEDICAL", "CVS", "WALGREENS", "HEALTHCARE"];
+const GIG_KEYWORDS = ["UBER", "LYFT", "UPWORK", "FIVERR", "DOORDASH", "INSTACART"];
 
 function matchesKeywords(desc: string, keywords: string[]): boolean {
   const upperDesc = desc.toUpperCase();
@@ -101,24 +107,25 @@ function classifyTransaction(
     };
   }
 
-  // 4. Check for loan payments (simplified - treating as Transfer for principal)
-  if (matchesKeywords(desc, MORTGAGE_KEYWORDS) || matchesKeywords(merchant, MORTGAGE_KEYWORDS)) {
+  // 4. Check for mortgage payments (Essential Need - Housing)
+  if (matchesKeywords(desc, MORTGAGE_KEYWORDS) || matchesKeywords(merchant, MORTGAGE_KEYWORDS) || matchesKeywords(desc, HOUSING_KEYWORDS)) {
     return {
-      classification: "Transfer",
-      subcategory: "loan_principal",
-      reason: "Mortgage payment (principal portion classified as transfer)"
+      classification: "Expense",
+      subcategory: "housing",
+      reason: "Essential housing expense (mortgage/rent payment)"
     };
   }
 
+  // 5. Check for loan payments (Debt payments are Needs - minimum payment portion)
   if (matchesKeywords(desc, LOAN_KEYWORDS) || matchesKeywords(merchant, LOAN_KEYWORDS)) {
     return {
-      classification: "Transfer",
-      subcategory: "loan_principal",
-      reason: "Loan payment (principal portion classified as transfer)"
+      classification: "Expense",
+      subcategory: "debt_payment",
+      reason: "Debt payment (classified as Need)"
     };
   }
 
-  // 5. Check for payroll (Income)
+  // 6. Check for payroll (Income)
   if (sign === "credit" && (matchesKeywords(desc, PAYROLL_KEYWORDS) || matchesKeywords(merchant, PAYROLL_KEYWORDS))) {
     return {
       classification: "Income",
@@ -127,7 +134,16 @@ function classifyTransaction(
     };
   }
 
-  // 6. Check for P2P transactions
+  // 7. Check for gig/freelance income
+  if (sign === "credit" && (matchesKeywords(desc, GIG_KEYWORDS) || matchesKeywords(merchant, GIG_KEYWORDS))) {
+    return {
+      classification: "Income",
+      subcategory: "freelance",
+      reason: "Gig/freelance income"
+    };
+  }
+
+  // 8. Check for P2P transactions
   if (matchesKeywords(desc, P2P_KEYWORDS) || matchesKeywords(merchant, P2P_KEYWORDS)) {
     // Default to transfer for P2P unless clear indicators suggest otherwise
     return {
@@ -137,8 +153,35 @@ function classifyTransaction(
     };
   }
 
-  // 7. Classify based on merchant/category for debits (Expenses)
+  // 9. Classify based on merchant/category for debits (Expenses)
   if (sign === "debit") {
+    // Childcare (Essential Need)
+    if (matchesKeywords(desc, CHILDCARE_KEYWORDS) || matchesKeywords(merchant, CHILDCARE_KEYWORDS)) {
+      return {
+        classification: "Expense",
+        subcategory: "childcare",
+        reason: "Essential childcare expense"
+      };
+    }
+
+    // Insurance (Essential Need)
+    if (matchesKeywords(desc, INSURANCE_KEYWORDS) || matchesKeywords(merchant, INSURANCE_KEYWORDS)) {
+      return {
+        classification: "Expense",
+        subcategory: "insurance",
+        reason: "Essential insurance payment"
+      };
+    }
+
+    // Healthcare (Essential Need)
+    if (matchesKeywords(desc, HEALTHCARE_KEYWORDS) || matchesKeywords(merchant, HEALTHCARE_KEYWORDS)) {
+      return {
+        classification: "Expense",
+        subcategory: "healthcare",
+        reason: "Healthcare/medical expense"
+      };
+    }
+
     // Utilities
     if (matchesKeywords(desc, UTILITY_KEYWORDS) || matchesKeywords(merchant, UTILITY_KEYWORDS)) {
       return {
@@ -148,17 +191,27 @@ function classifyTransaction(
       };
     }
 
-    // Food/Groceries
+    // Food/Groceries (prioritize grocery keywords for better classification)
+    if (matchesKeywords(desc, GROCERY_KEYWORDS) || matchesKeywords(merchant, GROCERY_KEYWORDS)) {
+      return {
+        classification: "Expense",
+        subcategory: "food",
+        reason: "Grocery purchase (essential food expense)"
+      };
+    }
+
+    // Restaurants (after groceries check)
     if (matchesKeywords(desc, FOOD_KEYWORDS) || matchesKeywords(merchant, FOOD_KEYWORDS)) {
       return {
         classification: "Expense",
         subcategory: "food",
-        reason: "Food and grocery purchase"
+        reason: "Food purchase"
       };
     }
 
     // Transportation
-    if (merchant.toUpperCase().includes("SHELL") || merchant.toUpperCase().includes("GAS")) {
+    if (merchant.toUpperCase().includes("SHELL") || merchant.toUpperCase().includes("GAS") || 
+        desc.toUpperCase().includes("FUEL") || desc.toUpperCase().includes("GASOLINE")) {
       return {
         classification: "Expense",
         subcategory: "transport",
@@ -197,7 +250,7 @@ function classifyTransaction(
     };
   }
 
-  // 8. Credits that aren't payroll
+  // 10. Credits that aren't payroll
   if (sign === "credit") {
     // Could be interest, dividends, or other income
     if (desc.toUpperCase().includes("INTEREST") || desc.toUpperCase().includes("DIVIDEND")) {
@@ -216,12 +269,47 @@ function classifyTransaction(
     };
   }
 
-  // 9. Default to unknown
+  // 11. Default to unknown
   return {
     classification: "unknown",
     subcategory: "unclassified",
     reason: "Insufficient information for deterministic classification"
   };
+}
+
+/**
+ * Maps a subcategory to its corresponding budget category (need/want/saving)
+ * Used to properly classify transactions in the 50/30/20 budget rule
+ */
+export function mapSubcategoryToCategory(subcategory: string): "need" | "want" | "saving" {
+  const normalizedSub = subcategory.toLowerCase();
+  
+  // Needs: Essential expenses that are required for living
+  const needsSubs = [
+    "housing", "utilities", "food", "transport", "transportation",
+    "childcare", "insurance", "healthcare", "debt_payment",
+    "rent/mortgage", "groceries", "health", "medical"
+  ];
+  
+  // Savings: Money set aside for future goals or investments
+  const savingsSubs = [
+    "investment", "investments", "emergency_fund", "emergency fund",
+    "401k", "ira", "retirement", "savings", "extra_debt_payment",
+    "savings_transfer", "brokerage"
+  ];
+  
+  // Check if it's a Need
+  if (needsSubs.some(sub => normalizedSub.includes(sub))) {
+    return "need";
+  }
+  
+  // Check if it's a Saving
+  if (savingsSubs.some(sub => normalizedSub.includes(sub))) {
+    return "saving";
+  }
+  
+  // Default: Everything else is a Want (discretionary spending)
+  return "want";
 }
 
 function aggregateByCategory(
@@ -317,6 +405,74 @@ export function validate50_30_20(
 }
 
 /**
+ * Validates if a credit transaction is real income (not a transfer or refund)
+ * Strictly includes only: payroll, salary, interest, dividends, freelance/gig income
+ */
+function isValidIncome(txn: Transaction): boolean {
+  const desc = txn.desc.toLowerCase();
+  const merchant = txn.merchant.toLowerCase();
+  const subcategory = txn.subcategory.toLowerCase();
+
+  // EXCLUDE: Transfers, card payments, refunds
+  const isTransfer = 
+    desc.includes('transfer') ||
+    desc.includes('zelle') ||
+    desc.includes('venmo') ||
+    desc.includes('cash app') ||
+    desc.includes('paypal') ||
+    desc.includes('p2p') ||
+    merchant.includes('transfer');
+
+  const isCardPayment = 
+    desc.includes('credit card payment') ||
+    desc.includes('payment thank you') ||
+    desc.includes('autopay') ||
+    merchant.includes('credit card');
+
+  const isRefund = 
+    desc.includes('refund') ||
+    desc.includes('return') ||
+    desc.includes('chargeback') ||
+    subcategory.includes('refund');
+
+  const isAssetSale = 
+    desc.includes('withdrawal') ||
+    desc.includes('redemption') ||
+    merchant.includes('brokerage');
+
+  if (isTransfer || isCardPayment || isRefund || isAssetSale) {
+    return false;
+  }
+
+  // INCLUDE: Real income sources only
+  const isPayroll = 
+    desc.includes('payroll') ||
+    desc.includes('salary') ||
+    desc.includes('direct dep') ||
+    desc.includes('ppd') ||
+    desc.includes('adp') ||
+    desc.includes('gusto') ||
+    merchant.includes('payroll') ||
+    merchant.includes('acme corp') ||
+    subcategory.includes('payroll');
+
+  const isInvestmentIncome = 
+    desc.includes('interest') ||
+    desc.includes('dividend') ||
+    subcategory.includes('interest') ||
+    subcategory.includes('dividend');
+
+  const isGigIncome = 
+    merchant.includes('uber') ||
+    merchant.includes('lyft') ||
+    merchant.includes('doordash') ||
+    merchant.includes('upwork') ||
+    merchant.includes('fiverr');
+
+  return isPayroll || isInvestmentIncome || isGigIncome;
+}
+
+/**
  * Filters transactions for 50/30/20 budget calculation
  * Excludes: transfers, card payments, refunds, non-operational flows
  * Returns only operational debits (true expenses) and credits (true income)
@@ -337,16 +493,13 @@ export function filterOperationalTransactions(
 
     // EXCLUDE from operational flow:
     const isTransfer = 
-      desc.includes('transfer') ||
       desc.includes('zelle') ||
       desc.includes('venmo') ||
       desc.includes('atm withdrawal') ||
       desc.includes('credit card payment') ||
-      desc.includes('loan payment') ||
-      desc.includes('mortgage payment') ||
       merchant.includes('credit card') ||
-      subcategory.includes('transfer') ||
-      subcategory.includes('payment');
+      (desc.includes('transfer') && !desc.includes('emergency fund')) ||
+      (subcategory.includes('transfer') && !subcategory.includes('savings'));
 
     const isRefund = 
       desc.includes('refund') ||
@@ -354,7 +507,7 @@ export function filterOperationalTransactions(
       desc.includes('return') ||
       subcategory.includes('refund');
 
-    // INCLUDE only operational debits (true expenses)
+    // INCLUDE operational debits (true expenses including mortgage, loans, childcare, etc.)
     if (txn.sign === 'debit' && !isTransfer && !isRefund) {
       // Exclude transactions with "Income" subcategory (data quality issue)
       if (subcategory !== 'income') {
@@ -362,21 +515,9 @@ export function filterOperationalTransactions(
       }
     }
 
-    // INCLUDE only operational credits (true income, not transfers/refunds)
-    if (txn.sign === 'credit' && !isTransfer && !isRefund) {
-      // Only include if it's actual income
-      if (
-        desc.includes('payroll') ||
-        desc.includes('deposit') ||
-        desc.includes('salary') ||
-        desc.includes('income') ||
-        merchant.includes('payroll') ||
-        merchant.includes('acme corp') ||
-        subcategory.includes('payroll') ||
-        subcategory.includes('salary')
-      ) {
-        operationalCredits.push(txn);
-      }
+    // INCLUDE only VALIDATED income credits
+    if (txn.sign === 'credit' && isValidIncome(txn)) {
+      operationalCredits.push(txn);
     }
   });
 
