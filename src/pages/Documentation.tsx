@@ -11,11 +11,11 @@ const Documentation = () => {
       {/* Print/Download controls - hidden when printing */}
       <div className="print:hidden sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
         <div className="container py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Documentación del Sistema</h1>
+          <h1 className="text-2xl font-bold">System Documentation</h1>
           <div className="flex gap-2">
             <Button onClick={handlePrint} variant="outline">
               <Printer className="w-4 h-4 mr-2" />
-              Imprimir / Guardar PDF
+              Print / Save as PDF
             </Button>
           </div>
         </div>
@@ -26,239 +26,239 @@ const Documentation = () => {
         {/* Cover Page */}
         <div className="text-center mb-16 page-break-after">
           <h1 className="text-5xl font-bold mb-4">Rockwell Wealth OS</h1>
-          <h2 className="text-3xl text-muted-foreground mb-8">Documentación Técnica del Sistema</h2>
+          <h2 className="text-3xl text-muted-foreground mb-8">Technical System Documentation</h2>
           <p className="text-xl text-muted-foreground">
-            Plataforma Integral de Gestión Financiera Personal
+            Comprehensive Personal Financial Management Platform
           </p>
           <div className="mt-16">
-            <p className="text-sm text-muted-foreground">Versión 1.0</p>
+            <p className="text-sm text-muted-foreground">Version 1.0</p>
             <p className="text-sm text-muted-foreground">{new Date().toLocaleDateString()}</p>
           </div>
         </div>
 
         {/* Table of Contents */}
         <div className="mb-12 page-break-after">
-          <h2 className="text-3xl font-bold mb-6">Índice de Contenidos</h2>
+          <h2 className="text-3xl font-bold mb-6">Table of Contents</h2>
           <nav className="space-y-2">
-            <a href="#overview" className="block text-primary hover:underline">1. Descripción General del Sistema</a>
-            <a href="#architecture" className="block text-primary hover:underline ml-4">1.1 Arquitectura y Flujo de Datos</a>
-            <a href="#tech-stack" className="block text-primary hover:underline ml-4">1.2 Stack Tecnológico</a>
-            <a href="#command-center" className="block text-primary hover:underline">2. Command Center - Ingesta de Datos</a>
-            <a href="#dashboard" className="block text-primary hover:underline">3. Dashboard - Vista de Patrimonio Neto</a>
-            <a href="#budget" className="block text-primary hover:underline">4. Budget Analyzer - Análisis 50/30/20</a>
-            <a href="#classification" className="block text-primary hover:underline ml-4">4.1 Sistema de Clasificación de Transacciones</a>
-            <a href="#calculation" className="block text-primary hover:underline ml-4">4.2 Flujo de Cálculo 50/30/20</a>
-            <a href="#visualizations" className="block text-primary hover:underline ml-4">4.3 Visualizaciones y Componentes</a>
-            <a href="#investments" className="block text-primary hover:underline">5. Investment Planning - Preparación para Inversión Activa</a>
-            <a href="#goals" className="block text-primary hover:underline">6. Goals - Calculadora RPIC</a>
-            <a href="#formulas" className="block text-primary hover:underline">7. Cálculos y Fórmulas Clave</a>
-            <a href="#user-flow" className="block text-primary hover:underline">8. Flujo de Usuario Típico</a>
-            <a href="#glossary" className="block text-primary hover:underline">9. Glosario de Términos</a>
+            <a href="#overview" className="block text-primary hover:underline">1. System Overview</a>
+            <a href="#architecture" className="block text-primary hover:underline ml-4">1.1 Architecture and Data Flow</a>
+            <a href="#tech-stack" className="block text-primary hover:underline ml-4">1.2 Technology Stack</a>
+            <a href="#command-center" className="block text-primary hover:underline">2. Command Center - Data Ingestion</a>
+            <a href="#dashboard" className="block text-primary hover:underline">3. Dashboard - Net Worth Overview</a>
+            <a href="#budget" className="block text-primary hover:underline">4. Budget Analyzer - 50/30/20 Analysis</a>
+            <a href="#classification" className="block text-primary hover:underline ml-4">4.1 Transaction Classification System</a>
+            <a href="#calculation" className="block text-primary hover:underline ml-4">4.2 50/30/20 Calculation Flow</a>
+            <a href="#visualizations" className="block text-primary hover:underline ml-4">4.3 Visualizations and Components</a>
+            <a href="#investments" className="block text-primary hover:underline">5. Investment Planning - Active Investment Readiness</a>
+            <a href="#goals" className="block text-primary hover:underline">6. Goals - RPIC Calculator</a>
+            <a href="#formulas" className="block text-primary hover:underline">7. Key Calculations and Formulas</a>
+            <a href="#user-flow" className="block text-primary hover:underline">8. Typical User Flow</a>
+            <a href="#glossary" className="block text-primary hover:underline">9. Glossary of Terms</a>
           </nav>
         </div>
 
         {/* 1. System Overview */}
         <section id="overview" className="mb-12 page-break-before">
-          <h2 className="text-3xl font-bold mb-6">1. Descripción General del Sistema</h2>
+          <h2 className="text-3xl font-bold mb-6">1. System Overview</h2>
           
-          <h3 className="text-2xl font-semibold mb-4">Propósito</h3>
+          <h3 className="text-2xl font-semibold mb-4">Purpose</h3>
           <p className="mb-4">
-            Rockwell Wealth OS es una plataforma integral de gestión financiera personal diseñada para ayudar a los usuarios a:
+            Rockwell Wealth OS is a comprehensive personal financial management platform designed to help users:
           </p>
           <ul className="list-disc pl-6 mb-6 space-y-2">
-            <li>Visualizar y analizar su patrimonio neto consolidado</li>
-            <li>Evaluar y optimizar su presupuesto usando la regla 50/30/20</li>
-            <li>Planificar y prepararse para inversiones activas</li>
-            <li>Calcular objetivos de independencia financiera (RPIC)</li>
-            <li>Tomar decisiones financieras informadas basadas en datos reales</li>
+            <li>Visualize and analyze their consolidated net worth</li>
+            <li>Evaluate and optimize their budget using the 50/30/20 rule</li>
+            <li>Plan and prepare for active investments</li>
+            <li>Calculate financial independence goals (RPIC)</li>
+            <li>Make informed financial decisions based on real data</li>
           </ul>
 
-          <h3 id="architecture" className="text-2xl font-semibold mb-4">1.1 Arquitectura y Flujo de Datos</h3>
+          <h3 id="architecture" className="text-2xl font-semibold mb-4">1.1 Architecture and Data Flow</h3>
           <p className="mb-4">
-            El sistema utiliza una arquitectura de contexto centralizado (<code>FinancialDataContext</code>) que gestiona todo el estado financiero de la aplicación:
+            The system uses a centralized context architecture (<code>FinancialDataContext</code>) that manages all financial state of the application:
           </p>
           <ul className="list-disc pl-6 mb-6 space-y-2">
-            <li><strong>FinancialSnapshot</strong>: Datos completos del usuario (activos, pasivos, transacciones)</li>
-            <li><strong>DashboardData</strong>: Datos procesados para visualizaciones del dashboard</li>
-            <li><strong>PaperTradingProgress</strong>: Estado del progreso de paper trading</li>
-            <li><strong>RpicResult</strong>: Resultados de cálculos RPIC</li>
+            <li><strong>FinancialSnapshot</strong>: Complete user data (assets, liabilities, transactions)</li>
+            <li><strong>DashboardData</strong>: Processed data for dashboard visualizations</li>
+            <li><strong>PaperTradingProgress</strong>: Paper trading progress state</li>
+            <li><strong>RpicResult</strong>: RPIC calculation results</li>
           </ul>
           <p className="mb-4">
-            Los datos se persisten localmente usando <code>localStorage</code> y se comparten entre todos los módulos mediante React Context API.
+            Data is persisted locally using <code>localStorage</code> and shared across all modules via React Context API.
           </p>
 
-          <h3 id="tech-stack" className="text-2xl font-semibold mb-4">1.2 Stack Tecnológico</h3>
+          <h3 id="tech-stack" className="text-2xl font-semibold mb-4">1.2 Technology Stack</h3>
           <div className="mb-6">
             <h4 className="text-xl font-semibold mb-3">Frontend Core</h4>
             <ul className="list-disc pl-6 mb-4 space-y-1">
-              <li><strong>React 18</strong>: Librería de UI con hooks y componentes funcionales</li>
-              <li><strong>TypeScript</strong>: Tipado estático para mayor seguridad</li>
-              <li><strong>Vite</strong>: Build tool moderno y rápido</li>
-              <li><strong>React Router v6</strong>: Navegación entre páginas</li>
+              <li><strong>React 18</strong>: UI library with hooks and functional components</li>
+              <li><strong>TypeScript</strong>: Static typing for enhanced safety</li>
+              <li><strong>Vite</strong>: Modern and fast build tool</li>
+              <li><strong>React Router v6</strong>: Page navigation</li>
             </ul>
 
-            <h4 className="text-xl font-semibold mb-3">Estado y Datos</h4>
+            <h4 className="text-xl font-semibold mb-3">State and Data</h4>
             <ul className="list-disc pl-6 mb-4 space-y-1">
-              <li><strong>Context API</strong>: Gestión de estado global</li>
-              <li><strong>localStorage</strong>: Persistencia de datos del lado del cliente</li>
+              <li><strong>Context API</strong>: Global state management</li>
+              <li><strong>localStorage</strong>: Client-side data persistence</li>
               <li><strong>React Hooks</strong>: useState, useEffect, useContext, useMemo</li>
             </ul>
 
             <h4 className="text-xl font-semibold mb-3">UI/UX</h4>
             <ul className="list-disc pl-6 mb-4 space-y-1">
-              <li><strong>Tailwind CSS</strong>: Framework de utilidades CSS</li>
-              <li><strong>shadcn/ui</strong>: Componentes UI accesibles y personalizables</li>
-              <li><strong>Radix UI</strong>: Primitivos de componentes sin estilos</li>
-              <li><strong>Lucide React</strong>: Iconos modernos</li>
-              <li><strong>Recharts</strong>: Gráficos y visualizaciones de datos</li>
+              <li><strong>Tailwind CSS</strong>: CSS utility framework</li>
+              <li><strong>shadcn/ui</strong>: Accessible and customizable UI components</li>
+              <li><strong>Radix UI</strong>: Unstyled component primitives</li>
+              <li><strong>Lucide React</strong>: Modern icons</li>
+              <li><strong>Recharts</strong>: Charts and data visualizations</li>
             </ul>
           </div>
         </section>
 
         {/* 2. Command Center */}
         <section id="command-center" className="mb-12 page-break-before">
-          <h2 className="text-3xl font-bold mb-6">2. Command Center - Ingesta de Datos</h2>
+          <h2 className="text-3xl font-bold mb-6">2. Command Center - Data Ingestion</h2>
           <p className="mb-4">
-            El Command Center es el punto de entrada para cargar datos financieros al sistema. Soporta múltiples métodos de ingesta:
+            The Command Center is the entry point for loading financial data into the system. It supports multiple ingestion methods:
           </p>
 
-          <h3 className="text-2xl font-semibold mb-4">Métodos de Ingesta</h3>
+          <h3 className="text-2xl font-semibold mb-4">Ingestion Methods</h3>
           
           <div className="mb-6">
             <h4 className="text-xl font-semibold mb-3">1. Sample Data</h4>
-            <p className="mb-2">Carga datos de demostración predefinidos para explorar el sistema.</p>
+            <p className="mb-2">Loads predefined demo data to explore the system.</p>
             <ul className="list-disc pl-6 mb-4 space-y-1">
-              <li>Datos sintéticos realistas de cuentas, inversiones y transacciones</li>
-              <li>Útil para demos y pruebas</li>
-              <li>Ubicación: <code>src/utils/sampleData.ts</code></li>
+              <li>Realistic synthetic data for accounts, investments, and transactions</li>
+              <li>Useful for demos and testing</li>
+              <li>Location: <code>src/utils/sampleData.ts</code></li>
             </ul>
 
             <h4 className="text-xl font-semibold mb-3">2. Mock Connect</h4>
-            <p className="mb-2">Simula una conexión a instituciones financieras.</p>
+            <p className="mb-2">Simulates a connection to financial institutions.</p>
             <ul className="list-disc pl-6 mb-4 space-y-1">
-              <li>Genera datos aleatorios de múltiples cuentas</li>
-              <li>Incluye checking, savings, credit cards, loans, investments</li>
-              <li>Transacciones de los últimos 90 días</li>
+              <li>Generates random data from multiple accounts</li>
+              <li>Includes checking, savings, credit cards, loans, investments</li>
+              <li>Transactions from the last 90 days</li>
             </ul>
 
             <h4 className="text-xl font-semibold mb-3">3. Upload Files (PDF/CSV/XLSX)</h4>
-            <p className="mb-2">Permite cargar estados de cuenta en múltiples formatos.</p>
+            <p className="mb-2">Allows uploading account statements in multiple formats.</p>
             <ul className="list-disc pl-6 mb-4 space-y-1">
-              <li><strong>PDF</strong>: Extracción de texto con validación de formato</li>
-              <li><strong>CSV</strong>: Parsing directo con detección automática de columnas</li>
-              <li><strong>XLSX</strong>: Lectura de hojas de cálculo Excel</li>
+              <li><strong>PDF</strong>: Text extraction with format validation</li>
+              <li><strong>CSV</strong>: Direct parsing with automatic column detection</li>
+              <li><strong>XLSX</strong>: Excel spreadsheet reading</li>
             </ul>
 
             <h4 className="text-xl font-semibold mb-3">4. Manual Entry</h4>
-            <p className="mb-2">Formulario para ingresar datos manualmente.</p>
+            <p className="mb-2">Form to manually input data.</p>
             <ul className="list-disc pl-6 mb-4 space-y-1">
-              <li>Campos validados para cuentas, balances y transacciones</li>
-              <li>Útil para ajustes o datos de fuentes no digitales</li>
+              <li>Validated fields for accounts, balances, and transactions</li>
+              <li>Useful for adjustments or data from non-digital sources</li>
             </ul>
           </div>
 
-          <h3 className="text-2xl font-semibold mb-4">Validación de Datos</h3>
+          <h3 className="text-2xl font-semibold mb-4">Data Validation</h3>
           <p className="mb-4">
-            Todos los datos ingresados pasan por validación:
+            All entered data goes through validation:
           </p>
           <ul className="list-disc pl-6 mb-6 space-y-2">
-            <li>Verificación de tipos de datos (números, fechas, strings)</li>
-            <li>Validación de rangos (balances positivos/negativos según tipo)</li>
-            <li>Detección de duplicados por ID único</li>
-            <li>Notificaciones de errores con toast messages</li>
+            <li>Data type verification (numbers, dates, strings)</li>
+            <li>Range validation (positive/negative balances by type)</li>
+            <li>Duplicate detection by unique ID</li>
+            <li>Error notifications with toast messages</li>
           </ul>
         </section>
 
         {/* 3. Dashboard */}
         <section id="dashboard" className="mb-12 page-break-before">
-          <h2 className="text-3xl font-bold mb-6">3. Dashboard - Vista de Patrimonio Neto</h2>
+          <h2 className="text-3xl font-bold mb-6">3. Dashboard - Net Worth Overview</h2>
           <p className="mb-4">
-            El Dashboard proporciona una vista consolidada del patrimonio neto del usuario, desglosando activos por clase y liquidez.
+            The Dashboard provides a consolidated view of the user's net worth, breaking down assets by class and liquidity.
           </p>
 
-          <h3 className="text-2xl font-semibold mb-4">Cálculos Principales</h3>
+          <h3 className="text-2xl font-semibold mb-4">Main Calculations</h3>
           
           <div className="mb-6">
-            <h4 className="text-xl font-semibold mb-3">Net Worth (Patrimonio Neto)</h4>
+            <h4 className="text-xl font-semibold mb-3">Net Worth</h4>
             <div className="bg-muted p-4 rounded-lg mb-4">
               <code>Net Worth = Total Assets - Total Liabilities</code>
             </div>
             <ul className="list-disc pl-6 mb-4 space-y-1">
-              <li>Total Assets incluye: cash, inversiones, propiedades, otros activos</li>
-              <li>Total Liabilities incluye: hipotecas, préstamos, tarjetas de crédito, otras deudas</li>
+              <li>Total Assets includes: cash, investments, properties, other assets</li>
+              <li>Total Liabilities includes: mortgages, loans, credit cards, other debts</li>
             </ul>
 
-            <h4 className="text-xl font-semibold mb-3">Liquid Assets (Activos Líquidos)</h4>
+            <h4 className="text-xl font-semibold mb-3">Liquid Assets</h4>
             <div className="bg-muted p-4 rounded-lg mb-4">
               <code>Liquid Assets = Cash + Investments (stocks, bonds, mutual funds, ETFs)</code>
             </div>
-            <p className="mb-4">Activos que pueden convertirse rápidamente en efectivo sin pérdida significativa de valor.</p>
+            <p className="mb-4">Assets that can be quickly converted to cash without significant loss of value.</p>
 
-            <h4 className="text-xl font-semibold mb-3">Emergency Fund (Fondo de Emergencia)</h4>
+            <h4 className="text-xl font-semibold mb-3">Emergency Fund</h4>
             <div className="bg-muted p-4 rounded-lg mb-4">
               <code>Emergency Fund = Liquid Assets × 0.30</code>
             </div>
-            <p className="mb-4">30% de los activos líquidos se reserva como fondo de emergencia (3-6 meses de gastos).</p>
+            <p className="mb-4">30% of liquid assets is reserved as an emergency fund (3-6 months of expenses).</p>
 
-            <h4 className="text-xl font-semibold mb-3">Available to Invest (Disponible para Invertir)</h4>
+            <h4 className="text-xl font-semibold mb-3">Available to Invest</h4>
             <div className="bg-muted p-4 rounded-lg mb-4">
               <code>Available to Invest = Liquid Assets - Emergency Fund</code>
             </div>
-            <p className="mb-4">Capital disponible para inversiones después de asegurar el fondo de emergencia.</p>
+            <p className="mb-4">Capital available for investments after securing the emergency fund.</p>
           </div>
 
-          <h3 className="text-2xl font-semibold mb-4">Componentes Visuales</h3>
+          <h3 className="text-2xl font-semibold mb-4">Visual Components</h3>
           <ul className="list-disc pl-6 mb-6 space-y-2">
-            <li><strong>Asset Allocation View</strong>: Gráfico de pastel mostrando distribución de activos</li>
-            <li><strong>Holdings Table</strong>: Tabla detallada de todas las cuentas e inversiones</li>
-            <li><strong>Liabilities Table</strong>: Tabla de todas las deudas y pasivos</li>
-            <li><strong>KPI Panel</strong>: Tarjetas con métricas clave (Net Worth, Liquid Assets, etc.)</li>
+            <li><strong>Asset Allocation View</strong>: Pie chart showing asset distribution</li>
+            <li><strong>Holdings Table</strong>: Detailed table of all accounts and investments</li>
+            <li><strong>Liabilities Table</strong>: Table of all debts and liabilities</li>
+            <li><strong>KPI Panel</strong>: Cards with key metrics (Net Worth, Liquid Assets, etc.)</li>
           </ul>
         </section>
 
         {/* 4. Budget Analyzer */}
         <section id="budget" className="mb-12 page-break-before">
-          <h2 className="text-3xl font-bold mb-6">4. Budget Analyzer - Análisis 50/30/20</h2>
+          <h2 className="text-3xl font-bold mb-6">4. Budget Analyzer - 50/30/20 Analysis</h2>
           <p className="mb-4">
-            El Budget Analyzer evalúa la salud financiera del usuario aplicando la regla 50/30/20:
+            The Budget Analyzer evaluates the user's financial health by applying the 50/30/20 rule:
           </p>
           <ul className="list-disc pl-6 mb-6 space-y-2">
-            <li><strong>50% Necesidades</strong>: Gastos esenciales (vivienda, alimentación, transporte, servicios)</li>
-            <li><strong>30% Deseos</strong>: Gastos discrecionales (entretenimiento, compras, hobbies)</li>
-            <li><strong>20% Ahorros</strong>: Inversiones, pagos de deuda, fondos de emergencia</li>
+            <li><strong>50% Needs</strong>: Essential expenses (housing, food, transportation, utilities)</li>
+            <li><strong>30% Wants</strong>: Discretionary spending (entertainment, shopping, hobbies)</li>
+            <li><strong>20% Savings</strong>: Investments, debt payments, emergency funds</li>
           </ul>
 
-          <h3 id="classification" className="text-2xl font-semibold mb-4">4.1 Sistema de Clasificación de Transacciones</h3>
+          <h3 id="classification" className="text-2xl font-semibold mb-4">4.1 Transaction Classification System</h3>
           <p className="mb-4">
-            El sistema utiliza un clasificador automático (<code>transactionClassifier.ts</code>) que categoriza cada transacción basándose en palabras clave y patrones.
+            The system uses an automatic classifier (<code>transactionClassifier.ts</code>) that categorizes each transaction based on keywords and patterns.
           </p>
 
-          <h4 className="text-xl font-semibold mb-3">Filtrado de Ingresos Operacionales</h4>
+          <h4 className="text-xl font-semibold mb-3">Operational Income Filtering</h4>
           <p className="mb-4">
-            La función <code>isValidIncome()</code> identifica ingresos reales, excluyendo movimientos no operacionales:
+            The <code>isValidIncome()</code> function identifies real income, excluding non-operational movements:
           </p>
           <div className="mb-4">
-            <p className="font-semibold mb-2">Ingresos Válidos (INCLUIDOS):</p>
+            <p className="font-semibold mb-2">Valid Income (INCLUDED):</p>
             <ul className="list-disc pl-6 mb-4 space-y-1">
-              <li>Payroll / Salarios</li>
-              <li>Investment Income (dividendos, intereses)</li>
+              <li>Payroll / Salaries</li>
+              <li>Investment Income (dividends, interest)</li>
               <li>Gig/Freelance Income</li>
             </ul>
-            <p className="font-semibold mb-2">Movimientos Excluidos (NO SON INGRESOS):</p>
+            <p className="font-semibold mb-2">Excluded Movements (NOT INCOME):</p>
             <ul className="list-disc pl-6 mb-4 space-y-1">
-              <li>Internal Transfers (transferencias entre cuentas propias)</li>
+              <li>Internal Transfers (transfers between own accounts)</li>
               <li>Credit Card Payments</li>
-              <li>Refunds / Reembolsos</li>
-              <li>Asset Sales (venta de activos)</li>
+              <li>Refunds / Reimbursements</li>
+              <li>Asset Sales</li>
             </ul>
           </div>
 
-          <h4 className="text-xl font-semibold mb-3">Clasificación de Gastos</h4>
+          <h4 className="text-xl font-semibold mb-3">Expense Classification</h4>
           <p className="mb-4">
-            La función <code>mapSubcategoryToCategory()</code> mapea subcategorías a las tres categorías principales:
+            The <code>mapSubcategoryToCategory()</code> function maps subcategories to the three main categories:
           </p>
           <div className="mb-4">
-            <p className="font-semibold mb-2">Needs (50% - Necesidades):</p>
+            <p className="font-semibold mb-2">Needs (50%):</p>
             <ul className="list-disc pl-6 mb-3 space-y-1 text-sm">
               <li>housing, utilities, internet, phone</li>
               <li>groceries, food_delivery</li>
@@ -269,51 +269,51 @@ const Documentation = () => {
               <li>minimum_debt_payment</li>
             </ul>
 
-            <p className="font-semibold mb-2">Wants (30% - Deseos):</p>
+            <p className="font-semibold mb-2">Wants (30%):</p>
             <ul className="list-disc pl-6 mb-3 space-y-1 text-sm">
               <li>restaurants, bars, coffee_shops</li>
               <li>entertainment, streaming, subscriptions</li>
               <li>shopping, clothing, personal_care</li>
               <li>travel, vacation, hotels</li>
               <li>hobbies, sports, gym_membership</li>
-              <li>pet_care (no esencial)</li>
+              <li>pet_care (non-essential)</li>
             </ul>
 
-            <p className="font-semibold mb-2">Savings (20% - Ahorros):</p>
+            <p className="font-semibold mb-2">Savings (20%):</p>
             <ul className="list-disc pl-6 mb-3 space-y-1 text-sm">
               <li>investment, brokerage, retirement_contribution</li>
               <li>savings_transfer</li>
-              <li>extra_debt_payment (por encima del mínimo)</li>
+              <li>extra_debt_payment (above minimum)</li>
               <li>emergency_fund</li>
             </ul>
           </div>
 
-          <h3 id="calculation" className="text-2xl font-semibold mb-4 page-break-before">4.2 Flujo de Cálculo 50/30/20</h3>
+          <h3 id="calculation" className="text-2xl font-semibold mb-4 page-break-before">4.2 50/30/20 Calculation Flow</h3>
           <p className="mb-4">
-            El cálculo se realiza en el componente <code>BudgetDonut.tsx</code> siguiendo estos pasos:
+            The calculation is performed in the <code>BudgetDonut.tsx</code> component following these steps:
           </p>
           
           <div className="mb-6">
-            <h4 className="text-xl font-semibold mb-3">Paso 1: Filtrado por Período</h4>
-            <p className="mb-2">Las transacciones se filtran según el período seleccionado (30, 60 o 90 días).</p>
+            <h4 className="text-xl font-semibold mb-3">Step 1: Period Filtering</h4>
+            <p className="mb-2">Transactions are filtered by the selected period (30, 60, or 90 days).</p>
 
-            <h4 className="text-xl font-semibold mb-3">Paso 2: Clasificación Operacional</h4>
+            <h4 className="text-xl font-semibold mb-3">Step 2: Operational Classification</h4>
             <div className="bg-muted p-4 rounded-lg mb-4">
               <code>filterOperationalTransactions(filteredTransactions)</code>
             </div>
             <ul className="list-disc pl-6 mb-4 space-y-1">
-              <li>Separa débitos (gastos) y créditos (ingresos)</li>
-              <li>Aplica <code>isValidIncome()</code> para filtrar solo ingresos reales</li>
+              <li>Separates debits (expenses) and credits (income)</li>
+              <li>Applies <code>isValidIncome()</code> to filter only real income</li>
             </ul>
 
-            <h4 className="text-xl font-semibold mb-3">Paso 3: Cálculo de Ingreso Neto Real</h4>
+            <h4 className="text-xl font-semibold mb-3">Step 3: Real Net Income Calculation</h4>
             <div className="bg-muted p-4 rounded-lg mb-4">
               <code>totalIncome = sum(operationalCredits.map(txn =&gt; txn.amount))</code>
             </div>
-            <p className="mb-4">Si <code>totalIncome &lt; $500</code>, se muestra una advertencia de ingreso insuficiente.</p>
+            <p className="mb-4">If <code>totalIncome &lt; $500</code>, an insufficient income warning is displayed.</p>
 
-            <h4 className="text-xl font-semibold mb-3">Paso 4: Clasificación de Gastos</h4>
-            <p className="mb-2">Los débitos operacionales se categorizan:</p>
+            <h4 className="text-xl font-semibold mb-3">Step 4: Expense Classification</h4>
+            <p className="mb-2">Operational debits are categorized:</p>
             <div className="bg-muted p-4 rounded-lg mb-4">
               <code className="text-sm">
                 {`needs = sum(expenses where category === "need")
@@ -322,7 +322,7 @@ savings = sum(expenses where category === "saving")`}
               </code>
             </div>
 
-            <h4 className="text-xl font-semibold mb-3">Paso 5: Cálculo de Porcentajes</h4>
+            <h4 className="text-xl font-semibold mb-3">Step 5: Percentage Calculation</h4>
             <div className="bg-muted p-4 rounded-lg mb-4">
               <code className="text-sm">
                 {`needsPct = (needs / totalIncome) × 100
@@ -331,99 +331,99 @@ savingsPct = (savings / totalIncome) × 100`}
               </code>
             </div>
 
-            <h4 className="text-xl font-semibold mb-3">Paso 6: Validación 50/30/20</h4>
-            <p className="mb-2">La función <code>validate50_30_20()</code> verifica:</p>
+            <h4 className="text-xl font-semibold mb-3">Step 6: 50/30/20 Validation</h4>
+            <p className="mb-2">The <code>validate50_30_20()</code> function verifies:</p>
             <ul className="list-disc pl-6 mb-4 space-y-1">
               <li>Needs ≤ 50%</li>
               <li>Wants ≤ 30%</li>
               <li>Savings ≥ 20%</li>
             </ul>
-            <p className="mb-4">Genera alertas específicas si no se cumplen los objetivos.</p>
+            <p className="mb-4">Generates specific alerts if targets are not met.</p>
           </div>
 
-          <h3 className="text-2xl font-semibold mb-4">Corrección: Average Monthly Income</h3>
+          <h3 className="text-2xl font-semibold mb-4">Correction: Average Monthly Income</h3>
           <p className="mb-4">
-            En <code>useDashboardData.ts</code>, el cálculo de <code>avgIncomeAmount</code> fue corregido:
+            In <code>useDashboardData.ts</code>, the <code>avgIncomeAmount</code> calculation was corrected:
           </p>
           <div className="bg-muted p-4 rounded-lg mb-4">
             <code className="text-sm">
-              {`// ANTES (INCORRECTO): dividía por número de transacciones
+              {`// BEFORE (INCORRECT): divided by number of transactions
 avgIncomeAmount = totalValidIncome / validIncomeTransactions.length
 
-// AHORA (CORRECTO): divide por número de meses en el período
+// NOW (CORRECT): divides by number of months in period
 avgIncomeAmount = totalValidIncome / period.months`}
             </code>
           </div>
 
-          <h3 id="visualizations" className="text-2xl font-semibold mb-4 page-break-before">4.3 Visualizaciones y Componentes</h3>
+          <h3 id="visualizations" className="text-2xl font-semibold mb-4 page-break-before">4.3 Visualizations and Components</h3>
           
           <h4 className="text-xl font-semibold mb-3">BudgetDonut</h4>
           <p className="mb-4">
-            Gráfico de dona circular mostrando la distribución 50/30/20 con:
+            Circular donut chart showing 50/30/20 distribution with:
           </p>
           <ul className="list-disc pl-6 mb-4 space-y-1">
-            <li>Gradiente cónico con colores diferenciados por categoría</li>
-            <li>Porcentajes y montos para cada categoría</li>
-            <li>Indicadores visuales de cumplimiento (✓ o ⚠)</li>
-            <li>Tooltip explicativo de la regla 50/30/20</li>
+            <li>Conic gradient with differentiated colors by category</li>
+            <li>Percentages and amounts for each category</li>
+            <li>Visual compliance indicators (✓ or ⚠)</li>
+            <li>Explanatory tooltip of the 50/30/20 rule</li>
           </ul>
 
           <h4 className="text-xl font-semibold mb-3">MonthlyStackedBars</h4>
           <p className="mb-4">
-            Gráfico de barras apiladas mostrando la evolución mensual de:
+            Stacked bar chart showing monthly evolution of:
           </p>
           <ul className="list-disc pl-6 mb-4 space-y-1">
-            <li>Needs (verde)</li>
-            <li>Wants (azul)</li>
-            <li>Savings (morado)</li>
-            <li>Incluye <strong>InfoTooltip</strong> explicando qué es el "Monthly Breakdown"</li>
+            <li>Needs (green)</li>
+            <li>Wants (blue)</li>
+            <li>Savings (purple)</li>
+            <li>Includes <strong>InfoTooltip</strong> explaining what "Monthly Breakdown" is</li>
           </ul>
 
           <h4 className="text-xl font-semibold mb-3">KeyInsights</h4>
           <p className="mb-4">
-            Tarjetas de insights destacando:
+            Insight cards highlighting:
           </p>
           <ul className="list-disc pl-6 mb-4 space-y-1">
-            <li><strong>Positive Trend</strong>: Tendencias favorables en el presupuesto (con <strong>InfoTooltip</strong> explicativo)</li>
-            <li><strong>Red Flag</strong>: Alertas de gastos excesivos (con <strong>InfoTooltip</strong> explicativo)</li>
-            <li><strong>Quick Win</strong>: Oportunidades inmediatas de ahorro</li>
+            <li><strong>Positive Trend</strong>: Favorable budget trends (with explanatory <strong>InfoTooltip</strong>)</li>
+            <li><strong>Red Flag</strong>: Excessive spending alerts (with explanatory <strong>InfoTooltip</strong>)</li>
+            <li><strong>Quick Win</strong>: Immediate savings opportunities</li>
           </ul>
 
           <h4 className="text-xl font-semibold mb-3">TransactionsList / TransactionsTable</h4>
           <p className="mb-4">
-            Lista/tabla detallada de todas las transacciones con filtros:
+            Detailed list/table of all transactions with filters:
           </p>
           <ul className="list-disc pl-6 mb-4 space-y-1">
-            <li><strong>Date Range</strong>: Rango de fechas personalizado</li>
+            <li><strong>Date Range</strong>: Custom date range</li>
             <li><strong>Type</strong>: Income, Expense, Transfer</li>
             <li><strong>Category</strong>: Need, Want, Saving</li>
-            <li><strong>Subcategory</strong>: housing, groceries, transportation, healthcare, etc. (nuevo filtro agregado)</li>
-            <li><strong>Account</strong>: Filtro por cuenta específica</li>
+            <li><strong>Subcategory</strong>: housing, groceries, transportation, healthcare, etc. (new filter added)</li>
+            <li><strong>Account</strong>: Filter by specific account</li>
           </ul>
 
           <h4 className="text-xl font-semibold mb-3">FiltersCard</h4>
           <p className="mb-4">
-            Panel de filtros actualizado con el nuevo filtro de <strong>Subcategory</strong> que permite ver transacciones específicas como:
+            Updated filters panel with the new <strong>Subcategory</strong> filter that allows viewing specific transactions such as:
           </p>
           <ul className="list-disc pl-6 mb-4 space-y-1">
-            <li>Groceries (Comestibles)</li>
-            <li>Transportation (Transporte)</li>
-            <li>Healthcare (Salud)</li>
-            <li>Housing (Vivienda)</li>
-            <li>Y muchas más subcategorías...</li>
+            <li>Groceries</li>
+            <li>Transportation</li>
+            <li>Healthcare</li>
+            <li>Housing</li>
+            <li>And many more subcategories...</li>
           </ul>
         </section>
 
         {/* 5. Investments */}
         <section id="investments" className="mb-12 page-break-before">
-          <h2 className="text-3xl font-bold mb-6">5. Investment Planning - Preparación para Inversión Activa</h2>
+          <h2 className="text-3xl font-bold mb-6">5. Investment Planning - Active Investment Readiness</h2>
           <p className="mb-4">
-            El módulo de Investments guía al usuario a través de un proceso paso a paso para determinar su preparación para inversiones activas.
+            The Investments module guides the user through a step-by-step process to determine their readiness for active investments.
           </p>
 
-          <h3 className="text-2xl font-semibold mb-4">Paso 1: Readiness Score (Puntuación de Preparación)</h3>
+          <h3 className="text-2xl font-semibold mb-4">Step 1: Readiness Score</h3>
           <p className="mb-4">
-            Evalúa 5 factores clave:
+            Evaluates 5 key factors:
           </p>
           <div className="mb-6">
             <h4 className="text-xl font-semibold mb-3">1. Emergency Fund Status</h4>
@@ -431,7 +431,7 @@ avgIncomeAmount = totalValidIncome / period.months`}
               <code className="text-sm">
                 {`emergencyFund = liquidAssets × 0.30
 score = (emergencyFund / (monthlyExpenses × 6)) × 20
-max score = 20 puntos`}
+max score = 20 points`}
               </code>
             </div>
 
@@ -440,7 +440,7 @@ max score = 20 puntos`}
               <code className="text-sm">
                 {`DTI = (totalDebtPayments / monthlyIncome) × 100
 score = max(0, 20 - (DTI - 20) / 2)
-max score = 20 puntos`}
+max score = 20 points`}
               </code>
             </div>
 
@@ -467,7 +467,7 @@ Deviations reduce score`}
               <code className="text-sm">
                 {`availableCapital = liquidAssets - emergencyFund
 score = min(20, availableCapital / 5000)
-max score = 20 puntos`}
+max score = 20 points`}
               </code>
             </div>
 
@@ -483,19 +483,19 @@ max score = 20 puntos`}
             </ul>
           </div>
 
-          <h3 className="text-2xl font-semibold mb-4">Paso 2: Optimize Assets</h3>
+          <h3 className="text-2xl font-semibold mb-4">Step 2: Optimize Assets</h3>
           <p className="mb-4">
-            Identifica oportunidades para liberar capital:
+            Identifies opportunities to free up capital:
           </p>
           <ul className="list-disc pl-6 mb-6 space-y-2">
-            <li><strong>Equity Opportunities</strong>: Activos que podrían venderse o refinanciarse</li>
-            <li><strong>Debt Payoff Scenarios</strong>: Simulaciones de pago de deudas de alto interés</li>
-            <li>Muestra el impacto en disponibilidad de capital</li>
+            <li><strong>Equity Opportunities</strong>: Assets that could be sold or refinanced</li>
+            <li><strong>Debt Payoff Scenarios</strong>: Simulations of high-interest debt payoff</li>
+            <li>Shows impact on capital availability</li>
           </ul>
 
-          <h3 className="text-2xl font-semibold mb-4">Paso 3: Strategy Selection</h3>
+          <h3 className="text-2xl font-semibold mb-4">Step 3: Strategy Selection</h3>
           <p className="mb-4">
-            Presenta estrategias de inversión activa:
+            Presents active investment strategies:
           </p>
           <ul className="list-disc pl-6 mb-6 space-y-2">
             <li>Long-term Holdings (LEAP options, wheel strategy)</li>
@@ -504,25 +504,25 @@ max score = 20 puntos`}
             <li>Income Generation (covered calls, cash-secured puts)</li>
           </ul>
           <p className="mb-4">
-            Cada estrategia incluye descripción, riesgo, retorno esperado y capital mínimo requerido.
+            Each strategy includes description, risk, expected return, and minimum required capital.
           </p>
 
-          <h3 className="text-2xl font-semibold mb-4">Paso 4: Paper Trading</h3>
+          <h3 className="text-2xl font-semibold mb-4">Step 4: Paper Trading</h3>
           <p className="mb-4">
-            Simulación de trading con requisitos específicos de gates:
+            Trading simulation with specific gate requirements:
           </p>
           <ul className="list-disc pl-6 mb-6 space-y-2">
-            <li><strong>Gate 1</strong>: Completar 40+ trades simulados</li>
-            <li><strong>Gate 2</strong>: 95%+ adherencia al plan de trading</li>
-            <li><strong>Gate 3</strong>: 70%+ completitud del checklist pre-trade</li>
+            <li><strong>Gate 1</strong>: Complete 40+ simulated trades</li>
+            <li><strong>Gate 2</strong>: 95%+ adherence to trading plan</li>
+            <li><strong>Gate 3</strong>: 70%+ completion of pre-trade checklist</li>
           </ul>
           <p className="mb-4">
-            El usuario debe pasar todas las gates antes de recibir recomendación de capital real.
+            User must pass all gates before receiving real capital recommendation.
           </p>
 
-          <h3 className="text-2xl font-semibold mb-4">Paso 5: Capital Allocation</h3>
+          <h3 className="text-2xl font-semibold mb-4">Step 5: Capital Allocation</h3>
           <p className="mb-4">
-            Lógica de waterfall para determinar capital asignable:
+            Waterfall logic to determine allocable capital:
           </p>
           <div className="bg-muted p-4 rounded-lg mb-4">
             <code className="text-sm">
@@ -537,60 +537,60 @@ max score = 20 puntos`}
 
         {/* 6. Goals */}
         <section id="goals" className="mb-12 page-break-before">
-          <h2 className="text-3xl font-bold mb-6">6. Goals - Calculadora RPIC</h2>
+          <h2 className="text-3xl font-bold mb-6">6. Goals - RPIC Calculator</h2>
           <p className="mb-4">
-            El módulo Goals ayuda a los usuarios a calcular su <strong>Retirement Passive Income Capital (RPIC)</strong>, el capital necesario para generar ingresos pasivos suficientes para la jubilación.
+            The Goals module helps users calculate their <strong>Retirement Passive Income Capital (RPIC)</strong>, the capital needed to generate sufficient passive income for retirement.
           </p>
 
-          <h3 className="text-2xl font-semibold mb-4">Inputs del Usuario (3 Preguntas)</h3>
+          <h3 className="text-2xl font-semibold mb-4">User Inputs (3 Questions)</h3>
           <div className="mb-6">
             <h4 className="text-xl font-semibold mb-3">1. Target Monthly Passive Income</h4>
-            <p className="mb-2">¿Cuánto deseas ganar mensualmente en pasivos al jubilarte?</p>
+            <p className="mb-2">How much do you want to earn monthly in passive income when you retire?</p>
             <ul className="list-disc pl-6 mb-4 space-y-1">
-              <li>Input numérico en dólares</li>
-              <li>Típicamente basado en gastos mensuales actuales</li>
+              <li>Numeric input in dollars</li>
+              <li>Typically based on current monthly expenses</li>
             </ul>
 
             <h4 className="text-xl font-semibold mb-3">2. Lifestyle Multiplier</h4>
-            <p className="mb-2">¿Cómo esperas que cambie tu estilo de vida?</p>
+            <p className="mb-2">How do you expect your lifestyle to change?</p>
             <ul className="list-disc pl-6 mb-4 space-y-1">
-              <li>0.7x: Downsize (reducción de gastos)</li>
-              <li>1.0x: Same (igual que ahora) - <strong>Corregido: value="1"</strong></li>
-              <li>1.3x: Upgrade (aumento de gastos)</li>
+              <li>0.7x: Downsize (expense reduction)</li>
+              <li>1.0x: Same (same as now) - <strong>Corrected: value="1"</strong></li>
+              <li>1.3x: Upgrade (expense increase)</li>
             </ul>
 
             <h4 className="text-xl font-semibold mb-3">3. Geography Multiplier</h4>
-            <p className="mb-2">¿Dónde planeas vivir?</p>
+            <p className="mb-2">Where do you plan to live?</p>
             <ul className="list-disc pl-6 mb-4 space-y-1">
-              <li>0.5x: Lower cost area (área de bajo costo)</li>
-              <li>1.0x: Same location (mismo lugar) - <strong>Corregido: value="1"</strong></li>
-              <li>1.5x: Higher cost area (área de alto costo)</li>
+              <li>0.5x: Lower cost area</li>
+              <li>1.0x: Same location - <strong>Corrected: value="1"</strong></li>
+              <li>1.5x: Higher cost area</li>
             </ul>
           </div>
 
-          <h3 className="text-2xl font-semibold mb-4">Cálculo de RPIC</h3>
+          <h3 className="text-2xl font-semibold mb-4">RPIC Calculation</h3>
           <div className="mb-6">
-            <h4 className="text-xl font-semibold mb-3">Paso 1: Ajustar Ingreso Objetivo</h4>
+            <h4 className="text-xl font-semibold mb-3">Step 1: Adjust Target Income</h4>
             <div className="bg-muted p-4 rounded-lg mb-4">
               <code className="text-sm">
                 {`adjustedMonthlyIncome = targetMonthly × lifestyle × geography`}
               </code>
             </div>
 
-            <h4 className="text-xl font-semibold mb-3">Paso 2: RPIC Anualizado</h4>
+            <h4 className="text-xl font-semibold mb-3">Step 2: Annualized RPIC</h4>
             <div className="bg-muted p-4 rounded-lg mb-4">
               <code className="text-sm">
                 {`annualRPIC = adjustedMonthlyIncome × 12`}
               </code>
             </div>
 
-            <h4 className="text-xl font-semibold mb-3">Paso 3: Capital Requerido</h4>
-            <p className="mb-4">Se calculan dos escenarios:</p>
+            <h4 className="text-xl font-semibold mb-3">Step 3: Required Capital</h4>
+            <p className="mb-4">Two scenarios are calculated:</p>
             
             <p className="font-semibold mb-2">A. Wealth OS Hybrid Approach</p>
             <div className="bg-muted p-4 rounded-lg mb-4">
               <code className="text-sm">
-                {`assumedReturn = 12% (combinación de inversiones activas/pasivas)
+                {`assumedReturn = 12% (combination of active/passive investments)
 capitalRequired = annualRPIC / 0.12`}
               </code>
             </div>
@@ -598,7 +598,7 @@ capitalRequired = annualRPIC / 0.12`}
             <p className="font-semibold mb-2">B. Traditional Passive Approach</p>
             <div className="bg-muted p-4 rounded-lg mb-4">
               <code className="text-sm">
-                {`assumedReturn = 4% (regla del 4% tradicional)
+                {`assumedReturn = 4% (traditional 4% rule)
 capitalRequired = annualRPIC / 0.04`}
               </code>
             </div>
@@ -610,41 +610,41 @@ capitalRequired = annualRPIC / 0.04`}
               </code>
             </div>
             <p className="mb-4">
-              El enfoque Wealth OS Hybrid requiere 67% menos capital que el tradicional debido a los mayores retornos proyectados.
+              The Wealth OS Hybrid approach requires 67% less capital than traditional due to projected higher returns.
             </p>
           </div>
 
-          <h3 className="text-2xl font-semibold mb-4">Cálculo de Timeline</h3>
+          <h3 className="text-2xl font-semibold mb-4">Timeline Calculation</h3>
           <p className="mb-4">
-            ¿Cuántos años tomará alcanzar el RPIC objetivo?
+            How many years will it take to reach the target RPIC?
           </p>
           <div className="mb-6">
-            <h4 className="text-xl font-semibold mb-3">Inputs Adicionales</h4>
+            <h4 className="text-xl font-semibold mb-3">Additional Inputs</h4>
             <ul className="list-disc pl-6 mb-4 space-y-1">
-              <li><strong>Starting Capital</strong>: Capital inicial disponible</li>
-              <li><strong>Monthly Contribution</strong>: Aporte mensual hacia el objetivo</li>
-              <li><strong>Expected Annual Return</strong>: Retorno anual esperado (%)</li>
+              <li><strong>Starting Capital</strong>: Available initial capital</li>
+              <li><strong>Monthly Contribution</strong>: Monthly contribution towards goal</li>
+              <li><strong>Expected Annual Return</strong>: Expected annual return (%)</li>
             </ul>
 
-            <h4 className="text-xl font-semibold mb-3">Fórmula de Valor Futuro</h4>
+            <h4 className="text-xl font-semibold mb-3">Future Value Formula</h4>
             <div className="bg-muted p-4 rounded-lg mb-4">
               <code className="text-sm">
                 {`FV = PV × (1 + r)^n + PMT × [((1 + r)^n - 1) / r]
 
-Donde:
+Where:
 - FV = Future Value (capitalRequired)
 - PV = Present Value (startingCapital)
 - PMT = Monthly Contribution (monthlyContribution)
 - r = Monthly Return (annualReturn / 12)
 - n = Number of months (what we solve for)
 
-Resolviendo para n:
+Solving for n:
 yearsToGoal = n / 12`}
               </code>
             </div>
 
             <p className="mb-4">
-              Si el objetivo no es alcanzable con los parámetros actuales (retorna años muy altos o negativos), se muestra una alerta sugerente:
+              If the goal is not achievable with current parameters (returns very high or negative years), a suggestive alert is shown:
             </p>
             <div className="bg-amber-100 dark:bg-amber-900/20 border border-amber-500 p-4 rounded-lg mb-4">
               <p className="text-foreground text-sm">
@@ -652,26 +652,26 @@ yearsToGoal = n / 12`}
               </p>
             </div>
             <p className="mb-4">
-              <strong>Corrección aplicada:</strong> El texto de esta alerta ahora usa <code>text-foreground</code> (negro) en lugar de <code>text-warning-foreground</code> (blanco) para mejor visibilidad.
+              <strong>Applied correction:</strong> This alert text now uses <code>text-foreground</code> (black) instead of <code>text-warning-foreground</code> (white) for better visibility.
             </p>
           </div>
 
-          <h3 className="text-2xl font-semibold mb-4">Visualizaciones</h3>
+          <h3 className="text-2xl font-semibold mb-4">Visualizations</h3>
           
           <h4 className="text-xl font-semibold mb-3">Required Capital Table</h4>
           <p className="mb-4">
-            Tabla comparativa mostrando:
+            Comparative table showing:
           </p>
           <ul className="list-disc pl-6 mb-4 space-y-1">
-            <li>Capital requerido para cada enfoque (Hybrid vs Traditional)</li>
-            <li>Gap de capital (diferencia con capital actual)</li>
-            <li>Años hasta alcanzar objetivo</li>
-            <li>Eficiencia de capital (ahorro del enfoque Hybrid)</li>
+            <li>Required capital for each approach (Hybrid vs Traditional)</li>
+            <li>Capital gap (difference with current capital)</li>
+            <li>Years to reach goal</li>
+            <li>Capital efficiency (Hybrid approach savings)</li>
           </ul>
 
           <h4 className="text-xl font-semibold mb-3">Visual Roadmap</h4>
           <p className="mb-4">
-            Timeline visual con milestones:
+            Visual timeline with milestones:
           </p>
           <ul className="list-disc pl-6 mb-4 space-y-1">
             <li>Emergency Fund Secured</li>
@@ -681,39 +681,39 @@ yearsToGoal = n / 12`}
             <li>RPIC Goal Reached</li>
           </ul>
           <p className="mb-4">
-            Cada milestone muestra fecha estimada de logro y progreso actual.
+            Each milestone shows estimated achievement date and current progress.
           </p>
 
           <h4 className="text-xl font-semibold mb-3">RPIC Result Card</h4>
           <p className="mb-4">
-            Resumen ejecutivo mostrando:
+            Executive summary showing:
           </p>
           <ul className="list-disc pl-6 mb-4 space-y-1">
-            <li>RPIC anualizado ajustado</li>
-            <li>Capital requerido (ambos enfoques)</li>
-            <li>Ahorro de capital (Hybrid vs Traditional)</li>
-            <li>RPIC Index (progreso como porcentaje)</li>
+            <li>Adjusted annualized RPIC</li>
+            <li>Required capital (both approaches)</li>
+            <li>Capital savings (Hybrid vs Traditional)</li>
+            <li>RPIC Index (progress as percentage)</li>
           </ul>
 
-          <h3 className="text-2xl font-semibold mb-4">Corrección: Expense Baseline Card</h3>
+          <h3 className="text-2xl font-semibold mb-4">Correction: Expense Baseline Card</h3>
           <p className="mb-4">
-            <strong>Issue identificado:</strong> El botón "Yes, this reflects my lifestyle" no funcionaba correctamente, y el estado de edición no se manejaba bien.
+            <strong>Identified issue:</strong> The "Yes, this reflects my lifestyle" button did not work correctly, and edit state was not properly managed.
           </p>
           <p className="mb-4">
-            <strong>Corrección aplicada:</strong>
+            <strong>Applied correction:</strong>
           </p>
           <ul className="list-disc pl-6 mb-4 space-y-1">
-            <li>El botón "Yes, this reflects my lifestyle" ahora confirma correctamente el <code>autoMonthlyExpenses</code> y llama a <code>onExpensesConfirmed(autoMonthlyExpenses)</code></li>
-            <li>Ambos botones ("Yes" y "Adjust") se muestran siempre cuando hay datos disponibles</li>
-            <li>El flujo de edición ahora es consistente: guardar actualiza el valor y sale del modo de edición</li>
+            <li>The "Yes, this reflects my lifestyle" button now correctly confirms <code>autoMonthlyExpenses</code> and calls <code>onExpensesConfirmed(autoMonthlyExpenses)</code></li>
+            <li>Both buttons ("Yes" and "Adjust") are always shown when data is available</li>
+            <li>Edit flow is now consistent: saving updates the value and exits edit mode</li>
           </ul>
         </section>
 
         {/* 7. Key Calculations */}
         <section id="formulas" className="mb-12 page-break-before">
-          <h2 className="text-3xl font-bold mb-6">7. Cálculos y Fórmulas Clave</h2>
+          <h2 className="text-3xl font-bold mb-6">7. Key Calculations and Formulas</h2>
           <p className="mb-4">
-            Resumen consolidado de todas las fórmulas utilizadas en el sistema:
+            Consolidated summary of all formulas used in the system:
           </p>
 
           <h3 className="text-2xl font-semibold mb-4">Dashboard Calculations</h3>
@@ -831,166 +831,166 @@ Solve for n, then: Years = n / 12`}
 
         {/* 8. User Flow */}
         <section id="user-flow" className="mb-12 page-break-before">
-          <h2 className="text-3xl font-bold mb-6">8. Flujo de Usuario Típico</h2>
+          <h2 className="text-3xl font-bold mb-6">8. Typical User Flow</h2>
 
-          <h3 className="text-2xl font-semibold mb-4">Primera Vez (Onboarding)</h3>
+          <h3 className="text-2xl font-semibold mb-4">First Time (Onboarding)</h3>
           <ol className="list-decimal pl-6 mb-6 space-y-3">
             <li>
               <strong>Command Center - Data Intake</strong>
               <ul className="list-disc pl-6 mt-2 space-y-1">
-                <li>Usuario carga datos vía Sample Data, Mock Connect, Upload Files, o Manual Entry</li>
-                <li>Sistema valida y procesa los datos</li>
-                <li>FinancialSnapshot se crea y persiste en localStorage</li>
+                <li>User loads data via Sample Data, Mock Connect, Upload Files, or Manual Entry</li>
+                <li>System validates and processes data</li>
+                <li>FinancialSnapshot is created and persisted in localStorage</li>
               </ul>
             </li>
             <li>
               <strong>Dashboard - Net Worth Overview</strong>
               <ul className="list-disc pl-6 mt-2 space-y-1">
-                <li>Usuario ve su patrimonio neto consolidado</li>
-                <li>Revisa distribución de activos y pasivos</li>
-                <li>Identifica activos líquidos y capital disponible</li>
+                <li>User sees their consolidated net worth</li>
+                <li>Reviews asset and liability distribution</li>
+                <li>Identifies liquid assets and available capital</li>
               </ul>
             </li>
             <li>
               <strong>Budget Analyzer - 50/30/20 Analysis</strong>
               <ul className="list-disc pl-6 mt-2 space-y-1">
-                <li>Sistema clasifica automáticamente transacciones</li>
-                <li>Usuario ve distribución actual vs objetivo 50/30/20</li>
-                <li>Identifica áreas de mejora y quick wins</li>
-                <li>Puede filtrar transacciones por Type, Category, Subcategory, Account, Date</li>
+                <li>System automatically classifies transactions</li>
+                <li>User sees current distribution vs 50/30/20 target</li>
+                <li>Identifies improvement areas and quick wins</li>
+                <li>Can filter transactions by Type, Category, Subcategory, Account, Date</li>
               </ul>
             </li>
             <li>
               <strong>Investments - Readiness Assessment</strong>
               <ul className="list-disc pl-6 mt-2 space-y-1">
-                <li>Completa Readiness Score (5 factores)</li>
-                <li>Revisa oportunidades de optimización de activos</li>
-                <li>Selecciona estrategia de inversión activa</li>
-                <li>Comienza paper trading si es apropiado</li>
+                <li>Completes Readiness Score (5 factors)</li>
+                <li>Reviews asset optimization opportunities</li>
+                <li>Selects active investment strategy</li>
+                <li>Starts paper trading if appropriate</li>
               </ul>
             </li>
             <li>
               <strong>Goals - RPIC Planning</strong>
               <ul className="list-disc pl-6 mt-2 space-y-1">
-                <li>Responde 3 preguntas clave (Target Income, Lifestyle, Geography)</li>
-                <li>Confirma o ajusta baseline de gastos mensuales</li>
-                <li>Sistema calcula RPIC requerido y timeline</li>
-                <li>Usuario ve roadmap visual con milestones</li>
+                <li>Answers 3 key questions (Target Income, Lifestyle, Geography)</li>
+                <li>Confirms or adjusts monthly expense baseline</li>
+                <li>System calculates required RPIC and timeline</li>
+                <li>User sees visual roadmap with milestones</li>
               </ul>
             </li>
           </ol>
 
-          <h3 className="text-2xl font-semibold mb-4">Usuario Recurrente</h3>
+          <h3 className="text-2xl font-semibold mb-4">Returning User</h3>
           <ul className="list-disc pl-6 mb-6 space-y-2">
-            <li>Dashboard carga automáticamente datos persistidos</li>
-            <li>Usuario puede actualizar datos en Command Center</li>
-            <li>Revisa progreso en Budget Analyzer (filtros de período: 30/60/90 días)</li>
-            <li>Actualiza paper trading progress en Investments</li>
-            <li>Ajusta assumptions en Goals según cambios de vida</li>
-            <li>Puede resetear todos los datos con "New Analysis" en cualquier momento</li>
+            <li>Dashboard automatically loads persisted data</li>
+            <li>User can update data in Command Center</li>
+            <li>Reviews progress in Budget Analyzer (period filters: 30/60/90 days)</li>
+            <li>Updates paper trading progress in Investments</li>
+            <li>Adjusts assumptions in Goals based on life changes</li>
+            <li>Can reset all data with "New Analysis" at any time</li>
           </ul>
         </section>
 
         {/* 9. Glossary */}
         <section id="glossary" className="mb-12">
-          <h2 className="text-3xl font-bold mb-6">9. Glosario de Términos</h2>
+          <h2 className="text-3xl font-bold mb-6">9. Glossary of Terms</h2>
 
           <dl className="space-y-4">
             <div>
               <dt className="font-semibold text-lg mb-1">50/30/20 Rule</dt>
               <dd className="text-muted-foreground">
-                Regla de presupuesto que sugiere asignar 50% del ingreso a necesidades, 30% a deseos, y 20% a ahorros/inversiones.
+                Budgeting rule suggesting allocation of 50% of income to needs, 30% to wants, and 20% to savings/investments.
               </dd>
             </div>
 
             <div>
               <dt className="font-semibold text-lg mb-1">Asset Allocation</dt>
               <dd className="text-muted-foreground">
-                Distribución de inversiones entre diferentes clases de activos (acciones, bonos, real estate, etc.).
+                Distribution of investments across different asset classes (stocks, bonds, real estate, etc.).
               </dd>
             </div>
 
             <div>
               <dt className="font-semibold text-lg mb-1">Debt-to-Income Ratio (DTI)</dt>
               <dd className="text-muted-foreground">
-                Porcentaje del ingreso mensual que se destina a pagos de deuda. DTI bajo indica mejor salud financiera.
+                Percentage of monthly income allocated to debt payments. Lower DTI indicates better financial health.
               </dd>
             </div>
 
             <div>
               <dt className="font-semibold text-lg mb-1">Emergency Fund</dt>
               <dd className="text-muted-foreground">
-                Reserva de efectivo equivalente a 3-6 meses de gastos para emergencias imprevistas.
+                Cash reserve equivalent to 3-6 months of expenses for unexpected emergencies.
               </dd>
             </div>
 
             <div>
               <dt className="font-semibold text-lg mb-1">Liquid Assets</dt>
               <dd className="text-muted-foreground">
-                Activos que pueden convertirse rápidamente en efectivo sin pérdida significativa de valor (cash, acciones, bonos).
+                Assets that can be quickly converted to cash without significant loss of value (cash, stocks, bonds).
               </dd>
             </div>
 
             <div>
               <dt className="font-semibold text-lg mb-1">Net Worth</dt>
               <dd className="text-muted-foreground">
-                Valor total de todos los activos menos todos los pasivos. Métrica principal de salud financiera.
+                Total value of all assets minus all liabilities. Primary metric of financial health.
               </dd>
             </div>
 
             <div>
               <dt className="font-semibold text-lg mb-1">Operational Income</dt>
               <dd className="text-muted-foreground">
-                Ingresos reales (salarios, inversiones, freelance) excluyendo transferencias internas, reembolsos, y ventas de activos.
+                Real income (salaries, investments, freelance) excluding internal transfers, refunds, and asset sales.
               </dd>
             </div>
 
             <div>
               <dt className="font-semibold text-lg mb-1">Paper Trading</dt>
               <dd className="text-muted-foreground">
-                Simulación de trading con dinero virtual para practicar estrategias sin riesgo financiero real.
+                Trading simulation with virtual money to practice strategies without real financial risk.
               </dd>
             </div>
 
             <div>
               <dt className="font-semibold text-lg mb-1">Readiness Score</dt>
               <dd className="text-muted-foreground">
-                Puntuación de 0-100 que evalúa la preparación de un usuario para inversiones activas basada en 5 factores clave.
+                0-100 score evaluating a user's readiness for active investments based on 5 key factors.
               </dd>
             </div>
 
             <div>
               <dt className="font-semibold text-lg mb-1">RPIC (Retirement Passive Income Capital)</dt>
               <dd className="text-muted-foreground">
-                Capital total necesario para generar ingresos pasivos suficientes para la jubilación sin agotar el principal.
+                Total capital needed to generate sufficient passive income for retirement without depleting principal.
               </dd>
             </div>
 
             <div>
               <dt className="font-semibold text-lg mb-1">RPIC Index</dt>
               <dd className="text-muted-foreground">
-                Porcentaje de progreso hacia el RPIC objetivo. RPIC Index = (Current Capital / Target RPIC) × 100.
+                Progress percentage toward target RPIC. RPIC Index = (Current Capital / Target RPIC) × 100.
               </dd>
             </div>
 
             <div>
               <dt className="font-semibold text-lg mb-1">Subcategory</dt>
               <dd className="text-muted-foreground">
-                Clasificación detallada de transacciones (groceries, transportation, healthcare, etc.) que se mapea a categorías principales (Need/Want/Saving).
+                Detailed transaction classification (groceries, transportation, healthcare, etc.) that maps to main categories (Need/Want/Saving).
               </dd>
             </div>
 
             <div>
               <dt className="font-semibold text-lg mb-1">Waterfall Logic</dt>
               <dd className="text-muted-foreground">
-                Proceso secuencial de cálculo donde cada paso depende del resultado del anterior (usado en capital allocation).
+                Sequential calculation process where each step depends on the result of the previous one (used in capital allocation).
               </dd>
             </div>
 
             <div>
               <dt className="font-semibold text-lg mb-1">Wealth OS Hybrid Approach</dt>
               <dd className="text-muted-foreground">
-                Estrategia que combina inversiones pasivas tradicionales con inversiones activas para lograr retornos del ~12% anual, requiriendo 67% menos capital que enfoques tradicionales.
+                Strategy combining traditional passive investments with active investments to achieve ~12% annual returns, requiring 67% less capital than traditional approaches.
               </dd>
             </div>
           </dl>
@@ -998,8 +998,8 @@ Solve for n, then: Years = n / 12`}
 
         {/* Footer */}
         <footer className="mt-16 pt-8 border-t text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Rockwell Wealth OS. Documentación Técnica del Sistema.</p>
-          <p className="mt-2">Generado el {new Date().toLocaleString()}</p>
+          <p>© {new Date().getFullYear()} Rockwell Wealth OS. Technical System Documentation.</p>
+          <p className="mt-2">Generated on {new Date().toLocaleString()}</p>
         </footer>
       </div>
     </div>
