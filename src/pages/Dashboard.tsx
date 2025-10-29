@@ -188,6 +188,9 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
             <div className="lg:col-span-1 space-y-6 flex flex-col">
               <BudgetDonut data={data} viewMode={viewMode} period={period} />
               <MonthlyStackedBars data={data} />
+              
+              {/* Key Insights - 3 Cards */}
+              <KeyInsights data={data} />
             </div>
 
             {/* Right Column: 2/3 width */}
@@ -205,9 +208,6 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
               </div>
             </div>
           </div>
-
-          {/* Key Insights - 3 Cards */}
-          <KeyInsights data={data} />
 
           {/* Personalized Recommendations */}
           <PersonalizedRecommendations data={data} />
