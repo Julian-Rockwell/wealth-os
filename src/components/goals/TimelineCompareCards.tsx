@@ -152,6 +152,21 @@ export function TimelineCompareCards({
         </Card>
       </div>
 
+      {/* Timing Alert */}
+      {timeline.timingAlert && (
+        <Card className="border-warning bg-warning/10">
+          <CardContent className="py-4 space-y-3">
+            <p className="text-sm font-semibold text-warning-foreground">
+              ⚠️ {timeline.timingAlert.message}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              <strong>Required monthly contribution to meet {timeline.timingGoal}-year goal:</strong>{" "}
+              ${timeline.timingAlert.requiredMonthlyContribution.toFixed(0)}/month
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Delta */}
       {timeline.deltaYears > 0 && (
         <Card className="border-success bg-success/10">

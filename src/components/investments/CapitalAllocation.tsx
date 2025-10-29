@@ -19,10 +19,13 @@ interface CapitalAllocationProps {
 }
 
 export function CapitalAllocation({ snapshot }: CapitalAllocationProps) {
-  const { availableCapital } = useFinancialData();
+  const { availableCapital, rpicResult } = useFinancialData();
   const [emergencyFundMonths, setEmergencyFundMonths] = useState<number>(6);
   const [emergencyFundInstrument, setEmergencyFundInstrument] = useState<string>("TBIL");
-  const [maxTradingAccountCap, setMaxTradingAccountCap] = useState<number>(100000);
+  
+  // Calculate dynamic cap based on RPIC (40% of target passive capital)
+  const dynamicCap = rpicResult ? Math.round(rpicResult.targetCapitalPassive * 0.4) : 100000;
+  const [maxTradingAccountCap, setMaxTradingAccountCap] = useState<number>(dynamicCap);
   const [currentTradingAccountValue, setCurrentTradingAccountValue] = useState<number>(0);
   const [selectedStrategy, setSelectedStrategy] = useState<TradingStrategy | null>(null);
   

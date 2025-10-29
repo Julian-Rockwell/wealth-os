@@ -22,7 +22,7 @@ import {
 import { calculateReadinessScore } from "@/utils/investmentCalculations";
 
 export default function Goals() {
-  const { snapshot, dashboardData } = useFinancialData();
+  const { snapshot, dashboardData, setRpicResult: saveRpicResult } = useFinancialData();
 
   // Auto-populated expense baseline
   const autoMonthlyExpenses = dashboardData
@@ -33,7 +33,7 @@ export default function Goals() {
 
   // State for user inputs
   const [confirmedExpenses, setConfirmedExpenses] = useState<number>(autoMonthlyExpenses);
-  const [timing, setTiming] = useState<string>("10y");
+  const [timing, setTiming] = useState<number>(10); // Years
   const [lifestyle, setLifestyle] = useState<number>(1.0);
   const [geography, setGeography] = useState<number>(1.0);
   const [inflationBuffer, setInflationBuffer] = useState<number>(1.15);
@@ -61,7 +61,7 @@ export default function Goals() {
   useEffect(() => {
     const inputs: RpicInputs = {
       currentMonthlyExpenses: confirmedExpenses,
-      timing: timing as any,
+      timing,
       lifestyle,
       geography,
       inflationBuffer,
@@ -79,6 +79,9 @@ export default function Goals() {
     setRpicResult(rpic);
     setTimelineResult(timeline);
     setMilestones(milestonesData);
+    
+    // Save to context for use in Investments
+    saveRpicResult(rpic);
   }, [
     confirmedExpenses,
     timing,
@@ -94,7 +97,7 @@ export default function Goals() {
 
   const handleResetAssumptions = () => {
     setActiveReturn(25);
-    setPassiveYield(13);
+    setPassiveYield(10);
     setInflation(3);
   };
 
@@ -161,7 +164,7 @@ export default function Goals() {
           timing={timing}
           lifestyle={lifestyle}
           geography={geography}
-          onTimingChange={setTiming}
+          onTimingChange={(value) => setTiming(typeof value === 'string' ? parseInt(value) : value)}
           onLifestyleChange={setLifestyle}
           onGeographyChange={setGeography}
         />

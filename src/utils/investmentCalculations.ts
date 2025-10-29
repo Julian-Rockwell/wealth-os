@@ -289,23 +289,22 @@ export function calculateReadinessScore(
   });
   totalScore += caScore;
 
-  // Generate recommendation
+  // Generate recommendation and action plan
   let recommendation = "";
-  const actionPlan: string[] = [];
+  let actionPlan: string[] = [];
   
   if (totalScore >= 80) {
     recommendation = "Ready: Your financial foundation is solid. You can proceed with optimization.";
-  } else if (totalScore >= 60) {
-    recommendation = "Foundation: Consider a 90-day preparation plan to strengthen your base.";
-    actionPlan.push("M+1: Build emergency fund to 50% target");
-    actionPlan.push("M+2: Address highest-priority debt");
-    actionPlan.push("M+3: Review and optimize monthly cash flow");
   } else {
-    recommendation = "Significant Work: A 6-month foundation-building plan is recommended.";
-    actionPlan.push("M+1-2: Focus on emergency fund (reach 25% target)");
-    actionPlan.push("M+3-4: Create debt payoff strategy for high-interest accounts");
-    actionPlan.push("M+5: Stabilize income streams and reduce expenses");
-    actionPlan.push("M+6: Build emergency fund to 50% and reassess");
+    // Import and use the enhanced foundation plan generator
+    const { generateFoundationPlan } = require("./foundationPlan");
+    actionPlan = generateFoundationPlan(factors, snapshot, emergencyFundMonths);
+    
+    if (totalScore >= 60) {
+      recommendation = "Foundation: A 90-day preparation plan will strengthen your base.";
+    } else {
+      recommendation = "Significant Work: A 6-month foundation-building plan is recommended.";
+    }
   }
 
   return {

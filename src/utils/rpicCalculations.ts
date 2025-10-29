@@ -4,7 +4,7 @@ import { classifyTransactions } from "./transactionClassifier";
 
 export interface RpicInputs {
   currentMonthlyExpenses: number;
-  timing: "asap" | "10y" | "15-20y" | "flexible";
+  timing: number; // Years desired to reach RPIC
   lifestyle: number; // 0.8, 1.0, 1.2, 1.5, or custom
   geography: number; // 0.8, 1.0, 1.2, or custom
   inflationBuffer: number; // default 1.15
@@ -40,6 +40,11 @@ export interface TimelineResult {
     phase3Years: number;
   };
   deltaYears: number;
+  timingGoal: number;
+  timingAlert?: {
+    message: string;
+    requiredMonthlyContribution: number;
+  };
 }
 
 export interface Milestone {
@@ -75,10 +80,10 @@ export function calculateRpic(inputs: RpicInputs): RpicResult {
   
   const annualRpic = monthlyRpic * 12;
   
-  // Traditional: 4% withdrawal rule
+  // Traditional: 7% growth with 4% withdrawal rule
   const targetCapitalPassive = annualRpic / 0.04;
   
-  // Wealth OS: higher yield allows lower capital
+  // Wealth OS: Use configured passive yield (default 10%)
   const targetCapitalActive = annualRpic / inputs.passiveYield;
   
   // RPIC Index: (Monthly RPIC / Current Monthly Expenses) * 100
@@ -138,6 +143,22 @@ export function calculateTimeline(
   const wealthOSDate = new Date(now);
   wealthOSDate.setFullYear(wealthOSDate.getFullYear() + Math.ceil(wealthOSYears));
   
+  // Check if timing goal is not met
+  let timingAlert = undefined;
+  if (wealthOSYears > inputs.timing) {
+    const requiredContribution = calculateRequiredMonthlyContribution(
+      inputs.startingCapital,
+      rpic.targetCapitalActive,
+      inputs.timing,
+      (inputs.activeReturn + inputs.passiveYield) / 2 // Use blended rate
+    );
+    
+    timingAlert = {
+      message: `With current parameters, you'd reach RPIC in ${wealthOSYears.toFixed(1)} years, exceeding your ${inputs.timing}-year goal. Consider increasing monthly contributions or adjusting return assumptions.`,
+      requiredMonthlyContribution: requiredContribution
+    };
+  }
+  
   return {
     traditional: {
       yearsToTarget: traditionalYears,
@@ -155,6 +176,8 @@ export function calculateTimeline(
       phase3Years,
     },
     deltaYears: traditionalYears - wealthOSYears,
+    timingGoal: inputs.timing,
+    timingAlert,
   };
 }
 
@@ -177,6 +200,29 @@ function calculateYearsToGoal(
   }
   
   return months / 12;
+}
+
+// Calculate required monthly contribution to reach goal in desired years
+function calculateRequiredMonthlyContribution(
+  startingCapital: number,
+  targetAmount: number,
+  years: number,
+  annualReturn: number
+): number {
+  const months = years * 12;
+  const monthlyRate = annualReturn / 12;
+  
+  if (monthlyRate === 0) {
+    return (targetAmount - startingCapital) / months;
+  }
+  
+  const futureValueOfPrincipal = startingCapital * Math.pow(1 + monthlyRate, months);
+  const remainingNeeded = targetAmount - futureValueOfPrincipal;
+  
+  if (remainingNeeded <= 0) return 0;
+  
+  // PMT formula: (FV * r) / ((1 + r)^n - 1)
+  return (remainingNeeded * monthlyRate) / (Math.pow(1 + monthlyRate, months) - 1);
 }
 
 export function generateMilestones(

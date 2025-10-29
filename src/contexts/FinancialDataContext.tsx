@@ -1,7 +1,8 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import type { FinancialSnapshot } from "@/types/financial";
 import type { DashboardData } from "@/types/dashboard";
-import type { PaperTradingProgress } from "@/types/trading";
+import type { PaperTradingProgress, TradingStrategy } from "@/types/trading";
+import type { RpicResult } from "@/utils/rpicCalculations";
 
 interface DraftData {
   mockConnections: any[];
@@ -21,6 +22,10 @@ interface FinancialDataContextType {
   setDraftData: (data: DraftData) => void;
   availableCapital: number;
   setAvailableCapital: (amount: number) => void;
+  rpicResult: RpicResult | null;
+  setRpicResult: (result: RpicResult | null) => void;
+  selectedStrategy: TradingStrategy | null;
+  setSelectedStrategy: (strategy: TradingStrategy | null) => void;
   resetAllData: () => void;
 }
 
@@ -55,6 +60,16 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
   const [availableCapital, setAvailableCapitalState] = useState<number>(() => {
     const stored = localStorage.getItem("availableCapital");
     return stored ? JSON.parse(stored) : 0;
+  });
+
+  const [rpicResult, setRpicResultState] = useState<RpicResult | null>(() => {
+    const stored = localStorage.getItem("rpicResult");
+    return stored ? JSON.parse(stored) : null;
+  });
+
+  const [selectedStrategy, setSelectedStrategyState] = useState<TradingStrategy | null>(() => {
+    const stored = localStorage.getItem("selectedStrategy");
+    return stored ? JSON.parse(stored) : null;
   });
 
   const setSnapshot = (newSnapshot: FinancialSnapshot | null) => {
@@ -94,6 +109,24 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     localStorage.setItem("availableCapital", JSON.stringify(amount));
   };
 
+  const setRpicResult = (result: RpicResult | null) => {
+    setRpicResultState(result);
+    if (result) {
+      localStorage.setItem("rpicResult", JSON.stringify(result));
+    } else {
+      localStorage.removeItem("rpicResult");
+    }
+  };
+
+  const setSelectedStrategy = (strategy: TradingStrategy | null) => {
+    setSelectedStrategyState(strategy);
+    if (strategy) {
+      localStorage.setItem("selectedStrategy", JSON.stringify(strategy));
+    } else {
+      localStorage.removeItem("selectedStrategy");
+    }
+  };
+
   const resetAllData = () => {
     setSnapshotState(null);
     setDashboardDataState(null);
@@ -105,11 +138,15 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
       manualLiabilities: [],
     });
     setAvailableCapitalState(0);
+    setRpicResultState(null);
+    setSelectedStrategyState(null);
     localStorage.removeItem("financialSnapshot");
     localStorage.removeItem("dashboardData");
     localStorage.removeItem("paperTradingData");
     localStorage.removeItem("draftData");
     localStorage.removeItem("availableCapital");
+    localStorage.removeItem("rpicResult");
+    localStorage.removeItem("selectedStrategy");
   };
 
   return (
@@ -125,6 +162,10 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
       setDraftData,
       availableCapital,
       setAvailableCapital,
+      rpicResult,
+      setRpicResult,
+      selectedStrategy,
+      setSelectedStrategy,
       resetAllData,
     }}
     >

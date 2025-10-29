@@ -6,10 +6,10 @@ import { HelpCircle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface GoalQuestionsCardProps {
-  timing: string;
+  timing: number;
   lifestyle: number;
   geography: number;
-  onTimingChange: (value: string) => void;
+  onTimingChange: (value: number) => void;
   onLifestyleChange: (value: number) => void;
   onGeographyChange: (value: number) => void;
 }
