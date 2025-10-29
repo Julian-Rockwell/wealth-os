@@ -109,8 +109,8 @@ export function GoalQuestionsCard({
               </Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="1.0" id="lifestyle-1.0" />
-              <Label htmlFor="lifestyle-1.0" className="font-normal cursor-pointer">
+              <RadioGroupItem value="1" id="lifestyle-1" />
+              <Label htmlFor="lifestyle-1" className="font-normal cursor-pointer">
                 1.0x (Current)
               </Label>
             </div>
@@ -169,8 +169,8 @@ export function GoalQuestionsCard({
               </Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="1.0" id="geo-1.0" />
-              <Label htmlFor="geo-1.0" className="font-normal cursor-pointer">
+              <RadioGroupItem value="1" id="geo-1" />
+              <Label htmlFor="geo-1" className="font-normal cursor-pointer">
                 1.0x (Same location)
               </Label>
             </div>
@@ -181,7 +181,7 @@ export function GoalQuestionsCard({
               </Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="1.0" id="geo-undecided" />
+              <RadioGroupItem value="1" id="geo-undecided" />
               <Label htmlFor="geo-undecided" className="font-normal cursor-pointer">
                 Undecided
               </Label>

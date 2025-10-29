@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
 import type { DashboardData } from "@/types/dashboard";
 
 interface MonthlyStackedBarsProps {
@@ -23,7 +24,18 @@ export const MonthlyStackedBars = ({ data }: MonthlyStackedBarsProps) => {
 
   return (
     <Card className="p-6 shadow-soft">
-      <h3 className="font-semibold mb-4">Monthly Breakdown</h3>
+      <div className="flex items-center gap-2 mb-4">
+        <h3 className="font-semibold">Monthly Breakdown</h3>
+        <InfoTooltip content={
+          <div className="space-y-2">
+            <p><strong>How to read this:</strong></p>
+            <p className="text-xs">Each bar shows your total spending for that month, broken down by category:</p>
+            <p className="text-xs">• <span className="font-semibold">Needs</span> (blue): Essential expenses like housing, groceries, utilities</p>
+            <p className="text-xs">• <span className="font-semibold">Wants</span> (yellow): Discretionary spending like dining, entertainment</p>
+            <p className="text-xs">• <span className="font-semibold">Savings</span> (green): Investments and savings contributions</p>
+          </div>
+        } />
+      </div>
       
       <div className="space-y-4">
         {months.map((month) => {

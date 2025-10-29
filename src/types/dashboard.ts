@@ -60,4 +60,5 @@ export interface DashboardFilters {
   minConfidence?: number;
   searchTerm?: string;
   category?: TransactionCategory | "all";
+  subcategory?: string;
 }

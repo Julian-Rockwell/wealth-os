@@ -19,8 +19,8 @@ export function ExpenseBaselineCard({
   const [confirmedAmount, setConfirmedAmount] = useState<number | null>(null);
 
   const handleConfirm = () => {
-    const amount = confirmedAmount || autoMonthlyExpenses;
-    onExpensesConfirmed(amount);
+    setConfirmedAmount(autoMonthlyExpenses);
+    onExpensesConfirmed(autoMonthlyExpenses);
   };
 
   const handleAdjust = () => {

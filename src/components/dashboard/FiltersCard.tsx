@@ -32,7 +32,7 @@ export const FiltersCard = ({ data, filters, setFilters }: FiltersCardProps) => 
         </Button>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div>
           <Label htmlFor="category-filter" className="text-xs">Category</Label>
           <Select 
@@ -50,6 +50,36 @@ export const FiltersCard = ({ data, filters, setFilters }: FiltersCardProps) => 
               <SelectItem value="need">Needs Only</SelectItem>
               <SelectItem value="want">Wants Only</SelectItem>
               <SelectItem value="saving">Savings Only</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Label htmlFor="subcategory-filter" className="text-xs">Subcategory</Label>
+          <Select 
+            value={filters.subcategory || "all"}
+            onValueChange={(value) => setFilters({ 
+              ...filters, 
+              subcategory: value === "all" ? undefined : value
+            })}
+          >
+            <SelectTrigger id="subcategory-filter" className="h-9 text-sm mt-1">
+              <SelectValue placeholder="All subcategories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Subcategories</SelectItem>
+              <SelectItem value="Groceries">Groceries</SelectItem>
+              <SelectItem value="Transportation">Transportation</SelectItem>
+              <SelectItem value="Healthcare">Healthcare</SelectItem>
+              <SelectItem value="Utilities">Utilities</SelectItem>
+              <SelectItem value="Dining">Dining</SelectItem>
+              <SelectItem value="Entertainment">Entertainment</SelectItem>
+              <SelectItem value="Shopping">Shopping</SelectItem>
+              <SelectItem value="Rent/Mortgage">Rent/Mortgage</SelectItem>
+              <SelectItem value="Insurance">Insurance</SelectItem>
+              <SelectItem value="Childcare">Childcare</SelectItem>
+              <SelectItem value="Phone/Internet">Phone/Internet</SelectItem>
+              <SelectItem value="Subscriptions">Subscriptions</SelectItem>
             </SelectContent>
           </Select>
         </div>

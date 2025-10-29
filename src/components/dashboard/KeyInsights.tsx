@@ -180,9 +180,18 @@ export const KeyInsights = ({ data }: KeyInsightsProps) => {
             <CheckCircle className="w-5 h-5 text-success" />
           </div>
           <div className="flex-1">
-            <h4 className="text-sm font-semibold text-muted-foreground mb-2">
-              Positive Trend
-            </h4>
+            <div className="flex items-center gap-1 mb-2">
+              <h4 className="text-sm font-semibold text-muted-foreground">
+                Positive Trend
+              </h4>
+              <InfoTooltip content={
+                <div className="space-y-2">
+                  <p><strong>What this means:</strong></p>
+                  <p className="text-xs">We identify essential spending categories (like Groceries, Utilities, Healthcare) that you're managing well.</p>
+                  <p className="text-xs">The highlighted category has lower spending compared to similar households, showing good financial discipline.</p>
+                </div>
+              } />
+            </div>
             <p className="text-sm font-medium leading-relaxed">
               {insights.positive_trend.insight}
             </p>
@@ -196,9 +205,18 @@ export const KeyInsights = ({ data }: KeyInsightsProps) => {
             <AlertTriangle className="w-5 h-5 text-destructive" />
           </div>
           <div className="flex-1">
-            <h4 className="text-sm font-semibold text-muted-foreground mb-2">
-              Red Flag
-            </h4>
+            <div className="flex items-center gap-1 mb-2">
+              <h4 className="text-sm font-semibold text-muted-foreground">
+                Red Flag
+              </h4>
+              <InfoTooltip content={
+                <div className="space-y-2">
+                  <p><strong>What to watch for:</strong></p>
+                  <p className="text-xs">We detect discretionary spending patterns with high frequency or amounts that may indicate areas for improvement.</p>
+                  <p className="text-xs">Categories with 8+ transactions/month or significant spending are flagged for your review.</p>
+                </div>
+              } />
+            </div>
             <p className="text-sm font-medium leading-relaxed">
               {insights.red_flag.insight}
             </p>

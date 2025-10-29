@@ -156,7 +156,7 @@ export function TimelineCompareCards({
       {timeline.timingAlert && (
         <Card className="border-warning bg-warning/10">
           <CardContent className="py-4 space-y-3">
-            <p className="text-sm font-semibold text-warning-foreground">
+            <p className="text-sm font-semibold text-foreground">
               ⚠️ {timeline.timingAlert.message}
             </p>
             <p className="text-xs text-muted-foreground">

@@ -35,6 +35,9 @@ export const TransactionsList = ({ transactions, onUpdate, onDelete, filters }: 
       if (filters.category && filters.category !== "all") {
         if (txn.category !== filters.category) return false;
       }
+      if (filters.subcategory && filters.subcategory !== "all") {
+        if (txn.subcategory !== filters.subcategory) return false;
+      }
       if (filters.searchTerm) {
         const matchesSearch = 
           txn.merchant.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
