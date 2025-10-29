@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
 import type { Account, Holding, Liability, FinancialSnapshot, AccountStatus, AccountType, AssetClass, Liquidity, LiabilityType } from "@/types/financial";
-import { SAMPLE_REYNOLDS_DATA, SAMPLE_JOHNSON_DATA, SAMPLE_DASHBOARD_DATA, SAMPLE_JOHNSON_DASHBOARD_DATA, REYNOLDS_PAPER_TRADING_DATA, JOHNSON_PAPER_TRADING_DATA } from "@/utils/sampleData";
+import { SAMPLE_REYNOLDS_DATA, SAMPLE_JOHNSON_DATA, SAMPLE_DASHBOARD_DATA, SAMPLE_JOHNSON_DASHBOARD_DATA, REYNOLDS_PAPER_TRADING_DATA, JOHNSON_PAPER_TRADING_DATA, SAMPLE_AUSTIN_DATA, SAMPLE_AUSTIN_DASHBOARD_DATA, AUSTIN_PAPER_TRADING_DATA, SAMPLE_PHOENIX_DATA, SAMPLE_PHOENIX_DASHBOARD_DATA, PHOENIX_PAPER_TRADING_DATA } from "@/utils/sampleData";
 
 interface FileUploadState {
   file: File;
@@ -430,7 +430,79 @@ export default function Upload({ onComplete }: UploadProps = {}) {
                     className="w-full gradient-primary" 
                   >
                     <Database className="w-4 h-4 mr-2" />
-                    Load Johnson Family (Investment-Ready)
+                    Load Johnson Family
+                  </Button>
+                </div>
+
+                {/* Austin Family - Middle Ground */}
+                <div className="border rounded-lg p-6 hover:border-primary/50 transition-colors">
+                  <div className="mb-4">
+                    <h4 className="font-semibold text-lg mb-1">Austin Family</h4>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      (Moderate debt, liquid assets $40.8k, brokerage $4.4k, net worth $541.6k)
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Balanced profile with mortgage, auto loan, and credit card debt. Shows moderate savings behavior with childcare expenses.
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={() => {
+                      if (confirm("Load Austin Family demo data? This will replace any existing data.")) {
+                        resetAllData();
+                        setTimeout(() => {
+                          setDashboardData(SAMPLE_AUSTIN_DASHBOARD_DATA);
+                          setSnapshot(SAMPLE_AUSTIN_DATA);
+                          setPaperTradingData(AUSTIN_PAPER_TRADING_DATA);
+                          toast.success("Austin Family data loaded! Check Transaction Details for Austin-based spending.");
+                          setTimeout(() => {
+                            if (onComplete) {
+                              onComplete();
+                            }
+                          }, 300);
+                        }, 50);
+                      }
+                    }}
+                    className="w-full" 
+                    variant="outline"
+                  >
+                    <Database className="w-4 h-4 mr-2" />
+                    Load Austin Family
+                  </Button>
+                </div>
+
+                {/* Phoenix Family - Financial Struggles */}
+                <div className="border rounded-lg p-6 hover:border-primary/50 transition-colors">
+                  <div className="mb-4">
+                    <h4 className="font-semibold text-lg mb-1">Phoenix Family</h4>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      (High-interest debt $22.6k @ 15-21% APR, liquid assets $3.4k, net worth -$12.3k)
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Debt-heavy profile with multiple loans. Shows gig economy income and tight cash flow management needs.
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={() => {
+                      if (confirm("Load Phoenix Family demo data? This will replace any existing data.")) {
+                        resetAllData();
+                        setTimeout(() => {
+                          setDashboardData(SAMPLE_PHOENIX_DASHBOARD_DATA);
+                          setSnapshot(SAMPLE_PHOENIX_DATA);
+                          setPaperTradingData(PHOENIX_PAPER_TRADING_DATA);
+                          toast.success("Phoenix Family data loaded! Check Transaction Details for Phoenix-based spending.");
+                          setTimeout(() => {
+                            if (onComplete) {
+                              onComplete();
+                            }
+                          }, 300);
+                        }, 50);
+                      }
+                    }}
+                    className="w-full" 
+                    variant="outline"
+                  >
+                    <Database className="w-4 h-4 mr-2" />
+                    Load Phoenix Family
                   </Button>
                 </div>
               </div>
