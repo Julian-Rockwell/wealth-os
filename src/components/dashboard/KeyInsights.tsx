@@ -145,7 +145,7 @@ export const KeyInsights = ({ data }: KeyInsightsProps) => {
   const insights = generateInsights();
 
   return (
-    <div className="grid md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 gap-4">
       <Card className="p-5 shadow-soft border-l-4 border-l-primary">
         <div className="flex items-start gap-3">
           <div className="p-2 rounded-lg bg-primary/10">
