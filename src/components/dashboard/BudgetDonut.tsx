@@ -51,16 +51,17 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
           };
         }
 
+        // Calculate implicit savings (unspent income)
+        const totalExplicitExpenses = categoryTotals.needs + categoryTotals.wants + categoryTotals.savings;
+        const implicitSavings = Math.max(0, totalIncome - totalExplicitExpenses);
+        
+        // Add implicit savings to total savings
+        categoryTotals.savings += implicitSavings;
+
         // Calculate percentages using totalIncome as denominator
         const needsPct = (categoryTotals.needs / totalIncome) * 100;
         const wantsPct = (categoryTotals.wants / totalIncome) * 100;
         const savingsPct = (categoryTotals.savings / totalIncome) * 100;
-        
-        // Validate total percentages
-        const totalPct = needsPct + wantsPct + savingsPct;
-        if (Math.abs(totalPct - 100) > 5) {
-          console.warn(`⚠️ Budget percentages don't sum to 100%: ${totalPct.toFixed(1)}% (Income: $${totalIncome.toFixed(0)}, Expenses: $${(categoryTotals.needs + categoryTotals.wants + categoryTotals.savings).toFixed(0)})`);
-        }
         
         return {
           title: "50/30/20 Distribution",
@@ -199,7 +200,7 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
               <p><strong>50/30/20 Budget Rule:</strong></p>
               <p className="text-xs">• <strong>50% Needs:</strong> Essential expenses (housing, utilities, groceries, insurance)</p>
               <p className="text-xs">• <strong>30% Wants:</strong> Discretionary spending (dining out, entertainment, shopping)</p>
-              <p className="text-xs">• <strong>20% Savings:</strong> Emergency fund, investments, debt repayment</p>
+              <p className="text-xs">• <strong>20% Savings:</strong> Emergency fund, investments, debt repayment, plus unspent income (implicit savings)</p>
             </div>
           } />
         )}
