@@ -1,16 +1,18 @@
 import { Card } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, DollarSign, Minus, ChevronDown, ChevronUp } from "lucide-react";
-import type { DashboardData } from "@/types/dashboard";
+import type { DashboardData, Transaction } from "@/types/dashboard";
 import { classifyTransactions } from "@/utils/transactionClassifier";
 import { useState } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { IncomeSummaryCard } from "./IncomeSummaryCard";
 
 interface IncomeExpensesKPIProps {
   data: DashboardData;
   period: 30 | 60 | 90;
+  onUpdateTransaction?: (id: string, updates: Partial<Transaction>) => void;
 }
 
-export const IncomeExpensesKPI = ({ data, period }: IncomeExpensesKPIProps) => {
+export const IncomeExpensesKPI = ({ data, period, onUpdateTransaction }: IncomeExpensesKPIProps) => {
   const [incomeExpanded, setIncomeExpanded] = useState(false);
   const [expensesExpanded, setExpensesExpanded] = useState(false);
 
@@ -77,7 +79,17 @@ export const IncomeExpensesKPI = ({ data, period }: IncomeExpensesKPIProps) => {
   };
 
   return (
-    <div className="grid md:grid-cols-2 gap-6">
+    <div className="space-y-6">
+      {/* Income Summary Card with Edit */}
+      {onUpdateTransaction && (
+        <IncomeSummaryCard 
+          data={data} 
+          period={period}
+          onUpdate={onUpdateTransaction}
+        />
+      )}
+      
+      <div className="grid md:grid-cols-2 gap-6">
       {/* Income Card */}
       <Card className="p-6 shadow-soft">
         <Collapsible open={incomeExpanded} onOpenChange={setIncomeExpanded}>
@@ -147,6 +159,7 @@ export const IncomeExpensesKPI = ({ data, period }: IncomeExpensesKPIProps) => {
           </CollapsibleContent>
         </Collapsible>
       </Card>
+      </div>
     </div>
   );
 };

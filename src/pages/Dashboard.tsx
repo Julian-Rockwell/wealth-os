@@ -177,7 +177,7 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
           </Card>
 
           {/* Income & Expenses KPIs */}
-          <IncomeExpensesKPI data={data} period={period} />
+          <IncomeExpensesKPI data={data} period={period} onUpdateTransaction={updateTransaction} />
 
           {/* View Toggle */}
           <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
