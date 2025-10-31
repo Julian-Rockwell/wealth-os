@@ -158,7 +158,7 @@ const generateMockData = (): DashboardData => {
 };
 
 export const useDashboardData = (period?: 30 | 60 | 90) => {
-  const { snapshot, dashboardData } = useFinancialData();
+  const { snapshot, dashboardData, monthlyIncome, setMonthlyIncome } = useFinancialData();
   
   // Filter transactions by period
   const filterByPeriod = (txns: Transaction[]) => {
@@ -231,7 +231,7 @@ export const useDashboardData = (period?: 30 | 60 | 90) => {
       return {
         period: source.period,
         accounts: snapshot?.accounts?.map((acc) => ({ id: acc.id, name: acc.name, type: (acc.type as any) })) || [],
-        income: { avgMonthly: avgIncomeAmount || 0, stability: "stable" },
+        income: { avgMonthly: monthlyIncome ?? (avgIncomeAmount || 0), stability: "stable" },
         expenses: {
           needs: { total: totalNeeds, pct: totalExpenses ? (totalNeeds / totalExpenses) * 100 : 0, subs: needsSubs },
           wants: { total: totalWants, pct: totalExpenses ? (totalWants / totalExpenses) * 100 : 0, subs: wantsSubs },
@@ -343,6 +343,10 @@ export const useDashboardData = (period?: 30 | 60 | 90) => {
   }, []);
 
   const updateIncome = useCallback((newMonthlyIncome: number) => {
+    // Persist to context (localStorage)
+    setMonthlyIncome(newMonthlyIncome);
+    
+    // Update local state
     setData((prev) => {
       const totalExpenses = prev.expenses.needs.total + prev.expenses.wants.total + prev.expenses.savings.total;
       
@@ -357,7 +361,7 @@ export const useDashboardData = (period?: 30 | 60 | 90) => {
         },
       };
     });
-  }, []);
+  }, [setMonthlyIncome]);
 
   return {
     data,

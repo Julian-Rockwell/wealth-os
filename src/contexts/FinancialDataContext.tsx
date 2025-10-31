@@ -26,6 +26,8 @@ interface FinancialDataContextType {
   setRpicResult: (result: RpicResult | null) => void;
   selectedStrategy: TradingStrategy | null;
   setSelectedStrategy: (strategy: TradingStrategy | null) => void;
+  monthlyIncome: number | null;
+  setMonthlyIncome: (income: number | null) => void;
   resetAllData: () => void;
 }
 
@@ -69,6 +71,11 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
 
   const [selectedStrategy, setSelectedStrategyState] = useState<TradingStrategy | null>(() => {
     const stored = localStorage.getItem("selectedStrategy");
+    return stored ? JSON.parse(stored) : null;
+  });
+
+  const [monthlyIncome, setMonthlyIncomeState] = useState<number | null>(() => {
+    const stored = localStorage.getItem("monthlyIncome");
     return stored ? JSON.parse(stored) : null;
   });
 
@@ -127,6 +134,15 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     }
   };
 
+  const setMonthlyIncome = (income: number | null) => {
+    setMonthlyIncomeState(income);
+    if (income !== null) {
+      localStorage.setItem("monthlyIncome", JSON.stringify(income));
+    } else {
+      localStorage.removeItem("monthlyIncome");
+    }
+  };
+
   const resetAllData = () => {
     setSnapshotState(null);
     setDashboardDataState(null);
@@ -140,6 +156,7 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     setAvailableCapitalState(0);
     setRpicResultState(null);
     setSelectedStrategyState(null);
+    setMonthlyIncomeState(null);
     localStorage.removeItem("financialSnapshot");
     localStorage.removeItem("dashboardData");
     localStorage.removeItem("paperTradingData");
@@ -147,6 +164,7 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     localStorage.removeItem("availableCapital");
     localStorage.removeItem("rpicResult");
     localStorage.removeItem("selectedStrategy");
+    localStorage.removeItem("monthlyIncome");
   };
 
   return (
@@ -157,17 +175,19 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
         dashboardData,
         setDashboardData,
         paperTradingData,
-      setPaperTradingData,
-      draftData,
-      setDraftData,
-      availableCapital,
-      setAvailableCapital,
-      rpicResult,
-      setRpicResult,
-      selectedStrategy,
-      setSelectedStrategy,
-      resetAllData,
-    }}
+        setPaperTradingData,
+        draftData,
+        setDraftData,
+        availableCapital,
+        setAvailableCapital,
+        rpicResult,
+        setRpicResult,
+        selectedStrategy,
+        setSelectedStrategy,
+        monthlyIncome,
+        setMonthlyIncome,
+        resetAllData,
+      }}
     >
       {children}
     </FinancialDataContext.Provider>
