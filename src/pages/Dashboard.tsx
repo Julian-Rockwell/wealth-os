@@ -10,6 +10,7 @@ import { TransactionsList } from "@/components/dashboard/TransactionsList";
 import { KeyInsights } from "@/components/dashboard/KeyInsights";
 import { PersonalizedRecommendations } from "@/components/dashboard/PersonalizedRecommendations";
 import { IncomeExpensesKPI } from "@/components/dashboard/IncomeExpensesKPI";
+import { UnspentIncomeCard } from "@/components/dashboard/UnspentIncomeCard";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Database, BarChart3 } from "lucide-react";
@@ -24,7 +25,7 @@ interface DashboardProps {
 export default function Dashboard({ onContinue }: DashboardProps = {}) {
   const [viewMode, setViewMode] = useState<ViewMode>("category");
   const [period, setPeriod] = useState<30 | 60 | 90>(30);
-  const { data, updateTransaction, deleteTransaction, filters, setFilters } = useDashboardData(period);
+  const { data, updateTransaction, deleteTransaction, updateIncome, filters, setFilters } = useDashboardData(period);
   const { snapshot, setSnapshot, resetAllData } = useFinancialData();
 
   const handleLoadSampleData = () => {
@@ -196,6 +197,13 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
             {/* Right Column: 2/3 width */}
             <div className="lg:col-span-2 space-y-6 flex flex-col">
               <FiltersCard data={data} filters={filters} setFilters={setFilters} />
+              
+              {/* Unspent Income Card */}
+              <UnspentIncomeCard 
+                data={data} 
+                period={period}
+                onUpdateIncome={updateIncome}
+              />
               
               <div className="flex-1">
                 <TransactionsList 

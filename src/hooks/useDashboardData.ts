@@ -342,10 +342,28 @@ export const useDashboardData = (period?: 30 | 60 | 90) => {
     });
   }, []);
 
+  const updateIncome = useCallback((newMonthlyIncome: number) => {
+    setData((prev) => {
+      const totalExpenses = prev.expenses.needs.total + prev.expenses.wants.total + prev.expenses.savings.total;
+      
+      return {
+        ...prev,
+        income: {
+          ...prev.income,
+          avgMonthly: newMonthlyIncome,
+        },
+        cashflow: {
+          monthlySurplus: newMonthlyIncome - totalExpenses / prev.period.months,
+        },
+      };
+    });
+  }, []);
+
   return {
     data,
     updateTransaction,
     deleteTransaction,
+    updateIncome,
     filters,
     setFilters,
   };
