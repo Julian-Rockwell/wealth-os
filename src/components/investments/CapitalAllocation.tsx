@@ -179,7 +179,7 @@ export function CapitalAllocation({ snapshot }: CapitalAllocationProps) {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Info className="w-5 h-5" />
-                Recommended Allocation
+                Recommended Allocation <span className="text-xs text-muted-foreground font-normal ml-2">(strange calculation - fixed examples)</span>
               </CardTitle>
             </CardHeader>
             <CardContent>

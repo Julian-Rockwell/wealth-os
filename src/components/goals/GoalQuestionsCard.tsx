@@ -171,19 +171,13 @@ export function GoalQuestionsCard({
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="1" id="geo-1" />
               <Label htmlFor="geo-1" className="font-normal cursor-pointer">
-                1.0x (Same location)
+                1.0x (Same location / Undecided)
               </Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="1.2" id="geo-1.2" />
               <Label htmlFor="geo-1.2" className="font-normal cursor-pointer">
                 1.2x (Higher cost location)
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="1" id="geo-undecided" />
-              <Label htmlFor="geo-undecided" className="font-normal cursor-pointer">
-                Undecided
               </Label>
             </div>
           </RadioGroup>

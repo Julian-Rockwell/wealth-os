@@ -109,17 +109,20 @@ export function RpicResultCard({ rpic, foundationScore }: RpicResultCardProps) {
         </div>
 
         {/* CTA */}
-        <div className="flex gap-2">
-          <Button 
-            className="flex-1"
-            variant={pathway.status === "ready" ? "default" : "outline"}
-            onClick={() => console.log("Pathway action:", pathway.cta)}
-          >
-            {pathway.cta}
-          </Button>
-          <Button variant="outline" onClick={() => console.log("Learn more")}>
-            Learn More
-          </Button>
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <Button 
+              className="flex-1"
+              variant={pathway.status === "ready" ? "default" : "outline"}
+              onClick={() => console.log("Pathway action:", pathway.cta)}
+            >
+              {pathway.cta}
+            </Button>
+            <Button variant="outline" onClick={() => console.log("Learn more")}>
+              Learn More
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground text-center">(fixed examples)</p>
         </div>
 
         {/* Note */}

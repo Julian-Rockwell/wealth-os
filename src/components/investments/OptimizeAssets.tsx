@@ -152,7 +152,7 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
           {debtPayoffScenarios.map((scenario, index) => (
             <Card key={index} className="border-2 border-red-200">
               <CardHeader>
-                <CardTitle>{scenario.name}</CardTitle>
+                <CardTitle>{scenario.name} <span className="text-xs text-muted-foreground font-normal">(strange calculation - fixed examples)</span></CardTitle>
                 <CardDescription>
                   Current balance: {scenario.balance.toLocaleString("en-US", { style: "currency", currency: "USD" })} at {scenario.apr}% APR
                 </CardDescription>

@@ -49,7 +49,7 @@ export function ReadinessScore({ snapshot }: ReadinessScoreProps) {
         <CardHeader>
           <div className="flex items-start justify-between">
             <div>
-              <CardTitle>Investment Readiness Score</CardTitle>
+              <CardTitle>Investment Readiness Score <span className="text-xs text-muted-foreground font-normal">(strange calculation)</span></CardTitle>
               <CardDescription>
                 Assess foundation across five factors before optimizing assets
               </CardDescription>
@@ -105,7 +105,7 @@ export function ReadinessScore({ snapshot }: ReadinessScoreProps) {
           <Card key={factor.name}>
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
-                <CardTitle className="text-base">{factor.name}</CardTitle>
+                <CardTitle className="text-base">{factor.name} <span className="text-xs text-muted-foreground font-normal">(strange calculation)</span></CardTitle>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
