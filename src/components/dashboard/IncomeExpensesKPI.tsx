@@ -77,7 +77,7 @@ export const IncomeExpensesKPI = ({ data, period }: IncomeExpensesKPIProps) => {
   };
 
   return (
-    <div className="grid md:grid-cols-2 gap-6">
+    <div className="space-y-6">{/* Changed from grid to vertical stack */}
       {/* Income Card */}
       <Card className="p-6 shadow-soft">
         <Collapsible open={incomeExpanded} onOpenChange={setIncomeExpanded}>
