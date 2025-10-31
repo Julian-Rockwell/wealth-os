@@ -16,58 +16,45 @@ interface Question {
 
 const ASSESSMENT_QUESTIONS: Question[] = [
   {
-    id: "experience",
-    question: "What's your trading experience level?",
+    id: "capital",
+    question: "How much capital do you have available for active trading? 💰",
     options: [
-      { value: 1, label: "Complete beginner" },
-      { value: 2, label: "Some paper trading" },
-      { value: 3, label: "Less than 1 year live" },
-      { value: 4, label: "1-3 years live" },
-      { value: 5, label: "3+ years live" },
+      { value: 1, label: "1 - Limited Capital (Under $10,000)" },
+      { value: 2, label: "2 - Small Capital ($10,000 - $25,000)" },
+      { value: 3, label: "3 - Moderate Capital ($25,000 - $50,000)" },
+      { value: 4, label: "4 - Good Capital ($50,000 - $100,000)" },
+      { value: 5, label: "5 - Substantial Capital (Over $100,000)" },
     ],
   },
   {
     id: "risk",
-    question: "How comfortable are you with risk?",
+    question: "How comfortable are you with investment risk? ⚖️",
     options: [
-      { value: 1, label: "Very conservative" },
-      { value: 2, label: "Conservative" },
-      { value: 3, label: "Moderate" },
-      { value: 4, label: "Aggressive" },
-      { value: 5, label: "Very aggressive" },
+      { value: 1, label: "1 - Very Conservative (5% drop = very concerned)" },
+      { value: 2, label: "2 - Conservative (10% drop = uncomfortable but stay)" },
+      { value: 3, label: "3 - Moderate Risk (15% drop = concerned but understand)" },
+      { value: 4, label: "4 - Aggressive (20% drop = calm, look for opportunities)" },
+      { value: 5, label: "5 - Very Aggressive (25% drop = buying opportunity)" },
     ],
   },
   {
-    id: "timeframe",
-    question: "What's your preferred trading timeframe?",
+    id: "time",
+    question: "How much time can you dedicate to trading daily? ⏰",
     options: [
-      { value: 1, label: "Long-term (weeks-months)" },
-      { value: 2, label: "Swing (days-weeks)" },
-      { value: 3, label: "Day trading" },
-      { value: 4, label: "Scalping (minutes-hours)" },
-      { value: 5, label: "All timeframes" },
+      { value: 1, label: "1 - Very Limited (Less than 30 min/day)" },
+      { value: 2, label: "2 - Moderate (30-60 min/day)" },
+      { value: 3, label: "3 - Good Availability (1-2 hours/day)" },
     ],
   },
   {
-    id: "availability",
-    question: "How much time can you dedicate weekly?",
+    id: "experience",
+    question: "What's your trading and investing experience? 📚",
     options: [
-      { value: 1, label: "1-2 hours" },
-      { value: 2, label: "3-5 hours" },
-      { value: 3, label: "5-10 hours" },
-      { value: 4, label: "10-20 hours" },
-      { value: 5, label: "20+ hours (full-time)" },
-    ],
-  },
-  {
-    id: "style",
-    question: "Which trading style appeals to you most?",
-    options: [
-      { value: 1, label: "Income generation (options)" },
-      { value: 2, label: "Momentum/Trend following" },
-      { value: 3, label: "Value/Mean reversion" },
-      { value: 4, label: "Technical patterns" },
-      { value: 5, label: "Mix of multiple styles" },
+      { value: 1, label: "🌱 1 - Complete Beginner (No trading experience)" },
+      { value: 2, label: "🌿 2 - Novice (Some basic knowledge, limited experience)" },
+      { value: 3, label: "🌳 3 - Intermediate (Moderate knowledge, some trades)" },
+      { value: 4, label: "🌲 4 - Advanced (Strong knowledge, significant experience)" },
+      { value: 5, label: "🏞️ 5 - Expert (Extensive knowledge, years of success)" },
     ],
   },
 ];
@@ -96,110 +83,106 @@ export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProp
   const allQuestionsAnswered = ASSESSMENT_QUESTIONS.every((q) => answers[q.id] !== undefined);
 
   const getRecommendations = (): StrategyRecommendation[] => {
-    const exp = answers.experience || 1;
-    const risk = answers.risk || 1;
-    const timeframe = answers.timeframe || 1;
-    const availability = answers.availability || 1;
-    const style = answers.style || 1;
+    const capital = answers.capital || 3;
+    const risk = answers.risk || 3;
+    const time = answers.time || 2;
+    const experience = answers.experience || 2;
 
     const recommendations: StrategyRecommendation[] = [];
 
-    // Covered Calls - best for conservative, low time, income focus
+    // Covered Calls - best for conservative, low time, moderate capital
     const ccMatch =
-      ((exp >= 2 ? 20 : 10) +
+      ((capital >= 2 ? 20 : 5) +
         (risk <= 2 ? 25 : risk === 3 ? 15 : 5) +
-        (timeframe <= 2 ? 20 : 10) +
-        (availability <= 2 ? 25 : 10) +
-        (style === 1 ? 20 : 5)) /
-      1.1;
+        (time <= 2 ? 25 : 10) +
+        (experience >= 2 ? 20 : 10)) /
+      0.9;
     recommendations.push({
       strategy: "covered_calls",
       name: "Covered Calls",
       description: "Own stock, sell calls for premium. Conservative income enhancement.",
       match: Math.round(ccMatch),
       reasons: [
+        capital >= 2 ? "✓ Capital level supports stock ownership" : "⚠ Requires at least $10K capital",
         risk <= 2 ? "✓ Matches your conservative risk profile" : "",
-        availability <= 2 ? "✓ Low time commitment fits your schedule" : "",
-        style === 1 ? "✓ Aligns with income generation preference" : "",
+        time <= 2 ? "✓ Low time commitment fits your schedule" : "",
       ].filter(Boolean),
     });
 
-    // Credit Spreads - balanced, defined risk
+    // Credit Spreads - balanced, defined risk, lower capital needs
     const csMatch =
-      ((exp >= 2 ? 20 : 5) +
+      ((capital >= 1 ? 20 : 10) +
         (risk >= 2 && risk <= 4 ? 25 : 10) +
-        (timeframe <= 3 ? 20 : 10) +
-        (availability >= 1 && availability <= 3 ? 20 : 10) +
-        (style === 1 || style === 3 ? 15 : 10)) /
-      1.0;
+        (time >= 1 && time <= 2 ? 25 : 10) +
+        (experience >= 2 ? 20 : 10)) /
+      0.9;
     recommendations.push({
       strategy: "spreads",
       name: "Credit Spreads",
       description: "Defined-risk options strategies. Lower capital requirements, predictable outcomes.",
       match: Math.round(csMatch),
       reasons: [
+        capital >= 1 ? "✓ Works with your capital level" : "",
         risk >= 2 && risk <= 4 ? "✓ Moderate risk tolerance is ideal" : "",
-        availability <= 3 ? "✓ Time commitment matches your availability" : "",
+        time <= 2 ? "✓ Time commitment matches your availability" : "",
         "✓ Defined risk limits downside exposure",
       ].filter(Boolean),
     });
 
     // Options Wheel - medium complexity, consistent income
     const owMatch =
-      ((exp >= 3 ? 20 : exp === 2 ? 10 : 5) +
+      ((capital >= 3 ? 25 : capital === 2 ? 15 : 5) +
         (risk >= 2 && risk <= 4 ? 20 : 10) +
-        (timeframe <= 3 ? 20 : 10) +
-        (availability >= 2 && availability <= 4 ? 25 : 10) +
-        (style === 1 || style === 5 ? 15 : 5)) /
-      1.0;
+        (time >= 2 ? 20 : 10) +
+        (experience >= 3 ? 25 : experience === 2 ? 15 : 5)) /
+      0.9;
     recommendations.push({
       strategy: "options_wheel",
       name: "Options Wheel",
       description: "Sell cash-secured puts, get assigned, sell covered calls. Consistent income generation.",
       match: Math.round(owMatch),
       reasons: [
-        exp >= 3 ? "✓ Experience level supports this strategy" : "",
+        capital >= 3 ? "✓ Capital level ideal for wheel strategy" : capital >= 2 ? "⚠ Minimum capital, consider smaller positions" : "⚠ Requires at least $10K",
+        experience >= 3 ? "✓ Experience level supports this strategy" : experience === 2 ? "⚠ Consider paper trading first" : "⚠ Requires intermediate knowledge",
         risk >= 2 && risk <= 4 ? "✓ Risk profile is well-suited" : "",
-        style === 1 ? "✓ Excellent for income generation" : "",
       ].filter(Boolean),
     });
 
     // Swing Trading - technical, medium term
     const stMatch =
-      ((exp >= 3 ? 20 : 10) +
-        (risk >= 3 ? 20 : 10) +
-        (timeframe === 2 || timeframe === 3 ? 25 : 10) +
-        (availability >= 3 ? 20 : 10) +
-        (style === 2 || style === 4 || style === 5 ? 15 : 5)) /
-      1.0;
+      ((capital >= 2 ? 20 : 10) +
+        (risk >= 3 ? 25 : 10) +
+        (time >= 2 ? 25 : 10) +
+        (experience >= 3 ? 20 : 10)) /
+      0.9;
     recommendations.push({
       strategy: "swing_trading",
       name: "Swing Trading",
       description: "Hold positions for 2-10 days. Technical analysis-based entries and exits.",
       match: Math.round(stMatch),
       reasons: [
-        timeframe === 2 ? "✓ Perfect match for your timeframe preference" : "",
-        availability >= 3 ? "✓ Your time availability supports active monitoring" : "",
-        style === 2 || style === 4 ? "✓ Aligns with your trading style" : "",
+        capital >= 2 ? "✓ Capital supports swing positions" : "⚠ Limited capital for diversification",
+        time >= 2 ? "✓ Your time availability supports monitoring" : "⚠ Requires regular market monitoring",
+        experience >= 3 ? "✓ Experience level appropriate" : "⚠ Requires technical analysis skills",
       ].filter(Boolean),
     });
 
-    // Day Trading - high risk, high time, experienced only
+    // Day Trading - high risk, high time, high capital, experienced only
     const dtMatch =
-      ((exp >= 4 ? 25 : exp === 3 ? 10 : 0) +
+      ((capital >= 4 ? 25 : capital === 3 ? 10 : 0) +
         (risk >= 4 ? 25 : 5) +
-        (timeframe >= 3 ? 25 : 5) +
-        (availability >= 4 ? 25 : 0) +
-        (style === 3 || style === 4 || style === 5 ? 10 : 0)) /
-      1.1;
+        (time >= 3 ? 25 : 0) +
+        (experience >= 4 ? 25 : experience === 3 ? 10 : 0)) /
+      1.0;
     recommendations.push({
       strategy: "day_trading",
       name: "Day Trading",
       description: "Intraday positions. Requires active monitoring and quick decision-making.",
       match: Math.round(dtMatch),
       reasons: [
-        exp >= 4 ? "✓ Experience level supports day trading" : "⚠ Requires significant experience",
-        availability >= 4 ? "✓ Time availability is sufficient" : "⚠ Requires 20+ hours weekly",
+        capital >= 4 ? "✓ Capital meets PDT requirements" : capital === 3 ? "⚠ Consider PDT rule ($25K minimum)" : "⚠ Insufficient capital for day trading",
+        experience >= 4 ? "✓ Experience level supports day trading" : "⚠ Requires significant experience",
+        time >= 3 ? "✓ Time availability is sufficient" : "⚠ Requires 1-2+ hours daily",
         risk >= 4 ? "✓ Risk tolerance matches requirements" : "⚠ High risk tolerance needed",
       ].filter(Boolean),
     });
@@ -231,7 +214,7 @@ export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProp
             Strategy Assessment
           </CardTitle>
           <CardDescription>
-            Answer 5 quick questions to get personalized strategy recommendations
+            Answer 4 quick questions to get personalized strategy recommendations
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

@@ -74,25 +74,10 @@ export const UnspentIncomeCard = ({ data, period, onUpdateIncome }: UnspentIncom
           </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {/* Unspent Income Display */}
-            <div className="p-4 rounded-lg bg-background/50 border">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-muted-foreground">Unspent</span>
-                <span className={`text-2xl font-bold ${unspentIncome >= 0 ? 'text-success' : 'text-destructive'}`}>
-                  ${Math.abs(unspentIncome).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </span>
-              </div>
-              {unspentIncome < 0 && (
-                <p className="text-xs text-destructive mt-2">
-                  You've spent ${Math.abs(unspentIncome).toFixed(2)} more than your income
-                </p>
-              )}
-            </div>
-
-            {/* Breakdown */}
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center justify-between p-2 rounded bg-background/30">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Income and Expenses stacked on the left */}
+            <div className="space-y-3 md:col-span-2">
+              <div className="flex items-center justify-between p-3 rounded bg-background/30">
                 <div className="flex items-center gap-2">
                   <DollarSign className="w-4 h-4 text-success" />
                   <span className="text-muted-foreground">Total Income ({period} days)</span>
@@ -102,14 +87,14 @@ export const UnspentIncomeCard = ({ data, period, onUpdateIncome }: UnspentIncom
                 </span>
               </div>
 
-              <div className="flex items-center justify-between p-2 rounded bg-background/30">
+              <div className="flex items-center justify-between p-3 rounded bg-background/30">
                 <span className="text-muted-foreground">Total Expenses ({period} days)</span>
                 <span className="font-semibold text-destructive">
                   -${totalExpenses.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between p-2 rounded bg-background/30 border-t pt-3 mt-3">
+              <div className="flex items-center justify-between p-3 rounded bg-background/30 border-t pt-3">
                 <div className="flex items-center gap-2">
                   <span className="text-muted-foreground">Avg Monthly Income</span>
                 </div>
@@ -129,6 +114,21 @@ export const UnspentIncomeCard = ({ data, period, onUpdateIncome }: UnspentIncom
                     <Pencil className="w-3 h-3" />
                   </Button>
                 </div>
+              </div>
+            </div>
+
+            {/* Unspent Income on the right */}
+            <div className="flex items-center justify-center p-4 rounded bg-background/30 border-2 border-primary/20">
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground mb-2">Unspent Income</p>
+                <p className={`text-2xl font-bold ${unspentIncome >= 0 ? 'text-success' : 'text-destructive'}`}>
+                  ${Math.abs(unspentIncome).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+                {unspentIncome < 0 && (
+                  <p className="text-xs text-destructive mt-2">
+                    Overspent
+                  </p>
+                )}
               </div>
             </div>
           </div>
