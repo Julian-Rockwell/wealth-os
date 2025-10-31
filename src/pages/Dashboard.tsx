@@ -179,13 +179,13 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
 
           {/* Income, Expenses & Unspent Income - 2 Column Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column: Income and Expenses stacked */}
-            <div className="lg:col-span-2 space-y-6">
+            {/* Left Column: Income and Expenses stacked - 1/3 width */}
+            <div className="lg:col-span-1 space-y-6">
               <IncomeExpensesKPI data={data} period={period} />
             </div>
             
-            {/* Right Column: Unspent Income */}
-            <div className="lg:col-span-1">
+            {/* Right Column: Unspent Income - 2/3 width */}
+            <div className="lg:col-span-2">
               <UnspentIncomeCard 
                 data={data} 
                 period={period}
