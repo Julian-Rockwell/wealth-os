@@ -177,8 +177,22 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
             </div>
           </Card>
 
-          {/* Income & Expenses KPIs */}
-          <IncomeExpensesKPI data={data} period={period} />
+          {/* Income, Expenses & Unspent Income - 2 Column Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column: Income and Expenses stacked */}
+            <div className="lg:col-span-2 space-y-6">
+              <IncomeExpensesKPI data={data} period={period} />
+            </div>
+            
+            {/* Right Column: Unspent Income */}
+            <div className="lg:col-span-1">
+              <UnspentIncomeCard 
+                data={data} 
+                period={period}
+                onUpdateIncome={updateIncome}
+              />
+            </div>
+          </div>
 
           {/* View Toggle */}
           <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
@@ -197,13 +211,6 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
             {/* Right Column: 2/3 width */}
             <div className="lg:col-span-2 space-y-6 flex flex-col">
               <FiltersCard data={data} filters={filters} setFilters={setFilters} />
-              
-              {/* Unspent Income Card */}
-              <UnspentIncomeCard 
-                data={data} 
-                period={period}
-                onUpdateIncome={updateIncome}
-              />
               
               <div className="flex-1">
                 <TransactionsList 
