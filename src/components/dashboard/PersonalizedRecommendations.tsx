@@ -125,7 +125,7 @@ export const PersonalizedRecommendations = ({ data }: PersonalizedRecommendation
     <Card className="p-6 shadow-soft">
       <div className="flex items-center gap-2 mb-6">
         <Bot className="w-6 h-6 text-primary" />
-        <h3 className="text-lg font-semibold">Personalized Recommendations</h3>
+        <h3 className="text-lg font-semibold">Personalized Recommendations <span className="text-xs text-muted-foreground font-normal ml-2">(strange calculation - Rocky's help here)</span></h3>
       </div>
 
       <Tabs defaultValue="quick-wins" className="w-full">

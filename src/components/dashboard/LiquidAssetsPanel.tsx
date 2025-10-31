@@ -37,7 +37,7 @@ export const LiquidAssetsPanel = ({ holdings }: LiquidAssetsPanelProps) => {
     <Card className="p-6 shadow-soft">
       <div className="flex items-center gap-2 mb-4">
         <Droplet className="w-5 h-5 text-primary" />
-        <h3 className="font-semibold">Liquid Assets</h3>
+        <h3 className="font-semibold">Liquid Assets <span className="text-xs text-muted-foreground font-normal">(fixed examples)</span></h3>
       </div>
 
       <div className="space-y-4">

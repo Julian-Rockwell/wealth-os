@@ -20,7 +20,7 @@ export const ConnectionStatus = ({ accounts }: ConnectionStatusProps) => {
   return (
     <Card className="p-6 shadow-soft">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold">Connection Status</h3>
+        <h3 className="font-semibold">Connection Status <span className="text-xs text-muted-foreground font-normal">(fixed examples)</span></h3>
         <Button variant="outline" size="sm" onClick={handleSync}>
           <RefreshCw className="w-4 h-4 mr-2" />
           Sync

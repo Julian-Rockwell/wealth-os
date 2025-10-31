@@ -21,11 +21,10 @@ export default function Investments() {
     return calculateReadinessScore(snapshot, 6);
   }, [snapshot]);
 
-  const isReady = readinessResult && readinessResult.totalScore >= 80;
-  const hasSelectedStrategy = selectedStrategy !== null;
-
-  // Use paper trading data from context
-  const isPaperTradingComplete = paperTradingData?.isReadyForLiveTrading || false;
+  // TESTING MODE: All tabs unlocked for demo/testing purposes
+  const isReady = true;
+  const hasSelectedStrategy = true;
+  const isPaperTradingComplete = true;
 
   const handleStrategyConfirmed = (strategy: TradingStrategy) => {
     setSelectedStrategy(strategy);
@@ -63,60 +62,14 @@ export default function Investments() {
         </div>
       </div>
 
-      {!isReady && activeTab !== "readiness" && (
-        <Alert variant="destructive">
-          <Lock className="h-4 w-4" />
-          <AlertDescription>
-            Foundation score must be 80+ to enable next steps. Complete foundation first.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {!hasSelectedStrategy && (activeTab === "paper-trading" || activeTab === "allocation") && (
-        <Alert variant="destructive">
-          <Lock className="h-4 w-4" />
-          <AlertDescription>
-            Select a trading strategy before proceeding to Paper Trading.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {!isPaperTradingComplete && activeTab === "allocation" && (
-        <Alert variant="destructive">
-          <Lock className="h-4 w-4" />
-          <AlertDescription>
-            Complete Paper Trading gates (40 trades with ≥95% adherence + 70% checklist) before Capital Allocation.
-          </AlertDescription>
-        </Alert>
-      )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="readiness">Readiness</TabsTrigger>
-          <TabsTrigger value="optimize" disabled={!isReady}>
-            <span className="flex items-center gap-2">
-              {!isReady && <Lock className="h-3 w-3" />}
-              Optimize
-            </span>
-          </TabsTrigger>
-          <TabsTrigger value="strategy" disabled={!isReady}>
-            <span className="flex items-center gap-2">
-              {!isReady && <Lock className="h-3 w-3" />}
-              Strategy
-            </span>
-          </TabsTrigger>
-          <TabsTrigger value="paper-trading" disabled={!isReady || !hasSelectedStrategy}>
-            <span className="flex items-center gap-2">
-              {(!isReady || !hasSelectedStrategy) && <Lock className="h-3 w-3" />}
-              Paper Trading
-            </span>
-          </TabsTrigger>
-          <TabsTrigger value="allocation" disabled={!isReady || !hasSelectedStrategy || !isPaperTradingComplete}>
-            <span className="flex items-center gap-2">
-              {(!isReady || !hasSelectedStrategy || !isPaperTradingComplete) && <Lock className="h-3 w-3" />}
-              Allocation
-            </span>
-          </TabsTrigger>
+          <TabsTrigger value="optimize">Optimize</TabsTrigger>
+          <TabsTrigger value="strategy">Strategy</TabsTrigger>
+          <TabsTrigger value="paper-trading">Paper Trading</TabsTrigger>
+          <TabsTrigger value="allocation">Allocation</TabsTrigger>
         </TabsList>
 
         <TabsContent value="readiness" className="mt-6">
@@ -124,70 +77,28 @@ export default function Investments() {
         </TabsContent>
 
         <TabsContent value="optimize" className="mt-6">
-          {isReady ? (
-            <OptimizeAssets snapshot={snapshot} />
-          ) : (
-            <Alert>
-              <Lock className="h-4 w-4" />
-              <AlertDescription>
-                Complete the Readiness Score requirements (score ≥80) to unlock asset optimization.
-              </AlertDescription>
-            </Alert>
-          )}
+          <OptimizeAssets snapshot={snapshot} />
         </TabsContent>
 
         <TabsContent value="strategy" className="mt-6">
-          {isReady ? (
-            <StrategySelection onStrategyConfirmed={handleStrategyConfirmed} />
-          ) : (
-            <Alert>
-              <Lock className="h-4 w-4" />
-              <AlertDescription>
-                Complete the Readiness Score requirements (score ≥80) to select your strategy.
-              </AlertDescription>
-            </Alert>
-          )}
+          <StrategySelection onStrategyConfirmed={handleStrategyConfirmed} />
         </TabsContent>
 
         <TabsContent value="paper-trading" className="mt-6">
-          {isReady && hasSelectedStrategy ? (
-            paperTradingData ? (
-              <PaperTradingProgress progress={paperTradingData} />
-            ) : (
-              <Alert>
-                <Lock className="h-4 w-4" />
-                <AlertDescription>
-                  No paper trading data available. Load sample data to see your progress.
-                </AlertDescription>
-              </Alert>
-            )
+          {paperTradingData ? (
+            <PaperTradingProgress progress={paperTradingData} />
           ) : (
             <Alert>
               <Lock className="h-4 w-4" />
               <AlertDescription>
-                {!isReady 
-                  ? "Complete the Readiness Score requirements (score ≥80) first."
-                  : "Select a trading strategy before starting paper trading."}
+                No paper trading data available. Load sample data to see your progress.
               </AlertDescription>
             </Alert>
           )}
         </TabsContent>
 
         <TabsContent value="allocation" className="mt-6">
-          {isReady && hasSelectedStrategy && isPaperTradingComplete ? (
-            <CapitalAllocation snapshot={snapshot} />
-          ) : (
-            <Alert>
-              <Lock className="h-4 w-4" />
-              <AlertDescription>
-                {!isReady 
-                  ? "Complete the Readiness Score requirements (score ≥80) first."
-                  : !hasSelectedStrategy
-                  ? "Select a trading strategy before proceeding to capital allocation."
-                  : "Complete Paper Trading gates (40 trades + ≥95% adherence + 70% checklist) to unlock capital allocation."}
-              </AlertDescription>
-            </Alert>
-          )}
+          <CapitalAllocation snapshot={snapshot} />
         </TabsContent>
       </Tabs>
     </div>

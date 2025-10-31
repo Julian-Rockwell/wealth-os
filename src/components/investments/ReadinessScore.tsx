@@ -133,7 +133,7 @@ export function ReadinessScore({ snapshot }: ReadinessScoreProps) {
       {result.totalScore < 80 && result.actionPlan.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Recommended Action Plan</CardTitle>
+            <CardTitle>Recommended Action Plan <span className="text-xs text-muted-foreground font-normal ml-2">(fixed examples - connect with Trading Plan of PXO)</span></CardTitle>
             <CardDescription>
               Follow these steps to improve your readiness score
             </CardDescription>
