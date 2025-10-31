@@ -54,7 +54,7 @@ export const UnspentIncomeCard = ({ data, period, onUpdateIncome }: UnspentIncom
                 <TrendingUp className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <CardTitle>Unspent Income</CardTitle>
+                <CardTitle>Unspent Income (strange calculation)</CardTitle>
                 <CardDescription>
                   Income not allocated to expenses in this {period}-day period
                 </CardDescription>
