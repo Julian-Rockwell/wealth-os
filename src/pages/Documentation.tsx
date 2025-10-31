@@ -412,6 +412,24 @@ avgIncomeAmount = totalValidIncome / period.months`}
             <li>Housing</li>
             <li>And many more subcategories...</li>
           </ul>
+
+          <h4 className="text-xl font-semibold mb-3">UnspentIncomeCard</h4>
+          <p className="mb-4">
+            Displays income that was not allocated to expenses during the selected period:
+          </p>
+          <div className="bg-muted p-4 rounded-lg mb-4">
+            <code className="text-sm">
+              Unspent Income = Total Income - Total Expenses
+            </code>
+          </div>
+          <p className="mb-4">
+            <strong>Note:</strong> This card displays "(strange calculation)" as a label to indicate that the calculation methodology for unspent income differs from traditional approaches and may require further refinement or clarification in future iterations.
+          </p>
+          <ul className="list-disc pl-6 mb-4 space-y-1">
+            <li>Shows the difference between income and expenses for the period</li>
+            <li>Indicates available surplus for additional savings or investments</li>
+            <li>Updates dynamically based on selected time period (30, 60, or 90 days)</li>
+          </ul>
         </section>
 
         {/* 5. Investments */}
