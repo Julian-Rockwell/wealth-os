@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Pencil, DollarSign, TrendingUp } from "lucide-react";
 import type { DashboardData } from "@/types/dashboard";
+import { classifyTransactions } from "@/utils/transactionClassifier";
 
 interface UnspentIncomeCardProps {
   data: DashboardData;
@@ -17,15 +18,22 @@ export const UnspentIncomeCard = ({ data, period, onUpdateIncome }: UnspentIncom
   const [isEditing, setIsEditing] = useState(false);
   const [editedIncome, setEditedIncome] = useState(String(data.income.avgMonthly));
 
-  // Calculate total expenses
-  const totalExpenses = 
-    data.expenses.needs.total + 
-    data.expenses.wants.total + 
-    data.expenses.savings.total;
+  // Calculate date range for the period
+  const endDate = new Date();
+  const startDate = new Date();
+  startDate.setDate(endDate.getDate() - period);
 
-  // Calculate unspent income
-  const monthsInPeriod = period / 30;
-  const totalIncomeForPeriod = data.income.avgMonthly * monthsInPeriod;
+  // Filter transactions for the current period
+  const periodTransactions = data.txns.filter(txn => {
+    const txnDate = new Date(txn.date);
+    return txnDate >= startDate && txnDate <= endDate;
+  });
+
+  // Classify transactions to get real income and expenses for the period
+  const classified = classifyTransactions(periodTransactions);
+  
+  const totalIncomeForPeriod = classified.totals.income;
+  const totalExpenses = classified.totals.expenses;
   const unspentIncome = totalIncomeForPeriod - totalExpenses;
 
   const handleSave = () => {
@@ -87,10 +95,26 @@ export const UnspentIncomeCard = ({ data, period, onUpdateIncome }: UnspentIncom
               <div className="flex items-center justify-between p-2 rounded bg-background/30">
                 <div className="flex items-center gap-2">
                   <DollarSign className="w-4 h-4 text-success" />
-                  <span className="text-muted-foreground">Monthly Income</span>
+                  <span className="text-muted-foreground">Total Income ({period} days)</span>
+                </div>
+                <span className="font-semibold">
+                  ${totalIncomeForPeriod.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between p-2 rounded bg-background/30">
+                <span className="text-muted-foreground">Total Expenses ({period} days)</span>
+                <span className="font-semibold text-destructive">
+                  -${totalExpenses.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between p-2 rounded bg-background/30 border-t pt-3 mt-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground">Avg Monthly Income</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold">
+                  <span className="font-semibold text-muted-foreground">
                     ${data.income.avgMonthly.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                   <Button
@@ -105,20 +129,6 @@ export const UnspentIncomeCard = ({ data, period, onUpdateIncome }: UnspentIncom
                     <Pencil className="w-3 h-3" />
                   </Button>
                 </div>
-              </div>
-
-              <div className="flex items-center justify-between p-2 rounded bg-background/30">
-                <span className="text-muted-foreground">Total for {period} days</span>
-                <span className="font-semibold">
-                  ${totalIncomeForPeriod.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between p-2 rounded bg-background/30">
-                <span className="text-muted-foreground">Total Expenses</span>
-                <span className="font-semibold text-destructive">
-                  -${totalExpenses.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </span>
               </div>
             </div>
           </div>
