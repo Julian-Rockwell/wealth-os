@@ -540,17 +540,92 @@ max score = 20 points`}
 
           <h3 className="text-2xl font-semibold mb-4">Step 5: Capital Allocation</h3>
           <p className="mb-4">
-            Waterfall logic to determine allocable capital:
+            The Capital Allocation module implements a waterfall logic to determine how available capital flows through different financial priorities and into investment accounts.
+          </p>
+
+          <h4 className="text-xl font-semibold mb-3">Capital Allocation Waterfall</h4>
+          <p className="mb-4">
+            Capital flows through the following priority levels:
           </p>
           <div className="bg-muted p-4 rounded-lg mb-4">
             <code className="text-sm">
-              {`1. availableCapital = liquidAssets - emergencyFund
-2. highInterestDebtBuffer = highInterestDebt × 0.5
-3. capitalAfterDebtBuffer = availableCapital - highInterestDebtBuffer
-4. allocableCapital = max(0, capitalAfterDebtBuffer)
-5. recommendedStart = min(allocableCapital × 0.2, 5000)`}
+              {`1. Total Liquid Assets (starting point)
+2. Emergency Fund = monthlyExpenses × emergencyFundMonths (user-defined: 3-12 months)
+3. Debt Payoff Buffer = highInterestDebt × 0.5
+4. Active Trading Account (capped at maxTradingAccountCap)
+5. Passive Income Reserve (receives overflow when trading account reaches cap)`}
             </code>
           </div>
+
+          <h4 className="text-xl font-semibold mb-3">Dynamic Trading Account Cap</h4>
+          <p className="mb-4">
+            The trading account cap is calculated dynamically based on the user's RPIC (Retirement Planning & Income Calculator) target:
+          </p>
+          <div className="bg-muted p-4 rounded-lg mb-4">
+            <code className="text-sm">
+              {`dynamicCap = rpicTargetPassiveCapital × 0.40
+Default Cap = $100,000 (if no RPIC target set)
+
+Example:
+- If RPIC target passive capital = $500,000
+- Dynamic cap = $500,000 × 0.40 = $200,000`}
+            </code>
+          </div>
+          <p className="mb-4">
+            This ensures the active trading account size is proportional to the user's long-term wealth goals.
+          </p>
+
+          <h4 className="text-xl font-semibold mb-3">"Feeding Mode" - Capital Flow to Passive Reserve</h4>
+          <p className="mb-4">
+            When the active trading account reaches or exceeds the cap, the system enters "Feeding Mode":
+          </p>
+          <ul className="list-disc pl-6 mb-4 space-y-2">
+            <li><strong>Automatic Overflow:</strong> Additional capital automatically flows to the Passive Income Reserve</li>
+            <li><strong>Stability Tracking:</strong> System tracks months above cap and average returns</li>
+            <li><strong>Full Transition Gate:</strong> After 12+ months above cap with 20%+ average returns, user may consider full transition to passive investing</li>
+            <li><strong>Risk Management:</strong> Prevents over-concentration in active trading</li>
+          </ul>
+
+          <h4 className="text-xl font-semibold mb-3">Strategy Selection</h4>
+          <p className="mb-4">
+            The StrategySelector component manages trading strategy choices:
+          </p>
+          <ul className="list-disc pl-6 mb-4 space-y-2">
+            <li><strong>Initial State:</strong> Only one strategy allowed when starting</li>
+            <li><strong>Multi-Strategy Unlock:</strong> Unlocked when trading account reaches $50,000</li>
+            <li><strong>Available Strategies:</strong>
+              <ul className="list-disc pl-6 mt-2 space-y-1">
+                <li>Options Wheel (Cash-secured puts + covered calls)</li>
+                <li>Swing Trading (Multi-day to multi-week positions)</li>
+                <li>Day Trading (Intraday positions - highest risk)</li>
+                <li>Spreads (Multi-leg options strategies)</li>
+                <li>Covered Calls (Income generation on existing holdings)</li>
+              </ul>
+            </li>
+            <li><strong>Risk Levels:</strong> Each strategy labeled as Low, Medium, or High risk</li>
+            <li><strong>Capital Requirements:</strong> Each strategy has minimum capital requirements</li>
+          </ul>
+
+          <h4 className="text-xl font-semibold mb-3">Recommended Allocation Parameters</h4>
+          <p className="mb-4">
+            The Capital Allocation view displays a "Recommended Allocation" card with the label <strong>"(strange calculation - fixed examples)"</strong> to indicate that:
+          </p>
+          <ul className="list-disc pl-6 mb-4 space-y-2">
+            <li>The allocation calculations use fixed example values for demonstration</li>
+            <li>The methodology differs from standard financial planning approaches</li>
+            <li>Future iterations may refine the calculation logic</li>
+          </ul>
+
+          <h4 className="text-xl font-semibold mb-3">Emergency Fund Instrument Selection</h4>
+          <p className="mb-4">
+            Users can select where to hold their emergency fund:
+          </p>
+          <ul className="list-disc pl-6 mb-4 space-y-2">
+            <li><strong>TBIL:</strong> Treasury Bills - Safest, government-backed</li>
+            <li><strong>HYSA:</strong> High-Yield Savings Account - FDIC insured, liquid</li>
+            <li><strong>Money Market:</strong> Money Market Fund - Balanced liquidity and yield</li>
+            <li><strong>Other:</strong> Custom solution</li>
+          </ul>
         </section>
 
         {/* 6. Goals */}
