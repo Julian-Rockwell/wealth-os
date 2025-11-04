@@ -14,6 +14,8 @@ import { updateSnapshotHoldings, updateSnapshotLiabilities } from "@/utils/snaps
 export default function NetWorthDashboard() {
   const { snapshot, setSnapshot } = useFinancialData();
 
+  console.log({snapshot})
+
   if (!snapshot) {
     return (
       <div className="min-h-screen bg-background">
