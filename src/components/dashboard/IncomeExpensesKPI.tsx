@@ -17,15 +17,15 @@ export const IncomeExpensesKPI = ({ data, period }: IncomeExpensesKPIProps) => {
   // Calculate date ranges based on period
   const now = new Date();
   const periodDaysAgo = new Date(now.getTime() - period * 24 * 60 * 60 * 1000);
-  const doublePeriodDaysAgo = new Date(now.getTime() - (period * 2) * 24 * 60 * 60 * 1000);
+  const doublePeriodDaysAgo = new Date(now.getTime() - period * 2 * 24 * 60 * 60 * 1000);
 
   // Filter transactions for current period
-  const currentPeriodTxns = data.txns.filter(t => {
+  const currentPeriodTxns = data.txns.filter((t) => {
     const date = new Date(t.date);
     return date >= periodDaysAgo && date <= now;
   });
 
-  const previousPeriodTxns = data.txns.filter(t => {
+  const previousPeriodTxns = data.txns.filter((t) => {
     const date = new Date(t.date);
     return date >= doublePeriodDaysAgo && date < periodDaysAgo;
   });
@@ -33,7 +33,7 @@ export const IncomeExpensesKPI = ({ data, period }: IncomeExpensesKPIProps) => {
   // Classify transactions using deterministic rules
   const currentClassification = classifyTransactions(currentPeriodTxns);
   const previousClassification = classifyTransactions(previousPeriodTxns);
-  
+
   const totalIncome = currentClassification.totals.income;
   const currentExpenses = currentClassification.totals.expenses;
   const incomeByCategory = currentClassification.by_category.income;
@@ -43,13 +43,9 @@ export const IncomeExpensesKPI = ({ data, period }: IncomeExpensesKPIProps) => {
   const previousIncome = previousClassification.totals.income;
   const previousExpenses = previousClassification.totals.expenses;
 
-  const incomeChange = previousIncome > 0 
-    ? ((totalIncome - previousIncome) / previousIncome) * 100
-    : 0;
+  const incomeChange = previousIncome > 0 ? ((totalIncome - previousIncome) / previousIncome) * 100 : 0;
 
-  const expensesChange = previousExpenses > 0
-    ? ((currentExpenses - previousExpenses) / previousExpenses) * 100
-    : 0;
+  const expensesChange = previousExpenses > 0 ? ((currentExpenses - previousExpenses) / previousExpenses) * 100 : 0;
 
   const getTrendIcon = (value: number) => {
     if (value > 0) return <TrendingUp className="w-4 h-4 text-success" />;
@@ -77,7 +73,8 @@ export const IncomeExpensesKPI = ({ data, period }: IncomeExpensesKPIProps) => {
   };
 
   return (
-    <div className="space-y-6">{/* Changed from grid to vertical stack */}
+    <div className="space-y-6">
+      {/* Changed from grid to vertical stack */}
       {/* Expenses Card */}
       <Card className="p-6 shadow-soft">
         <Collapsible open={expensesExpanded} onOpenChange={setExpensesExpanded}>
@@ -91,23 +88,25 @@ export const IncomeExpensesKPI = ({ data, period }: IncomeExpensesKPIProps) => {
             </div>
           </div>
           <p className="text-3xl font-bold text-destructive mb-1">
-            ${currentExpenses.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            ${currentExpenses.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
           <div className="flex items-center gap-2 text-sm">
             {getExpenseTrendIcon(expensesChange)}
             <span className={getExpenseTrendColor(expensesChange)}>
-              {expensesChange >= 0 ? "+" : ""}{expensesChange.toFixed(1)}% vs prev {period}d
+              {expensesChange >= 0 ? "+" : ""}
+              {expensesChange.toFixed(1)}% vs prev {period}d
             </span>
           </div>
-          
+
           <CollapsibleContent className="mt-4 pt-4 border-t space-y-2">
-            {Object.entries(expensesByCategory).map(([category, amount]) => 
-              amount > 0 && (
-                <div key={category} className="flex justify-between text-sm">
-                  <span className="text-muted-foreground capitalize">{category.replace('_', ' ')}</span>
-                  <span className="font-medium">${amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-                </div>
-              )
+            {Object.entries(expensesByCategory).map(
+              ([category, amount]) =>
+                amount > 0 && (
+                  <div key={category} className="flex justify-between text-sm">
+                    <span className="text-muted-foreground capitalize">{category.replace("_", " ")}</span>
+                    <span className="font-medium">${amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+                  </div>
+                ),
             )}
           </CollapsibleContent>
         </Collapsible>
@@ -126,23 +125,25 @@ export const IncomeExpensesKPI = ({ data, period }: IncomeExpensesKPIProps) => {
             </div>
           </div>
           <p className="text-3xl font-bold text-success mb-1">
-            ${totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            ${totalIncome.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
           <div className="flex items-center gap-2 text-sm">
             {getTrendIcon(incomeChange)}
             <span className={getTrendColor(incomeChange)}>
-              {incomeChange >= 0 ? "+" : ""}{incomeChange.toFixed(1)}% vs prev {period}d
+              {incomeChange >= 0 ? "+" : ""}
+              {incomeChange.toFixed(1)}% vs prev {period}d
             </span>
           </div>
-          
+
           <CollapsibleContent className="mt-4 pt-4 border-t space-y-2">
-            {Object.entries(incomeByCategory).map(([category, amount]) => 
-              amount > 0 && (
-                <div key={category} className="flex justify-between text-sm">
-                  <span className="text-muted-foreground capitalize">{category}</span>
-                  <span className="font-medium">${amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-                </div>
-              )
+            {Object.entries(incomeByCategory).map(
+              ([category, amount]) =>
+                amount > 0 && (
+                  <div key={category} className="flex justify-between text-sm">
+                    <span className="text-muted-foreground capitalize">{category}</span>
+                    <span className="font-medium">${amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+                  </div>
+                ),
             )}
           </CollapsibleContent>
         </Collapsible>

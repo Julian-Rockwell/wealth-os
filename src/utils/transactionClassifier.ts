@@ -52,7 +52,13 @@ export interface ClassificationResult {
 // Keywords for classification
 const PAYROLL_KEYWORDS = ["PAYROLL", "PPD", "ADP", "GUSTO", "PAYCHEX", "DIRECT DEP", "SALARY", "W-2", "Acme Corp"];
 const TRANSFER_KEYWORDS = ["XFER", "ONLINE TRANSFER", "ZELLE", "MOVE MONEY", "INTERNAL", "TRANSFER"];
-const CARD_PAYMENT_KEYWORDS = ["CARDMEMBER", "AUTOPAY", "PAYMENT THANK YOU", "CREDIT CARD PAYMENT", "Chase Credit Card"];
+const CARD_PAYMENT_KEYWORDS = [
+  "CARDMEMBER",
+  "AUTOPAY",
+  "PAYMENT THANK YOU",
+  "CREDIT CARD PAYMENT",
+  "Chase Credit Card",
+];
 const P2P_KEYWORDS = ["VENMO", "CASH APP", "PAYPAL"];
 const REFUND_KEYWORDS = ["REFUND", "RETURN", "REVERSAL", "CHARGEBACK"];
 const MORTGAGE_KEYWORDS = ["MORTGAGE", "FirstHome Mortgage"];
@@ -68,12 +74,12 @@ const GIG_KEYWORDS = ["UBER", "LYFT", "UPWORK", "FIVERR", "DOORDASH", "INSTACART
 
 function matchesKeywords(desc: string, keywords: string[]): boolean {
   const upperDesc = desc.toUpperCase();
-  return keywords.some(keyword => upperDesc.includes(keyword.toUpperCase()));
+  return keywords.some((keyword) => upperDesc.includes(keyword.toUpperCase()));
 }
 
 function classifyTransaction(
   txn: Transaction | StagingTransaction,
-  allTransactions: (Transaction | StagingTransaction)[]
+  allTransactions: (Transaction | StagingTransaction)[],
 ): { classification: TransactionClassification; subcategory: string; reason: string } {
   const desc = txn.desc || "";
   const merchant = "merchant" in txn ? txn.merchant : "";
@@ -85,7 +91,7 @@ function classifyTransaction(
     return {
       classification: "Adjustment",
       subcategory: "refund",
-      reason: "Transaction descriptor indicates refund or chargeback"
+      reason: "Transaction descriptor indicates refund or chargeback",
     };
   }
 
@@ -94,7 +100,7 @@ function classifyTransaction(
     return {
       classification: "Transfer",
       subcategory: "cc_payment",
-      reason: "Credit card payment from deposit account"
+      reason: "Credit card payment from deposit account",
     };
   }
 
@@ -103,16 +109,20 @@ function classifyTransaction(
     return {
       classification: "Transfer",
       subcategory: "internal_transfer",
-      reason: "Descriptor indicates internal account transfer"
+      reason: "Descriptor indicates internal account transfer",
     };
   }
 
   // 4. Check for mortgage payments (Essential Need - Housing)
-  if (matchesKeywords(desc, MORTGAGE_KEYWORDS) || matchesKeywords(merchant, MORTGAGE_KEYWORDS) || matchesKeywords(desc, HOUSING_KEYWORDS)) {
+  if (
+    matchesKeywords(desc, MORTGAGE_KEYWORDS) ||
+    matchesKeywords(merchant, MORTGAGE_KEYWORDS) ||
+    matchesKeywords(desc, HOUSING_KEYWORDS)
+  ) {
     return {
       classification: "Expense",
       subcategory: "housing",
-      reason: "Essential housing expense (mortgage/rent payment)"
+      reason: "Essential housing expense (mortgage/rent payment)",
     };
   }
 
@@ -121,7 +131,7 @@ function classifyTransaction(
     return {
       classification: "Expense",
       subcategory: "debt_payment",
-      reason: "Debt payment (classified as Need)"
+      reason: "Debt payment (classified as Need)",
     };
   }
 
@@ -130,7 +140,7 @@ function classifyTransaction(
     return {
       classification: "Income",
       subcategory: "payroll",
-      reason: "Payroll deposit identified by descriptor and credit sign"
+      reason: "Payroll deposit identified by descriptor and credit sign",
     };
   }
 
@@ -139,7 +149,7 @@ function classifyTransaction(
     return {
       classification: "Income",
       subcategory: "freelance",
-      reason: "Gig/freelance income"
+      reason: "Gig/freelance income",
     };
   }
 
@@ -149,7 +159,7 @@ function classifyTransaction(
     return {
       classification: "Transfer",
       subcategory: "p2p_transfer",
-      reason: "P2P transaction, likely between user accounts"
+      reason: "P2P transaction, likely between user accounts",
     };
   }
 
@@ -160,7 +170,7 @@ function classifyTransaction(
       return {
         classification: "Expense",
         subcategory: "childcare",
-        reason: "Essential childcare expense"
+        reason: "Essential childcare expense",
       };
     }
 
@@ -169,7 +179,7 @@ function classifyTransaction(
       return {
         classification: "Expense",
         subcategory: "insurance",
-        reason: "Essential insurance payment"
+        reason: "Essential insurance payment",
       };
     }
 
@@ -178,7 +188,7 @@ function classifyTransaction(
       return {
         classification: "Expense",
         subcategory: "healthcare",
-        reason: "Healthcare/medical expense"
+        reason: "Healthcare/medical expense",
       };
     }
 
@@ -187,7 +197,7 @@ function classifyTransaction(
       return {
         classification: "Expense",
         subcategory: "utilities",
-        reason: "Utility bill payment"
+        reason: "Utility bill payment",
       };
     }
 
@@ -196,7 +206,7 @@ function classifyTransaction(
       return {
         classification: "Expense",
         subcategory: "food",
-        reason: "Grocery purchase (essential food expense)"
+        reason: "Grocery purchase (essential food expense)",
       };
     }
 
@@ -205,40 +215,48 @@ function classifyTransaction(
       return {
         classification: "Expense",
         subcategory: "food",
-        reason: "Food purchase"
+        reason: "Food purchase",
       };
     }
 
     // Transportation
-    if (merchant.toUpperCase().includes("SHELL") || merchant.toUpperCase().includes("GAS") || 
-        desc.toUpperCase().includes("FUEL") || desc.toUpperCase().includes("GASOLINE")) {
+    if (
+      merchant.toUpperCase().includes("SHELL") ||
+      merchant.toUpperCase().includes("GAS") ||
+      desc.toUpperCase().includes("FUEL") ||
+      desc.toUpperCase().includes("GASOLINE")
+    ) {
       return {
         classification: "Expense",
         subcategory: "transport",
-        reason: "Transportation/fuel expense"
+        reason: "Transportation/fuel expense",
       };
     }
 
     // General retail
-    if (merchant.toUpperCase().includes("TARGET") || 
-        merchant.toUpperCase().includes("AMAZON") || 
-        merchant.toUpperCase().includes("COSTCO") ||
-        merchant.toUpperCase().includes("HOME DEPOT")) {
+    if (
+      merchant.toUpperCase().includes("TARGET") ||
+      merchant.toUpperCase().includes("AMAZON") ||
+      merchant.toUpperCase().includes("COSTCO") ||
+      merchant.toUpperCase().includes("HOME DEPOT")
+    ) {
       return {
         classification: "Expense",
         subcategory: "other",
-        reason: "Retail purchase"
+        reason: "Retail purchase",
       };
     }
 
     // Subscriptions
-    if (merchant.toUpperCase().includes("NETFLIX") || 
-        merchant.toUpperCase().includes("SPOTIFY") ||
-        desc.toUpperCase().includes("SUBSCRIPTION")) {
+    if (
+      merchant.toUpperCase().includes("NETFLIX") ||
+      merchant.toUpperCase().includes("SPOTIFY") ||
+      desc.toUpperCase().includes("SUBSCRIPTION")
+    ) {
       return {
         classification: "Expense",
         subcategory: "other",
-        reason: "Subscription service"
+        reason: "Subscription service",
       };
     }
 
@@ -246,7 +264,7 @@ function classifyTransaction(
     return {
       classification: "Expense",
       subcategory: "other",
-      reason: "Debit transaction without transfer indicators"
+      reason: "Debit transaction without transfer indicators",
     };
   }
 
@@ -257,7 +275,7 @@ function classifyTransaction(
       return {
         classification: "Income",
         subcategory: desc.toUpperCase().includes("INTEREST") ? "interest" : "dividends",
-        reason: "Investment income"
+        reason: "Investment income",
       };
     }
 
@@ -265,7 +283,7 @@ function classifyTransaction(
     return {
       classification: "unknown",
       subcategory: "unclassified_credit",
-      reason: "Credit transaction without clear income classification"
+      reason: "Credit transaction without clear income classification",
     };
   }
 
@@ -273,7 +291,7 @@ function classifyTransaction(
   return {
     classification: "unknown",
     subcategory: "unclassified",
-    reason: "Insufficient information for deterministic classification"
+    reason: "Insufficient information for deterministic classification",
   };
 }
 
@@ -283,44 +301,60 @@ function classifyTransaction(
  */
 export function mapSubcategoryToCategory(subcategory: string): "need" | "want" | "saving" {
   const normalizedSub = subcategory.toLowerCase();
-  
+
   // Needs: Essential expenses that are required for living
   const needsSubs = [
-    "housing", "utilities", "food", "transport", "transportation",
-    "childcare", "insurance", "healthcare", "debt_payment",
-    "rent/mortgage", "groceries", "health", "medical"
+    "housing",
+    "utilities",
+    "food",
+    "transport",
+    "transportation",
+    "childcare",
+    "insurance",
+    "healthcare",
+    "debt_payment",
+    "rent/mortgage",
+    "groceries",
+    "health",
+    "medical",
   ];
-  
+
   // Savings: Money set aside for future goals or investments
   const savingsSubs = [
-    "investment", "investments", "emergency_fund", "emergency fund",
-    "401k", "ira", "retirement", "savings", "extra_debt_payment",
-    "savings_transfer", "brokerage"
+    "investment",
+    "investments",
+    "emergency_fund",
+    "emergency fund",
+    "401k",
+    "ira",
+    "retirement",
+    "savings",
+    "extra_debt_payment",
+    "savings_transfer",
+    "brokerage",
   ];
-  
+
   // Check if it's a Need
-  if (needsSubs.some(sub => normalizedSub.includes(sub))) {
+  if (needsSubs.some((sub) => normalizedSub.includes(sub))) {
     return "need";
   }
-  
+
   // Check if it's a Saving
-  if (savingsSubs.some(sub => normalizedSub.includes(sub))) {
+  if (savingsSubs.some((sub) => normalizedSub.includes(sub))) {
     return "saving";
   }
-  
+
   // Default: Everything else is a Want (discretionary spending)
   return "want";
 }
 
-function aggregateByCategory(
-  transactions: ClassifiedTransaction[]
-): ClassificationResult["by_category"] {
+function aggregateByCategory(transactions: ClassifiedTransaction[]): ClassificationResult["by_category"] {
   const result: ClassificationResult["by_category"] = {
     income: { payroll: 0, interest: 0, dividends: 0, other: 0 },
-    expenses: { housing: 0, utilities: 0, food: 0, transport: 0, interest_fees: 0, taxes: 0, other: 0 }
+    expenses: { housing: 0, utilities: 0, food: 0, transport: 0, interest_fees: 0, taxes: 0, other: 0 },
   };
 
-  transactions.forEach(txn => {
+  transactions.forEach((txn) => {
     if (txn.classification === "Income") {
       if (txn.subcategory === "payroll") {
         result.income.payroll += txn.amount;
@@ -350,7 +384,7 @@ function aggregateByCategory(
       }
     }
   });
-
+  console.log(result);
   return result;
 }
 
@@ -364,24 +398,19 @@ export interface BudgetValidation {
   alerts: string[];
 }
 
-export function validate50_30_20(
-  totalIncome: number,
-  needs: number,
-  wants: number,
-  savings: number
-): BudgetValidation {
+export function validate50_30_20(totalIncome: number, needs: number, wants: number, savings: number): BudgetValidation {
   const alerts: string[] = [];
-  
+
   // Calculate percentages based on income
   const needsPct = totalIncome > 0 ? (needs / totalIncome) * 100 : 0;
   const wantsPct = totalIncome > 0 ? (wants / totalIncome) * 100 : 0;
   const savingsPct = totalIncome > 0 ? (savings / totalIncome) * 100 : 0;
-  
+
   // Validate against targets
   const needsValid = needsPct <= 50;
   const wantsValid = wantsPct <= 30;
   const savingsValid = savingsPct >= 20;
-  
+
   // Generate alerts
   if (!needsValid) {
     alerts.push(`Needs (${needsPct.toFixed(1)}%) exceed 50% target. Consider reducing essential expenses.`);
@@ -392,7 +421,7 @@ export function validate50_30_20(
   if (!savingsValid) {
     alerts.push(`Savings (${savingsPct.toFixed(1)}%) below 20% target. Increase savings/investments rate.`);
   }
-  
+
   return {
     needsValid,
     wantsValid,
@@ -400,7 +429,7 @@ export function validate50_30_20(
     needsPct,
     wantsPct,
     savingsPct,
-    alerts
+    alerts,
   };
 }
 
@@ -414,60 +443,54 @@ function isValidIncome(txn: Transaction): boolean {
   const subcategory = txn.subcategory.toLowerCase();
 
   // EXCLUDE: Transfers, card payments, refunds
-  const isTransfer = 
-    desc.includes('transfer') ||
-    desc.includes('zelle') ||
-    desc.includes('venmo') ||
-    desc.includes('cash app') ||
-    desc.includes('paypal') ||
-    desc.includes('p2p') ||
-    merchant.includes('transfer');
+  const isTransfer =
+    desc.includes("transfer") ||
+    desc.includes("zelle") ||
+    desc.includes("venmo") ||
+    desc.includes("cash app") ||
+    desc.includes("paypal") ||
+    desc.includes("p2p") ||
+    merchant.includes("transfer");
 
-  const isCardPayment = 
-    desc.includes('credit card payment') ||
-    desc.includes('payment thank you') ||
-    desc.includes('autopay') ||
-    merchant.includes('credit card');
+  const isCardPayment =
+    desc.includes("credit card payment") ||
+    desc.includes("payment thank you") ||
+    desc.includes("autopay") ||
+    merchant.includes("credit card");
 
-  const isRefund = 
-    desc.includes('refund') ||
-    desc.includes('return') ||
-    desc.includes('chargeback') ||
-    subcategory.includes('refund');
+  const isRefund =
+    desc.includes("refund") || desc.includes("return") || desc.includes("chargeback") || subcategory.includes("refund");
 
-  const isAssetSale = 
-    desc.includes('withdrawal') ||
-    desc.includes('redemption') ||
-    merchant.includes('brokerage');
+  const isAssetSale = desc.includes("withdrawal") || desc.includes("redemption") || merchant.includes("brokerage");
 
   if (isTransfer || isCardPayment || isRefund || isAssetSale) {
     return false;
   }
 
   // INCLUDE: Real income sources only
-  const isPayroll = 
-    desc.includes('payroll') ||
-    desc.includes('salary') ||
-    desc.includes('direct dep') ||
-    desc.includes('ppd') ||
-    desc.includes('adp') ||
-    desc.includes('gusto') ||
-    merchant.includes('payroll') ||
-    merchant.includes('acme corp') ||
-    subcategory.includes('payroll');
+  const isPayroll =
+    desc.includes("payroll") ||
+    desc.includes("salary") ||
+    desc.includes("direct dep") ||
+    desc.includes("ppd") ||
+    desc.includes("adp") ||
+    desc.includes("gusto") ||
+    merchant.includes("payroll") ||
+    merchant.includes("acme corp") ||
+    subcategory.includes("payroll");
 
-  const isInvestmentIncome = 
-    desc.includes('interest') ||
-    desc.includes('dividend') ||
-    subcategory.includes('interest') ||
-    subcategory.includes('dividend');
+  const isInvestmentIncome =
+    desc.includes("interest") ||
+    desc.includes("dividend") ||
+    subcategory.includes("interest") ||
+    subcategory.includes("dividend");
 
-  const isGigIncome = 
-    merchant.includes('uber') ||
-    merchant.includes('lyft') ||
-    merchant.includes('doordash') ||
-    merchant.includes('upwork') ||
-    merchant.includes('fiverr');
+  const isGigIncome =
+    merchant.includes("uber") ||
+    merchant.includes("lyft") ||
+    merchant.includes("doordash") ||
+    merchant.includes("upwork") ||
+    merchant.includes("fiverr");
 
   return isPayroll || isInvestmentIncome || isGigIncome;
 }
@@ -477,46 +500,44 @@ function isValidIncome(txn: Transaction): boolean {
  * Excludes: transfers, card payments, refunds, non-operational flows
  * Returns only operational debits (true expenses) and credits (true income)
  */
-export function filterOperationalTransactions(
-  transactions: Transaction[]
-): { 
-  operationalDebits: Transaction[]; 
-  operationalCredits: Transaction[]; 
+export function filterOperationalTransactions(transactions: Transaction[]): {
+  operationalDebits: Transaction[];
+  operationalCredits: Transaction[];
 } {
   const operationalDebits: Transaction[] = [];
   const operationalCredits: Transaction[] = [];
 
-  transactions.forEach(txn => {
+  transactions.forEach((txn) => {
     const desc = txn.desc.toLowerCase();
     const merchant = txn.merchant.toLowerCase();
     const subcategory = txn.subcategory.toLowerCase();
 
     // EXCLUDE from operational flow:
-    const isTransfer = 
-      desc.includes('zelle') ||
-      desc.includes('venmo') ||
-      desc.includes('atm withdrawal') ||
-      desc.includes('credit card payment') ||
-      merchant.includes('credit card') ||
-      (desc.includes('transfer') && !desc.includes('emergency fund')) ||
-      (subcategory.includes('transfer') && !subcategory.includes('savings'));
+    const isTransfer =
+      desc.includes("zelle") ||
+      desc.includes("venmo") ||
+      desc.includes("atm withdrawal") ||
+      desc.includes("credit card payment") ||
+      merchant.includes("credit card") ||
+      (desc.includes("transfer") && !desc.includes("emergency fund")) ||
+      (subcategory.includes("transfer") && !subcategory.includes("savings"));
 
-    const isRefund = 
-      desc.includes('refund') ||
-      desc.includes('chargeback') ||
-      desc.includes('return') ||
-      subcategory.includes('refund');
+    const isRefund =
+      desc.includes("refund") ||
+      desc.includes("chargeback") ||
+      desc.includes("return") ||
+      subcategory.includes("refund");
 
     // INCLUDE operational debits (true expenses including mortgage, loans, childcare, etc.)
-    if (txn.sign === 'debit' && !isTransfer && !isRefund) {
+    if (txn.sign === "debit" && !isTransfer && !isRefund) {
       // Exclude transactions with "Income" subcategory (data quality issue)
-      if (subcategory !== 'income') {
+      if (subcategory !== "income") {
         operationalDebits.push(txn);
       }
     }
 
     // INCLUDE only VALIDATED income credits
-    if (txn.sign === 'credit' && isValidIncome(txn)) {
+    if (txn.sign === "credit" && isValidIncome(txn)) {
       operationalCredits.push(txn);
     }
   });
@@ -524,16 +545,14 @@ export function filterOperationalTransactions(
   return { operationalDebits, operationalCredits };
 }
 
-export function classifyTransactions(
-  transactions: (Transaction | StagingTransaction)[]
-): ClassificationResult {
+export function classifyTransactions(transactions: (Transaction | StagingTransaction)[]): ClassificationResult {
   const classified: ClassifiedTransaction[] = [];
   const pairings: Array<{ from_txn: string; to_txn: string; type: string }> = [];
   const assumptions: string[] = [
     "Loan payments treated as transfers (principal only; interest portion not itemized)",
     "Credit card payments from deposit accounts classified as transfers",
     "P2P transactions defaulted to transfers unless clear merchant indicators",
-    "Pending transactions excluded from analysis"
+    "Pending transactions excluded from analysis",
   ];
   const unknownSamples: string[] = [];
 
@@ -544,21 +563,22 @@ export function classifyTransactions(
   let unknown = 0;
 
   // Sort transactions by date
-  const sortedTxns = [...transactions].sort((a, b) => 
-    new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
+  const sortedTxns = [...transactions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   // Get period
-  const period = sortedTxns.length > 0 ? {
-    start: sortedTxns[0].date,
-    end: sortedTxns[sortedTxns.length - 1].date
-  } : {
-    start: "",
-    end: ""
-  };
+  const period =
+    sortedTxns.length > 0
+      ? {
+          start: sortedTxns[0].date,
+          end: sortedTxns[sortedTxns.length - 1].date,
+        }
+      : {
+          start: "",
+          end: "",
+        };
 
   // Classify each transaction
-  sortedTxns.forEach(txn => {
+  sortedTxns.forEach((txn) => {
     const { classification, subcategory, reason } = classifyTransaction(txn, sortedTxns);
 
     const classifiedTxn: ClassifiedTransaction = {
@@ -567,7 +587,7 @@ export function classifyTransactions(
       amount: txn.amount,
       classification,
       subcategory,
-      reason
+      reason,
     };
 
     classified.push(classifiedTxn);
@@ -605,14 +625,14 @@ export function classifyTransactions(
       expenses: Math.round(expenses * 100) / 100,
       excluded_transfers: Math.round(transfers * 100) / 100,
       adjustments: Math.round(adjustments * 100) / 100,
-      unknown_unclassified: Math.round(unknown * 100) / 100
+      unknown_unclassified: Math.round(unknown * 100) / 100,
     },
     by_category,
     transactions: classified,
     audit: {
       pairings,
       assumptions,
-      unknown_samples: unknownSamples
-    }
+      unknown_samples: unknownSamples,
+    },
   };
 }
