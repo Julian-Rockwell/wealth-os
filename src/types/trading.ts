@@ -56,3 +56,21 @@ export interface CapitalAllocationState {
   selectedStrategy: TradingStrategy | null;
   multiStrategyUnlocked: boolean; // unlocked when trading account >= $50K
 }
+
+export type BrokerId = 'tradier' | 'ibkr' | 'schwab' | 'etrade' | 'fidelity' | 'tradezero';
+
+export interface BrokerSetupProgress {
+  openAccount: boolean;
+  funded: boolean;
+  optionsSubmitted: boolean;
+  optionsApproved: boolean;
+  connected: boolean;
+}
+
+export interface BrokerSetup {
+  chosenBroker: BrokerId | null;
+  accountType: 'cash' | 'margin' | 'retirement' | null;
+  targetOptionsLevel: 0 | 1 | 2 | 3 | 4;
+  progress: BrokerSetupProgress;
+  notes: string[];
+}

@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { Lock, TrendingUp } from "lucide-react";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
 import { ReadinessScore } from "@/components/investments/ReadinessScore";
@@ -8,12 +9,16 @@ import { OptimizeAssets } from "@/components/investments/OptimizeAssets";
 import { StrategySelection } from "@/components/investments/StrategySelection";
 import { CapitalAllocation } from "@/components/investments/CapitalAllocation";
 import { PaperTradingProgress } from "@/components/investments/PaperTradingProgress";
+import { NextActionCard } from "@/components/investments/NextActionCard";
+import { BrokerStatusPanel } from "@/components/investments/BrokerStatusPanel";
+import { BrokerSetupWizard } from "@/components/investments/BrokerSetupWizard";
 import { calculateReadinessScore } from "@/utils/investmentCalculations";
 import type { TradingStrategy } from "@/types/trading";
 
 export default function Investments() {
   const { snapshot, paperTradingData, selectedStrategy, setSelectedStrategy } = useFinancialData();
   const [activeTab, setActiveTab] = useState("readiness");
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
 
   // Calculate readiness score to determine gating
   const readinessResult = useMemo(() => {
@@ -81,7 +86,33 @@ export default function Investments() {
         </TabsContent>
 
         <TabsContent value="strategy" className="mt-6">
-          <StrategySelection onStrategyConfirmed={handleStrategyConfirmed} />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              {readinessResult && (
+                <NextActionCard 
+                  readinessScore={readinessResult.totalScore}
+                  onOpenWizard={() => setIsWizardOpen(true)}
+                />
+              )}
+              
+              <StrategySelection onStrategyConfirmed={handleStrategyConfirmed} />
+              
+              {selectedStrategy && readinessResult && readinessResult.totalScore >= 80 && (
+                <div className="flex justify-center pt-4">
+                  <Button 
+                    size="lg"
+                    onClick={() => setIsWizardOpen(true)}
+                  >
+                    Start Broker Setup
+                  </Button>
+                </div>
+              )}
+            </div>
+            
+            <div className="lg:col-span-1">
+              <BrokerStatusPanel />
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="paper-trading" className="mt-6">
@@ -101,6 +132,14 @@ export default function Investments() {
           <CapitalAllocation snapshot={snapshot} />
         </TabsContent>
       </Tabs>
+
+      {selectedStrategy && (
+        <BrokerSetupWizard
+          isOpen={isWizardOpen}
+          onClose={() => setIsWizardOpen(false)}
+          selectedStrategy={selectedStrategy}
+        />
+      )}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import type { FinancialSnapshot } from "@/types/financial";
 import type { DashboardData } from "@/types/dashboard";
-import type { PaperTradingProgress, TradingStrategy } from "@/types/trading";
+import type { PaperTradingProgress, TradingStrategy, BrokerSetup } from "@/types/trading";
 import type { RpicResult } from "@/utils/rpicCalculations";
 
 interface DraftData {
@@ -28,6 +28,8 @@ interface FinancialDataContextType {
   setSelectedStrategy: (strategy: TradingStrategy | null) => void;
   monthlyIncome: number | null;
   setMonthlyIncome: (income: number | null) => void;
+  brokerSetup: BrokerSetup | null;
+  setBrokerSetup: (setup: BrokerSetup | null) => void;
   resetAllData: () => void;
 }
 
@@ -76,6 +78,11 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
 
   const [monthlyIncome, setMonthlyIncomeState] = useState<number | null>(() => {
     const stored = localStorage.getItem("monthlyIncome");
+    return stored ? JSON.parse(stored) : null;
+  });
+
+  const [brokerSetup, setBrokerSetupState] = useState<BrokerSetup | null>(() => {
+    const stored = localStorage.getItem("brokerSetup");
     return stored ? JSON.parse(stored) : null;
   });
 
@@ -143,6 +150,15 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     }
   };
 
+  const setBrokerSetup = (setup: BrokerSetup | null) => {
+    setBrokerSetupState(setup);
+    if (setup) {
+      localStorage.setItem("brokerSetup", JSON.stringify(setup));
+    } else {
+      localStorage.removeItem("brokerSetup");
+    }
+  };
+
   const resetAllData = () => {
     setSnapshotState(null);
     setDashboardDataState(null);
@@ -157,6 +173,7 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     setRpicResultState(null);
     setSelectedStrategyState(null);
     setMonthlyIncomeState(null);
+    setBrokerSetupState(null);
     localStorage.removeItem("financialSnapshot");
     localStorage.removeItem("dashboardData");
     localStorage.removeItem("paperTradingData");
@@ -165,6 +182,7 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     localStorage.removeItem("rpicResult");
     localStorage.removeItem("selectedStrategy");
     localStorage.removeItem("monthlyIncome");
+    localStorage.removeItem("brokerSetup");
   };
 
   return (
@@ -186,6 +204,8 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
         setSelectedStrategy,
         monthlyIncome,
         setMonthlyIncome,
+        brokerSetup,
+        setBrokerSetup,
         resetAllData,
       }}
     >
