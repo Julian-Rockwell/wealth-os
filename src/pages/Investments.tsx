@@ -26,9 +26,6 @@ export default function Investments() {
     return calculateReadinessScore(snapshot, 6);
   }, [snapshot]);
 
-  // Gating logic for Broker Setup tab
-  const isGated = !selectedStrategy || (readinessResult?.totalScore ?? 0) < 80;
-
   // TESTING MODE: All tabs unlocked for demo/testing purposes
   const isReady = true;
   const hasSelectedStrategy = true;
@@ -77,7 +74,7 @@ export default function Investments() {
           <TabsTrigger value="readiness">Readiness</TabsTrigger>
           <TabsTrigger value="optimize">Optimize</TabsTrigger>
           <TabsTrigger value="strategy">Strategy</TabsTrigger>
-          <TabsTrigger value="broker-setup" disabled={isGated}>Broker Setup</TabsTrigger>
+          <TabsTrigger value="broker-setup">Broker Setup</TabsTrigger>
           <TabsTrigger value="paper-trading">Paper Trading</TabsTrigger>
           <TabsTrigger value="allocation">Allocation</TabsTrigger>
         </TabsList>
@@ -103,16 +100,6 @@ export default function Investments() {
                   onOpenWizard={() => setIsWizardOpen(true)}
                 />
               )}
-              
-              <div className="flex justify-center pt-4">
-                <Button 
-                  size="lg"
-                  onClick={() => setIsWizardOpen(true)}
-                  disabled={isGated}
-                >
-                  Start Broker Setup Wizard
-                </Button>
-              </div>
             </div>
             
             <div className="lg:col-span-1">
