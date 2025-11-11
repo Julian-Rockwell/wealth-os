@@ -26,6 +26,9 @@ export default function Investments() {
     return calculateReadinessScore(snapshot, 6);
   }, [snapshot]);
 
+  // Gating logic for Broker Setup tab
+  const isGated = !selectedStrategy || (readinessResult?.totalScore ?? 0) < 80;
+
   // TESTING MODE: All tabs unlocked for demo/testing purposes
   const isReady = true;
   const hasSelectedStrategy = true;
@@ -33,7 +36,7 @@ export default function Investments() {
 
   const handleStrategyConfirmed = (strategy: TradingStrategy) => {
     setSelectedStrategy(strategy);
-    setActiveTab("paper-trading");
+    setActiveTab("broker-setup");
   };
 
   if (!snapshot) {
@@ -55,10 +58,11 @@ export default function Investments() {
           <div>
             <h2 className="text-2xl font-bold mb-2">Investment Planning</h2>
             <p className="text-muted-foreground leading-relaxed">
-              <strong>What you'll find here:</strong> A comprehensive 5-step process to prepare for active trading. 
+              <strong>What you'll find here:</strong> A comprehensive 6-step process to prepare for active trading. 
               Start by assessing your financial foundation with the <strong>Readiness Score</strong>, then identify 
               opportunities to <strong>Optimize Assets</strong> (liquidate equity or pay off high-interest debt). 
-              Next, select your <strong>Trading Strategy</strong> based on a personalized assessment. 
+              Next, select your <strong>Trading Strategy</strong> based on a personalized assessment, then complete 
+              <strong>Broker Setup</strong> to choose and configure your trading account. 
               Complete <strong>Paper Trading gates</strong> (40 trades, 95% adherence, 70% checklist) before unlocking 
               <strong>Capital Allocation</strong> where you'll define your trading account cap, emergency fund, 
               and feeding strategy for passive income.
@@ -69,10 +73,11 @@ export default function Investments() {
 
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="readiness">Readiness</TabsTrigger>
           <TabsTrigger value="optimize">Optimize</TabsTrigger>
           <TabsTrigger value="strategy">Strategy</TabsTrigger>
+          <TabsTrigger value="broker-setup" disabled={isGated}>Broker Setup</TabsTrigger>
           <TabsTrigger value="paper-trading">Paper Trading</TabsTrigger>
           <TabsTrigger value="allocation">Allocation</TabsTrigger>
         </TabsList>
@@ -86,6 +91,10 @@ export default function Investments() {
         </TabsContent>
 
         <TabsContent value="strategy" className="mt-6">
+          <StrategySelection onStrategyConfirmed={handleStrategyConfirmed} />
+        </TabsContent>
+
+        <TabsContent value="broker-setup" className="mt-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
               {readinessResult && (
@@ -95,18 +104,15 @@ export default function Investments() {
                 />
               )}
               
-              <StrategySelection onStrategyConfirmed={handleStrategyConfirmed} />
-              
-              {selectedStrategy && readinessResult && readinessResult.totalScore >= 80 && (
-                <div className="flex justify-center pt-4">
-                  <Button 
-                    size="lg"
-                    onClick={() => setIsWizardOpen(true)}
-                  >
-                    Start Broker Setup
-                  </Button>
-                </div>
-              )}
+              <div className="flex justify-center pt-4">
+                <Button 
+                  size="lg"
+                  onClick={() => setIsWizardOpen(true)}
+                  disabled={isGated}
+                >
+                  Start Broker Setup Wizard
+                </Button>
+              </div>
             </div>
             
             <div className="lg:col-span-1">
@@ -138,6 +144,7 @@ export default function Investments() {
           isOpen={isWizardOpen}
           onClose={() => setIsWizardOpen(false)}
           selectedStrategy={selectedStrategy}
+          onComplete={() => setActiveTab("paper-trading")}
         />
       )}
     </div>

@@ -21,13 +21,15 @@ interface BrokerSetupWizardProps {
   onClose: () => void;
   selectedStrategy: TradingStrategy;
   initialStep?: number;
+  onComplete?: () => void;
 }
 
 export function BrokerSetupWizard({ 
   isOpen, 
   onClose, 
-  selectedStrategy,
-  initialStep = 1 
+  selectedStrategy, 
+  initialStep = 1,
+  onComplete
 }: BrokerSetupWizardProps) {
   const [currentStep, setCurrentStep] = useState(initialStep);
 
@@ -59,6 +61,7 @@ export function BrokerSetupWizard({
   const handleComplete = () => {
     console.log('broker_setup_completed');
     onClose();
+    onComplete?.();
   };
 
   return (
