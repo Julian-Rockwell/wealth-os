@@ -82,7 +82,7 @@ export const IncomeExpensesKPI = ({ data, period }: IncomeExpensesKPIProps) => {
       <Card className="p-6 shadow-soft">
         <Collapsible open={incomeExpanded} onOpenChange={setIncomeExpanded}>
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-muted-foreground">Income</h3>
+            <h3 className="text-sm font-medium text-muted-foreground">Income <span className="text-xs font-normal">(calculated from txns)</span></h3>
             <div className="flex items-center gap-2">
               <DollarSign className="w-4 h-4 text-success" />
               <CollapsibleTrigger className="p-1 hover:bg-muted rounded">
@@ -117,7 +117,7 @@ export const IncomeExpensesKPI = ({ data, period }: IncomeExpensesKPIProps) => {
       <Card className="p-6 shadow-soft">
         <Collapsible open={expensesExpanded} onOpenChange={setExpensesExpanded}>
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-muted-foreground">Expenses</h3>
+            <h3 className="text-sm font-medium text-muted-foreground">Expenses <span className="text-xs font-normal">(calculated from txns)</span></h3>
             <div className="flex items-center gap-2">
               <DollarSign className="w-4 h-4 text-destructive" />
               <CollapsibleTrigger className="p-1 hover:bg-muted rounded">

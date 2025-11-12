@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Lock, TrendingUp } from "lucide-react";
+import { Lock, TrendingUp, AlertCircle } from "lucide-react";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
 import { ReadinessScore } from "@/components/investments/ReadinessScore";
 import { OptimizeAssets } from "@/components/investments/OptimizeAssets";
@@ -67,6 +67,20 @@ export default function Investments() {
         </div>
       </div>
 
+      {/* Warning Alert when Foundation Score < 80 */}
+      {readinessResult && readinessResult.totalScore < 80 && (
+        <Alert variant="destructive" className="border-red-500 bg-red-50 dark:bg-red-950/20">
+          <AlertCircle className="h-5 w-5 text-red-600" />
+          <AlertDescription className="text-red-900 dark:text-red-200">
+            <strong>Foundation Score Below Recommended Level ({readinessResult.totalScore}/100)</strong>
+            <p className="mt-2">
+              While you can explore Strategy Selection and Broker Setup, we strongly recommend 
+              strengthening your financial foundation first. Proceeding without a solid base 
+              may increase risk. Review the Readiness tab for specific recommendations.
+            </p>
+          </AlertDescription>
+        </Alert>
+      )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-5">

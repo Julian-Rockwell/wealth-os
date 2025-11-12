@@ -62,7 +62,7 @@ export const HoldingsTable = ({ holdings, onUpdate, onDelete, onAdd }: HoldingsT
     <>
       <div className="flex justify-between items-center mb-4">
         <h4 className="text-sm font-medium text-muted-foreground">
-          {holdings.length} {holdings.length === 1 ? 'Asset' : 'Assets'}
+          {holdings.length} {holdings.length === 1 ? 'Asset' : 'Assets'} <span className="text-xs font-normal">(from snapshot data)</span>
         </h4>
         {onAdd && (
           <Button onClick={onAdd} variant="outline" size="sm">

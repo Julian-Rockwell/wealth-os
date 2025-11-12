@@ -36,7 +36,7 @@ export const NetWorthKPI = ({ snapshot }: NetWorthKPIProps) => {
       {/* Net Worth Card with 12M Trend */}
       <Card className="p-6 shadow-soft">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-medium text-muted-foreground">Net Worth</h3>
+          <h3 className="text-sm font-medium text-muted-foreground">Net Worth <span className="text-xs font-normal">(calculated from snapshot)</span></h3>
           <DollarSign className="w-4 h-4 text-muted-foreground" />
         </div>
         <p className="text-3xl font-bold mb-1">

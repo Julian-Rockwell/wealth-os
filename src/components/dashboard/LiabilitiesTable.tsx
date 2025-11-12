@@ -89,7 +89,7 @@ export const LiabilitiesTable = ({ liabilities, onUpdate, onDelete, onAdd }: Lia
       {/* Header with Add Button */}
       <div className="flex justify-between items-center">
         <h4 className="text-sm font-medium text-muted-foreground">
-          {liabilities.length} {liabilities.length === 1 ? 'Liability' : 'Liabilities'}
+          {liabilities.length} {liabilities.length === 1 ? 'Liability' : 'Liabilities'} <span className="text-xs font-normal">(from snapshot data)</span>
         </h4>
         {onAdd && (
           <Button onClick={onAdd} variant="outline" size="sm">

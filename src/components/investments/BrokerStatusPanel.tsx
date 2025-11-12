@@ -70,7 +70,7 @@ export function BrokerStatusPanel() {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Broker Setup Status</CardTitle>
+          <CardTitle className="text-lg">Broker Setup Status <span className="text-xs text-muted-foreground font-normal ml-2">(progress from wizard)</span></CardTitle>
           {allComplete && (
             <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20">
               Ready for Step 4

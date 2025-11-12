@@ -211,7 +211,7 @@ export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProp
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Target className="w-5 h-5 text-primary" />
-            Strategy Assessment
+            Strategy Assessment <span className="text-xs text-muted-foreground font-normal ml-2">(calculated from assessment)</span>
           </CardTitle>
           <CardDescription>
             Answer 4 quick questions to get personalized strategy recommendations

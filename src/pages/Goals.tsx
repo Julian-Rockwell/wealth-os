@@ -140,7 +140,7 @@ export default function Goals() {
             <Target className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold mb-2">RPIC Calculator</h2>
+            <h2 className="text-2xl font-bold mb-2">RPIC Calculator <span className="text-xs text-muted-foreground font-normal ml-2">(calculated from your inputs)</span></h2>
             <p className="text-muted-foreground leading-relaxed">
               <strong>What you'll find here:</strong> Calculate your <strong>Retirement Passive Income Capital (RPIC)</strong>—the 
               lump sum needed to generate your target monthly passive income. Answer 3 simple questions (timing, lifestyle, geography), 

@@ -25,7 +25,7 @@ export const MonthlyStackedBars = ({ data }: MonthlyStackedBarsProps) => {
   return (
     <Card className="p-6 shadow-soft">
       <div className="flex items-center gap-2 mb-4">
-        <h3 className="font-semibold">Monthly Breakdown</h3>
+        <h3 className="font-semibold">Monthly Breakdown <span className="text-xs text-muted-foreground font-normal ml-2">(calculated from transaction history)</span></h3>
         <InfoTooltip content={
           <div className="space-y-2">
             <p><strong>How to read this:</strong></p>

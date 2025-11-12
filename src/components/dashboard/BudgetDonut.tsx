@@ -193,7 +193,7 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
   return (
     <Card className="p-6 shadow-soft">
       <div className="flex items-center gap-2 mb-4">
-        <h3 className="font-semibold">{viewData.title}</h3>
+        <h3 className="font-semibold">{viewData.title} <span className="text-xs text-muted-foreground font-normal ml-2">(calculated from classified transactions)</span></h3>
         {viewMode === "category" && (
           <InfoTooltip content={
             <div className="space-y-2">

@@ -38,7 +38,7 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-2">Asset Optimization Opportunities</h3>
+        <h3 className="text-lg font-semibold mb-2">Asset Optimization Opportunities <span className="text-xs text-muted-foreground font-normal ml-2">(calculated from holdings and liabilities)</span></h3>
         <p className="text-sm text-muted-foreground">
           Prescriptive recommendations to maximize your financial position
         </p>

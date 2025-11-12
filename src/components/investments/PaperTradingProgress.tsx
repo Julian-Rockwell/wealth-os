@@ -65,7 +65,7 @@ export function PaperTradingProgress({ progress }: PaperTradingProgressProps) {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h3 className="text-lg font-semibold mb-2">Paper Trading Gates</h3>
+        <h3 className="text-lg font-semibold mb-2">Paper Trading Gates <span className="text-xs text-muted-foreground font-normal ml-2">(fixed examples)</span></h3>
         <p className="text-sm text-muted-foreground">
           Complete these requirements before live trading with real capital
         </p>
