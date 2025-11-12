@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { RpicResult } from "@/utils/rpicCalculations";
 import { getReadinessPathway } from "@/utils/rpicCalculations";
 import { TrendingUp, Target } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface RpicResultCardProps {
   rpic: RpicResult;
@@ -11,6 +12,7 @@ interface RpicResultCardProps {
 }
 
 export function RpicResultCard({ rpic, foundationScore }: RpicResultCardProps) {
+  const navigate = useNavigate();
   const pathway = getReadinessPathway(foundationScore);
   
   const getColorClass = (color: string) => {
@@ -21,6 +23,21 @@ export function RpicResultCard({ rpic, foundationScore }: RpicResultCardProps) {
       default: return "text-primary border-primary bg-primary/10";
     }
   };
+
+  const getNavigationConfig = () => {
+    if (!foundationScore) {
+      return { text: "Complete Snapshot", path: "/dashboard" };
+    }
+    if (foundationScore >= 80) {
+      return { text: "Go to Investments", path: "/investments" };
+    }
+    if (foundationScore >= 60) {
+      return { text: "Strengthen Foundation", path: "/dashboard" };
+    }
+    return { text: "Review Dashboard", path: "/dashboard" };
+  };
+
+  const navConfig = getNavigationConfig();
 
   return (
     <Card className="border-2">
@@ -113,16 +130,15 @@ export function RpicResultCard({ rpic, foundationScore }: RpicResultCardProps) {
           <div className="flex gap-2">
             <Button 
               className="flex-1"
-              variant={pathway.status === "ready" ? "default" : "outline"}
-              onClick={() => console.log("Pathway action:", pathway.cta)}
+              variant={foundationScore && foundationScore >= 80 ? "default" : "outline"}
+              onClick={() => navigate(navConfig.path)}
             >
-              {pathway.cta}
+              {navConfig.text}
             </Button>
-            <Button variant="outline" onClick={() => console.log("Learn more")}>
+            <Button variant="outline" onClick={() => window.open("https://docs.example.com/rpic", "_blank")}>
               Learn More
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground text-center">(fixed examples)</p>
         </div>
 
         {/* Note */}

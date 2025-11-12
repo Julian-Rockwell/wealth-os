@@ -67,6 +67,13 @@ export interface BrokerSetupProgress {
   connected: boolean;
 }
 
+export interface StrategyAssessmentAnswers {
+  capital: string;
+  risk: string;
+  time: string;
+  experience: string;
+}
+
 export interface BrokerSetup {
   chosenBroker: BrokerId | null;
   accountType: 'cash' | 'margin' | 'retirement' | null;

@@ -5,9 +5,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Target, TrendingUp } from "lucide-react";
-import { useState } from "react";
 import { toast } from "sonner";
 import type { TradingStrategy } from "@/types/trading";
+import { useFinancialData } from "@/contexts/FinancialDataContext";
 
 interface Question {
   id: string;
@@ -73,11 +73,26 @@ interface StrategySelectionProps {
 }
 
 export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProps) {
-  const [answers, setAnswers] = useState<Record<string, number>>({});
-  const [selectedStrategies, setSelectedStrategies] = useState<TradingStrategy[]>([]);
+  const { 
+    setSelectedStrategy, 
+    selectedStrategies, 
+    setSelectedStrategies,
+    strategyAssessmentAnswers,
+    setStrategyAssessmentAnswers
+  } = useFinancialData();
+  
+  const answers = {
+    capital: strategyAssessmentAnswers.capital ? parseInt(strategyAssessmentAnswers.capital) : undefined,
+    risk: strategyAssessmentAnswers.risk ? parseInt(strategyAssessmentAnswers.risk) : undefined,
+    time: strategyAssessmentAnswers.time ? parseInt(strategyAssessmentAnswers.time) : undefined,
+    experience: strategyAssessmentAnswers.experience ? parseInt(strategyAssessmentAnswers.experience) : undefined,
+  };
 
   const handleAnswerChange = (questionId: string, value: number) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: value }));
+    setStrategyAssessmentAnswers({
+      ...strategyAssessmentAnswers,
+      [questionId]: value.toString()
+    });
   };
 
   const allQuestionsAnswered = ASSESSMENT_QUESTIONS.every((q) => answers[q.id] !== undefined);
@@ -192,21 +207,21 @@ export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProp
 
   const handleConfirmStrategy = () => {
     if (selectedStrategies.length > 0) {
-      // Pass the first selected strategy (primary strategy)
+      // Pass the first selected strategy (primary strategy) and save it
+      setSelectedStrategy(selectedStrategies[0]);
       onStrategyConfirmed(selectedStrategies[0]);
       toast.success(`${selectedStrategies.length} strategy(ies) confirmed! Proceed to Broker Setup.`);
     }
   };
 
   const handleToggleStrategy = (strategy: TradingStrategy) => {
-    setSelectedStrategies((prev) =>
-      prev.includes(strategy)
-        ? prev.filter((s) => s !== strategy)
-        : [...prev, strategy]
-    );
+    const newStrategies = selectedStrategies.includes(strategy)
+      ? selectedStrategies.filter((s) => s !== strategy)
+      : [...selectedStrategies, strategy];
+    setSelectedStrategies(newStrategies);
   };
 
-  const recommendations = allQuestionsAnswered ? getRecommendations() : [];
+  const recommendations = getRecommendations();
 
   return (
     <div className="space-y-6">
@@ -269,19 +284,18 @@ export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProp
           </CardContent>
         </Card>
 
-        {/* Right column: Recommendations (auto-show when all answered) */}
-        {allQuestionsAnswered && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-success" />
-                Recommended Strategies
-              </CardTitle>
-              <CardDescription>Based on your assessment, here are your best matches (sorted by fit)</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {recommendations.map((rec) => (
+        {/* Right column: Recommendations (always shown) */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-success" />
+              Recommended Strategies
+            </CardTitle>
+            <CardDescription>Based on your assessment, here are your best matches (sorted by fit)</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {recommendations.map((rec) => (
                   <div
                     key={rec.strategy}
                     className={`p-4 border rounded-lg transition-colors ${
@@ -319,9 +333,8 @@ export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProp
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        )}
+              </CardContent>
+            </Card>
       </div>
     </div>
   );

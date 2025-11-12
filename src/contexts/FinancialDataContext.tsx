@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import type { FinancialSnapshot } from "@/types/financial";
 import type { DashboardData } from "@/types/dashboard";
-import type { PaperTradingProgress, TradingStrategy, BrokerSetup } from "@/types/trading";
+import type { PaperTradingProgress, TradingStrategy, BrokerSetup, StrategyAssessmentAnswers } from "@/types/trading";
 import type { RpicResult } from "@/utils/rpicCalculations";
 
 interface DraftData {
@@ -26,6 +26,10 @@ interface FinancialDataContextType {
   setRpicResult: (result: RpicResult | null) => void;
   selectedStrategy: TradingStrategy | null;
   setSelectedStrategy: (strategy: TradingStrategy | null) => void;
+  selectedStrategies: TradingStrategy[];
+  setSelectedStrategies: (strategies: TradingStrategy[]) => void;
+  strategyAssessmentAnswers: StrategyAssessmentAnswers;
+  setStrategyAssessmentAnswers: (answers: StrategyAssessmentAnswers) => void;
   monthlyIncome: number | null;
   setMonthlyIncome: (income: number | null) => void;
   brokerSetup: BrokerSetup | null;
@@ -89,6 +93,16 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
       return { ...parsed, wizardStep: parsed.wizardStep || 1 };
     }
     return null;
+  });
+
+  const [selectedStrategies, setSelectedStrategiesState] = useState<TradingStrategy[]>(() => {
+    const stored = localStorage.getItem("selectedStrategies");
+    return stored ? JSON.parse(stored) : [];
+  });
+
+  const [strategyAssessmentAnswers, setStrategyAssessmentAnswersState] = useState<StrategyAssessmentAnswers>(() => {
+    const stored = localStorage.getItem("strategyAssessmentAnswers");
+    return stored ? JSON.parse(stored) : { capital: "", risk: "", time: "", experience: "" };
   });
 
   const setSnapshot = (newSnapshot: FinancialSnapshot | null) => {
@@ -164,6 +178,16 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     }
   };
 
+  const setSelectedStrategies = (strategies: TradingStrategy[]) => {
+    setSelectedStrategiesState(strategies);
+    localStorage.setItem("selectedStrategies", JSON.stringify(strategies));
+  };
+
+  const setStrategyAssessmentAnswers = (answers: StrategyAssessmentAnswers) => {
+    setStrategyAssessmentAnswersState(answers);
+    localStorage.setItem("strategyAssessmentAnswers", JSON.stringify(answers));
+  };
+
   const resetAllData = () => {
     setSnapshotState(null);
     setDashboardDataState(null);
@@ -177,6 +201,8 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     setAvailableCapitalState(0);
     setRpicResultState(null);
     setSelectedStrategyState(null);
+    setSelectedStrategiesState([]);
+    setStrategyAssessmentAnswersState({ capital: "", risk: "", time: "", experience: "" });
     setMonthlyIncomeState(null);
     setBrokerSetupState(null);
     localStorage.removeItem("financialSnapshot");
@@ -186,6 +212,8 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     localStorage.removeItem("availableCapital");
     localStorage.removeItem("rpicResult");
     localStorage.removeItem("selectedStrategy");
+    localStorage.removeItem("selectedStrategies");
+    localStorage.removeItem("strategyAssessmentAnswers");
     localStorage.removeItem("monthlyIncome");
     localStorage.removeItem("brokerSetup");
   };
@@ -207,6 +235,10 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
         setRpicResult,
         selectedStrategy,
         setSelectedStrategy,
+        selectedStrategies,
+        setSelectedStrategies,
+        strategyAssessmentAnswers,
+        setStrategyAssessmentAnswers,
         monthlyIncome,
         setMonthlyIncome,
         brokerSetup,
