@@ -2,6 +2,8 @@ import type { ReadinessFactor } from "./investmentCalculations";
 import type { FinancialSnapshot } from "@/types/financial";
 import { calculateMonthlyExpenses, calculateLiquidAssets, calculateHighInterestDebt } from "./investmentCalculations";
 
+export { calculateMonthlyExpenses, calculateLiquidAssets, calculateHighInterestDebt };
+
 export function generateFoundationPlan(
   factors: ReadinessFactor[],
   snapshot: FinancialSnapshot,

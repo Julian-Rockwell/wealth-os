@@ -14,6 +14,10 @@ export default function UnifiedPanel() {
   const [activeTab, setActiveTab] = useState("intake");
   const { resetAllData, snapshot } = useFinancialData();
 
+  const handleNavigateToTab = (tabName: string) => {
+    setActiveTab(tabName);
+  };
+
   const handleExport = (format: "json" | "csv") => {
     toast.success(`Exporting data as ${format.toUpperCase()}...`);
   };
@@ -131,7 +135,7 @@ export default function UnifiedPanel() {
           </TabsContent>
 
           <TabsContent value="goals" className="mt-0">
-            <Goals />
+            <Goals onNavigateToTab={handleNavigateToTab} />
           </TabsContent>
 
           <TabsContent value="reports" className="mt-0">

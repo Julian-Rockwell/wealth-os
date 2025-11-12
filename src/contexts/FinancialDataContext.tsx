@@ -3,6 +3,7 @@ import type { FinancialSnapshot } from "@/types/financial";
 import type { DashboardData } from "@/types/dashboard";
 import type { PaperTradingProgress, TradingStrategy, BrokerSetup, StrategyAssessmentAnswers } from "@/types/trading";
 import type { RpicResult } from "@/utils/rpicCalculations";
+import type { SixMonthPlan } from "@/types/sixMonthPlan";
 
 interface DraftData {
   mockConnections: any[];
@@ -34,6 +35,8 @@ interface FinancialDataContextType {
   setMonthlyIncome: (income: number | null) => void;
   brokerSetup: BrokerSetup | null;
   setBrokerSetup: (setup: BrokerSetup | null) => void;
+  sixMonthPlan: SixMonthPlan | null;
+  setSixMonthPlan: (plan: SixMonthPlan | null) => void;
   resetAllData: () => void;
 }
 
@@ -103,6 +106,11 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
   const [strategyAssessmentAnswers, setStrategyAssessmentAnswersState] = useState<StrategyAssessmentAnswers>(() => {
     const stored = localStorage.getItem("strategyAssessmentAnswers");
     return stored ? JSON.parse(stored) : { capital: "", risk: "", time: "", experience: "" };
+  });
+
+  const [sixMonthPlan, setSixMonthPlanState] = useState<SixMonthPlan | null>(() => {
+    const stored = localStorage.getItem("sixMonthPlan");
+    return stored ? JSON.parse(stored) : null;
   });
 
   const setSnapshot = (newSnapshot: FinancialSnapshot | null) => {
@@ -188,6 +196,15 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     localStorage.setItem("strategyAssessmentAnswers", JSON.stringify(answers));
   };
 
+  const setSixMonthPlan = (plan: SixMonthPlan | null) => {
+    setSixMonthPlanState(plan);
+    if (plan) {
+      localStorage.setItem("sixMonthPlan", JSON.stringify(plan));
+    } else {
+      localStorage.removeItem("sixMonthPlan");
+    }
+  };
+
   const resetAllData = () => {
     setSnapshotState(null);
     setDashboardDataState(null);
@@ -216,6 +233,7 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     localStorage.removeItem("strategyAssessmentAnswers");
     localStorage.removeItem("monthlyIncome");
     localStorage.removeItem("brokerSetup");
+    localStorage.removeItem("sixMonthPlan");
   };
 
   return (
@@ -239,13 +257,15 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
         setSelectedStrategies,
         strategyAssessmentAnswers,
         setStrategyAssessmentAnswers,
-        monthlyIncome,
-        setMonthlyIncome,
-        brokerSetup,
-        setBrokerSetup,
-        resetAllData,
-      }}
-    >
+      monthlyIncome,
+      setMonthlyIncome,
+      brokerSetup,
+      setBrokerSetup,
+      sixMonthPlan,
+      setSixMonthPlan,
+      resetAllData,
+    }}
+  >
       {children}
     </FinancialDataContext.Provider>
   );

@@ -21,7 +21,11 @@ import {
 } from "@/utils/rpicCalculations";
 import { calculateReadinessScore } from "@/utils/investmentCalculations";
 
-export default function Goals() {
+interface GoalsProps {
+  onNavigateToTab?: (tabName: string) => void;
+}
+
+export default function Goals({ onNavigateToTab }: GoalsProps) {
   const { snapshot, dashboardData, setRpicResult: saveRpicResult } = useFinancialData();
 
   // Auto-populated expense baseline

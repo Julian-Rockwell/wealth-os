@@ -98,6 +98,50 @@ export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProp
   const allQuestionsAnswered = ASSESSMENT_QUESTIONS.every((q) => answers[q.id] !== undefined);
 
   const getRecommendations = (): StrategyRecommendation[] => {
+    // Check if any questions have been answered
+    const hasAnyAnswers = Object.values(answers).some(a => a !== undefined && a !== null);
+    
+    if (!hasAnyAnswers) {
+      // Return all strategies with 0% match and placeholder message
+      return [
+        {
+          strategy: "covered_calls",
+          name: "Covered Calls",
+          description: "Own stock, sell calls for premium. Conservative income enhancement.",
+          match: 0,
+          reasons: ["Answer assessment questions to see your match"]
+        },
+        {
+          strategy: "options_wheel",
+          name: "Options Wheel",
+          description: "Cash-secured puts and covered calls. Generate 1.5-3%/month.",
+          match: 0,
+          reasons: ["Answer assessment questions to see your match"]
+        },
+        {
+          strategy: "spreads",
+          name: "Credit Spreads",
+          description: "Defined-risk options strategies. Target 2-4%/month.",
+          match: 0,
+          reasons: ["Answer assessment questions to see your match"]
+        },
+        {
+          strategy: "swing_trading",
+          name: "Swing Trading",
+          description: "Hold positions 2-10 days. Capture short-term momentum.",
+          match: 0,
+          reasons: ["Answer assessment questions to see your match"]
+        },
+        {
+          strategy: "day_trading",
+          name: "Day Trading",
+          description: "Intraday positions. High activity, full-time commitment.",
+          match: 0,
+          reasons: ["Answer assessment questions to see your match"]
+        }
+      ];
+    }
+
     const capital = answers.capital || 3;
     const risk = answers.risk || 3;
     const time = answers.time || 2;

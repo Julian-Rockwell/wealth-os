@@ -4,15 +4,17 @@ import { Badge } from "@/components/ui/badge";
 import { RpicResult } from "@/utils/rpicCalculations";
 import { getReadinessPathway } from "@/utils/rpicCalculations";
 import { TrendingUp, Target } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { SixMonthPlanDialog } from "./SixMonthPlanDialog";
 
 interface RpicResultCardProps {
   rpic: RpicResult;
   foundationScore?: number;
+  onNavigateToTab?: (tabName: string) => void;
 }
 
-export function RpicResultCard({ rpic, foundationScore }: RpicResultCardProps) {
-  const navigate = useNavigate();
+export function RpicResultCard({ rpic, foundationScore, onNavigateToTab }: RpicResultCardProps) {
+  const [showPlanDialog, setShowPlanDialog] = useState(false);
   const pathway = getReadinessPathway(foundationScore);
   
   const getColorClass = (color: string) => {
@@ -25,16 +27,24 @@ export function RpicResultCard({ rpic, foundationScore }: RpicResultCardProps) {
   };
 
   const getNavigationConfig = () => {
-    if (!foundationScore) {
-      return { text: "Complete Snapshot", path: "/dashboard" };
+    if (foundationScore === undefined) {
+      return {
+        text: "Complete Snapshot",
+        action: () => onNavigateToTab?.("command")
+      };
     }
+    
     if (foundationScore >= 80) {
-      return { text: "Go to Investments", path: "/investments" };
+      return {
+        text: "Go to Investments",
+        action: () => onNavigateToTab?.("investments")
+      };
     }
-    if (foundationScore >= 60) {
-      return { text: "Strengthen Foundation", path: "/dashboard" };
-    }
-    return { text: "Review Dashboard", path: "/dashboard" };
+    
+    return {
+      text: "Build 6-Month Plan",
+      action: () => setShowPlanDialog(true)
+    };
   };
 
   const navConfig = getNavigationConfig();
@@ -131,7 +141,7 @@ export function RpicResultCard({ rpic, foundationScore }: RpicResultCardProps) {
             <Button 
               className="flex-1"
               variant={foundationScore && foundationScore >= 80 ? "default" : "outline"}
-              onClick={() => navigate(navConfig.path)}
+              onClick={navConfig.action}
             >
               {navConfig.text}
             </Button>
@@ -139,6 +149,12 @@ export function RpicResultCard({ rpic, foundationScore }: RpicResultCardProps) {
               Learn More
             </Button>
           </div>
+          
+          <SixMonthPlanDialog 
+            open={showPlanDialog} 
+            onOpenChange={setShowPlanDialog}
+            foundationScore={foundationScore}
+          />
         </div>
 
         {/* Note */}
