@@ -16,7 +16,7 @@ import { calculateReadinessScore } from "@/utils/investmentCalculations";
 import type { TradingStrategy } from "@/types/trading";
 
 export default function Investments() {
-  const { snapshot, paperTradingData, selectedStrategy, setSelectedStrategy } = useFinancialData();
+  const { snapshot, paperTradingData, selectedStrategy, setSelectedStrategy, brokerSetup } = useFinancialData();
   const [activeTab, setActiveTab] = useState("readiness");
   const [isWizardOpen, setIsWizardOpen] = useState(false);
 
@@ -144,6 +144,7 @@ export default function Investments() {
           isOpen={isWizardOpen}
           onClose={() => setIsWizardOpen(false)}
           selectedStrategy={selectedStrategy}
+          initialStep={brokerSetup?.wizardStep || 1}
           onComplete={() => setActiveTab("paper-trading")}
         />
       )}

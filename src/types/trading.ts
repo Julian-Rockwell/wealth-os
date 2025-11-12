@@ -71,6 +71,7 @@ export interface BrokerSetup {
   chosenBroker: BrokerId | null;
   accountType: 'cash' | 'margin' | 'retirement' | null;
   targetOptionsLevel: 0 | 1 | 2 | 3 | 4;
+  wizardStep: number;
   progress: BrokerSetupProgress;
   notes: string[];
 }

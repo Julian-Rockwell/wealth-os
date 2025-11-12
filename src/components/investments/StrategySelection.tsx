@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Target, TrendingUp } from "lucide-react";
@@ -73,8 +74,7 @@ interface StrategySelectionProps {
 
 export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProps) {
   const [answers, setAnswers] = useState<Record<string, number>>({});
-  const [showRecommendations, setShowRecommendations] = useState(false);
-  const [selectedStrategy, setSelectedStrategy] = useState<TradingStrategy | null>(null);
+  const [selectedStrategies, setSelectedStrategies] = useState<TradingStrategy[]>([]);
 
   const handleAnswerChange = (questionId: string, value: number) => {
     setAnswers((prev) => ({ ...prev, [questionId]: value }));
@@ -190,85 +190,113 @@ export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProp
     return recommendations.sort((a, b) => b.match - a.match);
   };
 
-  const handleGenerateRecommendations = () => {
-    setShowRecommendations(true);
-    toast.success("Recommendations generated based on your responses");
-  };
-
   const handleConfirmStrategy = () => {
-    if (selectedStrategy) {
-      onStrategyConfirmed(selectedStrategy);
-      toast.success("Strategy confirmed! Proceed to Paper Trading.");
+    if (selectedStrategies.length > 0) {
+      // Pass the first selected strategy (primary strategy)
+      onStrategyConfirmed(selectedStrategies[0]);
+      toast.success(`${selectedStrategies.length} strategy(ies) confirmed! Proceed to Broker Setup.`);
     }
   };
 
-  const recommendations = showRecommendations ? getRecommendations() : [];
+  const handleToggleStrategy = (strategy: TradingStrategy) => {
+    setSelectedStrategies((prev) =>
+      prev.includes(strategy)
+        ? prev.filter((s) => s !== strategy)
+        : [...prev, strategy]
+    );
+  };
+
+  const recommendations = allQuestionsAnswered ? getRecommendations() : [];
 
   return (
     <div className="space-y-6">
-      {/* Assessment Questions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="w-5 h-5 text-primary" />
-            Strategy Assessment <span className="text-xs text-muted-foreground font-normal ml-2">(calculated from assessment)</span>
-          </CardTitle>
-          <CardDescription>
-            Answer 4 quick questions to get personalized strategy recommendations
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {ASSESSMENT_QUESTIONS.map((question) => (
-            <div key={question.id} className="space-y-3">
-              <Label className="text-base font-medium">{question.question}</Label>
-              <RadioGroup
-                value={answers[question.id]?.toString()}
-                onValueChange={(v) => handleAnswerChange(question.id, parseInt(v))}
-              >
-                <div className="space-y-2">
-                  {question.options.map((option) => (
-                    <div key={option.value} className="flex items-center space-x-2">
-                      <RadioGroupItem value={option.value.toString()} id={`${question.id}-${option.value}`} />
-                      <Label htmlFor={`${question.id}-${option.value}`} className="font-normal cursor-pointer">
-                        {option.label}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </RadioGroup>
+      {/* Confirmation Card - shown above when strategies are selected */}
+      {selectedStrategies.length > 0 && (
+        <Card className="border-green-500/20 bg-green-500/5">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-semibold mb-2">
+                  {selectedStrategies.length} strateg{selectedStrategies.length > 1 ? 'ies' : 'y'} selected
+                </p>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Selected: {selectedStrategies.map(s => recommendations.find(r => r.strategy === s)?.name).join(', ')}
+                </p>
+                <Button onClick={handleConfirmStrategy} className="w-full">
+                  Confirm Strategy & Continue
+                </Button>
+              </div>
             </div>
-          ))}
+          </CardContent>
+        </Card>
+      )}
 
-          <Button onClick={handleGenerateRecommendations} disabled={!allQuestionsAnswered} className="w-full">
-            {allQuestionsAnswered ? "Generate Recommendations" : "Answer all questions to continue"}
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Recommendations */}
-      {showRecommendations && (
+      {/* Two-column layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left column: Assessment Questions */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-success" />
-              Recommended Strategies
+              <Target className="w-5 h-5 text-primary" />
+              Strategy Assessment <span className="text-xs text-muted-foreground font-normal ml-2">(calculated from assessment)</span>
             </CardTitle>
-            <CardDescription>Based on your assessment, here are your best matches (sorted by fit)</CardDescription>
+            <CardDescription>
+              Answer 4 quick questions to get personalized strategy recommendations
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <RadioGroup value={selectedStrategy || ""} onValueChange={(v) => setSelectedStrategy(v as TradingStrategy)}>
+          <CardContent className="space-y-6">
+            {ASSESSMENT_QUESTIONS.map((question) => (
+              <div key={question.id} className="space-y-3">
+                <Label className="text-base font-medium">{question.question}</Label>
+                <RadioGroup
+                  value={answers[question.id]?.toString()}
+                  onValueChange={(v) => handleAnswerChange(question.id, parseInt(v))}
+                >
+                  <div className="space-y-2">
+                    {question.options.map((option) => (
+                      <div key={option.value} className="flex items-center space-x-2">
+                        <RadioGroupItem value={option.value.toString()} id={`${question.id}-${option.value}`} />
+                        <Label htmlFor={`${question.id}-${option.value}`} className="font-normal cursor-pointer">
+                          {option.label}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </RadioGroup>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Right column: Recommendations (auto-show when all answered) */}
+        {allQuestionsAnswered && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-success" />
+                Recommended Strategies
+              </CardTitle>
+              <CardDescription>Based on your assessment, here are your best matches (sorted by fit)</CardDescription>
+            </CardHeader>
+            <CardContent>
               <div className="space-y-3">
                 {recommendations.map((rec) => (
                   <div
                     key={rec.strategy}
                     className={`p-4 border rounded-lg transition-colors ${
-                      selectedStrategy === rec.strategy
+                      selectedStrategies.includes(rec.strategy)
                         ? "border-primary bg-primary/5"
                         : "border-border hover:border-primary/50"
                     }`}
                   >
                     <div className="flex items-start space-x-3">
-                      <RadioGroupItem value={rec.strategy} id={rec.strategy} className="mt-1" />
+                      <Checkbox
+                        checked={selectedStrategies.includes(rec.strategy)}
+                        onCheckedChange={() => handleToggleStrategy(rec.strategy)}
+                        id={rec.strategy}
+                        className="mt-1"
+                      />
                       <Label htmlFor={rec.strategy} className="flex-1 cursor-pointer space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="font-semibold">{rec.name}</span>
@@ -291,29 +319,10 @@ export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProp
                   </div>
                 ))}
               </div>
-            </RadioGroup>
-
-            {selectedStrategy && (
-              <div className="mt-6 p-4 bg-success/10 border border-success/20 rounded-lg">
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-success-foreground mb-2">
-                      {recommendations.find((r) => r.strategy === selectedStrategy)?.name} selected
-                    </p>
-                    <p className="text-xs text-muted-foreground mb-3">
-                      Focus on mastering this strategy through paper trading before going live.
-                    </p>
-                    <Button onClick={handleConfirmStrategy} className="w-full">
-                      Confirm Strategy & Continue
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }

@@ -83,7 +83,12 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
 
   const [brokerSetup, setBrokerSetupState] = useState<BrokerSetup | null>(() => {
     const stored = localStorage.getItem("brokerSetup");
-    return stored ? JSON.parse(stored) : null;
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Ensure wizardStep exists for backwards compatibility
+      return { ...parsed, wizardStep: parsed.wizardStep || 1 };
+    }
+    return null;
   });
 
   const setSnapshot = (newSnapshot: FinancialSnapshot | null) => {

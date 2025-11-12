@@ -61,7 +61,7 @@ export default function UnifiedPanel() {
       {/* Tabs */}
       <div className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-8 mb-6">
+          <TabsList className="grid w-full grid-cols-7 mb-6">
             <TabsTrigger value="intake" className="flex items-center gap-2">
               <Download className="w-4 h-4" />
               Command Center
@@ -102,10 +102,12 @@ export default function UnifiedPanel() {
               <BarChart3 className="w-4 h-4" />
               Reports
             </TabsTrigger>
+            {/* Cash Flow tab - temporarily disabled
             <TabsTrigger value="cashflow" disabled className="flex items-center gap-2 opacity-50">
               <TrendingDown className="w-4 h-4" />
               Cash Flow
             </TabsTrigger>
+            */}
             <TabsTrigger value="advice" disabled className="flex items-center gap-2 opacity-50">
               <Lightbulb className="w-4 h-4" />
               Advice
@@ -138,11 +140,13 @@ export default function UnifiedPanel() {
             </div>
           </TabsContent>
 
+          {/* Cash Flow content - temporarily disabled
           <TabsContent value="cashflow" className="mt-0">
             <div className="text-center py-20 text-muted-foreground">
               Coming soon: Monthly inflow/outflow with projections
             </div>
           </TabsContent>
+          */}
 
           <TabsContent value="advice" className="mt-0">
             <div className="text-center py-20 text-muted-foreground">

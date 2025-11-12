@@ -38,6 +38,7 @@ export function Step1ChooseBroker({ selectedStrategy, onNext }: Step1Props) {
       chosenBroker: brokerId,
       accountType: null,
       targetOptionsLevel: requirements.optionsLevelMin,
+      wizardStep: 1,
       progress: {
         openAccount: false,
         funded: false,

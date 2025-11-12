@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useFinancialData } from "@/contexts/FinancialDataContext";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -31,7 +32,8 @@ export function BrokerSetupWizard({
   initialStep = 1,
   onComplete
 }: BrokerSetupWizardProps) {
-  const [currentStep, setCurrentStep] = useState(initialStep);
+  const { brokerSetup, setBrokerSetup } = useFinancialData();
+  const [currentStep, setCurrentStep] = useState(brokerSetup?.wizardStep || initialStep);
 
   const steps = [
     { number: 1, title: "Choose Broker", component: Step1ChooseBroker },
@@ -47,19 +49,30 @@ export function BrokerSetupWizard({
 
   const handleNext = () => {
     if (currentStep < steps.length) {
-      setCurrentStep(currentStep + 1);
+      const nextStep = currentStep + 1;
+      setCurrentStep(nextStep);
+      if (brokerSetup) {
+        setBrokerSetup({ ...brokerSetup, wizardStep: nextStep });
+      }
       console.log(`step_completed: ${currentStep}`);
     }
   };
 
   const handleBack = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+      const prevStep = currentStep - 1;
+      setCurrentStep(prevStep);
+      if (brokerSetup) {
+        setBrokerSetup({ ...brokerSetup, wizardStep: prevStep });
+      }
     }
   };
 
   const handleComplete = () => {
     console.log('broker_setup_completed');
+    if (brokerSetup) {
+      setBrokerSetup({ ...brokerSetup, wizardStep: 1 });
+    }
     onClose();
     onComplete?.();
   };
