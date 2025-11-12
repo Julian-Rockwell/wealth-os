@@ -7,7 +7,7 @@ import { useFinancialData } from "@/contexts/FinancialDataContext";
 import { ReadinessScore } from "@/components/investments/ReadinessScore";
 import { OptimizeAssets } from "@/components/investments/OptimizeAssets";
 import { StrategySelection } from "@/components/investments/StrategySelection";
-import { CapitalAllocation } from "@/components/investments/CapitalAllocation";
+// import { CapitalAllocation } from "@/components/investments/CapitalAllocation";
 import { PaperTradingProgress } from "@/components/investments/PaperTradingProgress";
 import { NextActionCard } from "@/components/investments/NextActionCard";
 import { BrokerStatusPanel } from "@/components/investments/BrokerStatusPanel";
@@ -55,14 +55,13 @@ export default function Investments() {
           <div>
             <h2 className="text-2xl font-bold mb-2">Investment Planning</h2>
             <p className="text-muted-foreground leading-relaxed">
-              <strong>What you'll find here:</strong> A comprehensive 6-step process to prepare for active trading. 
+              <strong>What you'll find here:</strong> A comprehensive 5-step process to prepare for active trading. 
               Start by assessing your financial foundation with the <strong>Readiness Score</strong>, then identify 
               opportunities to <strong>Optimize Assets</strong> (liquidate equity or pay off high-interest debt). 
               Next, select your <strong>Trading Strategy</strong> based on a personalized assessment, then complete 
               <strong>Broker Setup</strong> to choose and configure your trading account. 
-              Complete <strong>Paper Trading gates</strong> (40 trades, 95% adherence, 70% checklist) before unlocking 
-              <strong>Capital Allocation</strong> where you'll define your trading account cap, emergency fund, 
-              and feeding strategy for passive income.
+              Complete <strong>Paper Trading gates</strong> (40 trades, 95% adherence, 70% checklist) to complete 
+              the preparation process.
             </p>
           </div>
         </div>
@@ -70,13 +69,13 @@ export default function Investments() {
 
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="readiness">Readiness</TabsTrigger>
           <TabsTrigger value="optimize">Optimize</TabsTrigger>
           <TabsTrigger value="strategy">Strategy</TabsTrigger>
           <TabsTrigger value="broker-setup">Broker Setup</TabsTrigger>
           <TabsTrigger value="paper-trading">Paper Trading</TabsTrigger>
-          <TabsTrigger value="allocation">Allocation</TabsTrigger>
+          {/* <TabsTrigger value="allocation">Allocation</TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="readiness" className="mt-6">
@@ -121,9 +120,9 @@ export default function Investments() {
           )}
         </TabsContent>
 
-        <TabsContent value="allocation" className="mt-6">
+        {/* <TabsContent value="allocation" className="mt-6">
           <CapitalAllocation snapshot={snapshot} />
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
 
       {selectedStrategy && (
