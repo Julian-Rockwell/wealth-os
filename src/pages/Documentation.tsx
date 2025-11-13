@@ -1449,129 +1449,973 @@ yearsToGoal = n / 12`}
           </ul>
         </section>
 
-        {/* 7. Key Calculations */}
-        <section id="formulas" className="mb-12 page-break-before">
-          <h2 className="text-3xl font-bold mb-6">7. Key Calculations and Formulas</h2>
+        {/* 7. Six-Month Foundation Plan Generator */}
+        <section id="six-month-plan" className="mb-12 page-break-before">
+          <h2 className="text-3xl font-bold mb-6">7. Six-Month Foundation Plan Generator</h2>
           <p className="mb-4">
-            Consolidated summary of all formulas used in the system:
+            The Six-Month Plan Generator is a client-side algorithm that produces a personalized, actionable 6-month financial improvement plan. It requires no AI or backend services, using predefined templates and formulas to generate specific monthly tasks with dollar impacts.
           </p>
 
-          <h3 className="text-2xl font-semibold mb-4">Dashboard Calculations</h3>
+          <h3 className="text-2xl font-semibold mb-4">7.1 Overview</h3>
+          <p className="mb-4">
+            The plan generator bridges the gap between identifying financial issues (via Dashboard and Readiness Score) and taking concrete action. It provides month-by-month guidance with specific, measurable tasks tailored to the user's financial snapshot.
+          </p>
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+            <p className="font-semibold mb-2">Key Features:</p>
+            <ul className="list-disc pl-6 space-y-1 text-sm">
+              <li><strong>Fully Client-Side:</strong> No API calls or AI required, runs entirely in the browser</li>
+              <li><strong>Template-Based:</strong> Uses predefined task templates with estimated impacts</li>
+              <li><strong>Priority-Driven:</strong> Follows financial best practices (emergency fund → debt → capital building)</li>
+              <li><strong>Actionable:</strong> Each task includes specific actions and estimated dollar impacts</li>
+              <li><strong>Trackable:</strong> Monthly KPIs show progress toward readiness for active investing</li>
+            </ul>
+          </div>
+
+          <h3 className="text-2xl font-semibold mb-4">7.2 Plan Inputs</h3>
+          <p className="mb-4">
+            The generator collects inputs from existing financial data and contexts:
+          </p>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-6">
+            <code className="block whitespace-pre-wrap">
+{`interface SixMonthPlanInputs {
+  // Current state (from Dashboard)
+  currentMonthExpenses: number;          // Last month's total expenses
+  avgMonthlyIncome: number;              // Average monthly income
+  avgMonthlyExpenses: number;            // Average monthly expenses
+  cashFlowMonthly: number;               // Monthly surplus/deficit
+  liquidAssets: number;                  // Total liquid assets
+  
+  // Goals (calculated from expenses)
+  emergencyFundReq: number;              // Target emergency fund (6 months expenses)
+  
+  // Debts (from liabilities)
+  highAprDebts: Array<{                  // Debts with APR > 7%
+    id: string;
+    name: string;
+    type: string;
+    apr: number;
+    balance: number;
+    monthlyPayment: number;
+  }>;
+  allDebts: Array<{                      // All liabilities
+    id: string;
+    name: string;
+    apr: number;
+    balance: number;
+    monthlyPayment: number;
+  }>;
+  
+  // Readiness (from Readiness Score calculation)
+  readinessScore: number;                // 0-100 current readiness
+  
+  // RPIC (from Goals calculations)
+  rpicMonthly: number;                   // Monthly RPIC target
+  rpicAnnual: number;                    // Annual RPIC target
+  availableCapital: number;              // Capital available for investing
+}`}
+            </code>
+          </div>
+
+          <h3 className="text-2xl font-semibold mb-4">7.3 Plan Generation Algorithm</h3>
+          <p className="mb-4">
+            The algorithm follows a structured month-by-month approach with three financial priorities:
+          </p>
+
+          <h4 className="text-xl font-semibold mb-3">Month-by-Month Logic (Pseudocode)</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-6">
+            <code className="block whitespace-pre-wrap">
+{`function generateSixMonthPlan(inputs: SixMonthPlanInputs): SixMonthPlan {
+  // Initialize running balances
+  let runningCashFlow = inputs.cashFlowMonthly;
+  let runningEF = inputs.liquidAssets;
+  let runningHighAprDebt = sumHighAprDebt(inputs.highAprDebts);
+  
+  const months: MonthPlan[] = [];
+  
+  // Calculate gaps
+  const efGap = Math.max(0, inputs.emergencyFundReq - runningEF);
+  const monthlyEfContribution = efGap / 6; // Spread over 6 months
+  
+  // Identify primary debt (highest APR) for avalanche method
+  const primaryDebt = inputs.highAprDebts.sort((a, b) => b.apr - a.apr)[0];
+  
+  for (let month = 1; month <= 6; month++) {
+    const tasks: PlanTask[] = [];
+    
+    // Priority 1: Emergency Fund (if needed)
+    if (efGap > 0 && runningEF < inputs.emergencyFundReq) {
+      tasks.push({
+        type: "emergency_fund",
+        title: \`Contribute \${monthlyEfContribution} to Emergency Fund\`,
+        details: "Build emergency fund to 6 months of expenses before investing",
+        amount: monthlyEfContribution
+      });
+      runningEF += monthlyEfContribution;
+    }
+    
+    // Priority 2: Debt Paydown (starts when EF reaches 50%)
+    const efProgress = runningEF / inputs.emergencyFundReq;
+    if (efProgress >= 0.5 && primaryDebt && runningHighAprDebt > 0) {
+      const extraPayment = runningCashFlow * 0.3; // 30% of surplus to debt
+      const principalPaydown = extraPayment - (primaryDebt.balance * primaryDebt.apr / 12 / 100);
+      const interestSaved = calculateInterestSaved(principalPaydown, primaryDebt.apr);
+      
+      tasks.push({
+        type: "debt_paydown",
+        title: \`Extra \${extraPayment} payment on \${primaryDebt.name}\`,
+        details: "Avalanche method: Attack highest APR debt first",
+        estMonthlyImpact: extraPayment,
+        principalPaydown: principalPaydown,
+        estInterestSaved: interestSaved
+      });
+      
+      runningHighAprDebt -= principalPaydown;
+    }
+    
+    // Priority 3: Expense Reduction (template-based)
+    if (month === 1) {
+      tasks.push({
+        type: "expense_cut",
+        title: "Audit and cancel unused subscriptions",
+        details: "Review streaming, gym, software subscriptions",
+        estMonthlyImpact: randomRange(50, 150) // Template estimate
+      });
+      runningCashFlow += estimatedSavings;
+    }
+    
+    if (month === 2) {
+      tasks.push({
+        type: "expense_cut",
+        title: "Optimize utilities and insurance",
+        details: "Compare providers, negotiate rates",
+        estMonthlyImpact: randomRange(30, 80)
+      });
+      runningCashFlow += estimatedSavings;
+    }
+    
+    // Priority 4: Income Boost (template-based)
+    if (month === 3) {
+      tasks.push({
+        type: "income_boost",
+        title: "Start freelance/gig work side hustle",
+        details: "Use skills for extra income (Upwork, Fiverr, etc.)",
+        estMonthlyImpact: randomRange(200, 800)
+      });
+    }
+    
+    if (month === 4) {
+      tasks.push({
+        type: "income_boost",
+        title: "Request salary review or negotiate raise",
+        details: "Document accomplishments and market research",
+        estMonthlyImpact: randomRange(0, 500) // May or may not succeed
+      });
+    }
+    
+    // Calculate KPIs for this month
+    const kpis = {
+      cashFlowRunRate: runningCashFlow,
+      emergencyFundProgress: (runningEF / inputs.emergencyFundReq) * 100,
+      highAprBalance: runningHighAprDebt
+    };
+    
+    // Determine blocked actions (if readiness < 80)
+    const blockedActions = [];
+    if (inputs.readinessScore < 80 && month >= 4) {
+      blockedActions.push({
+        reason: "Foundation score below 80",
+        name: "Active trading account funding",
+        unblocksWhen: "Emergency fund complete and high-APR debt < $5k"
+      });
+    }
+    
+    months.push({
+      monthIndex: month,
+      theme: getMonthTheme(month), // e.g., "Foundation Building", "Debt Attack"
+      tasks,
+      kpis,
+      blockedActions
+    });
+  }
+  
+  // Calculate rollup summary
+  const totalMonthlySavings = sumTaskImpacts(months, "expense_cut");
+  const totalInterestSaved = sumTaskImpacts(months, "debt_paydown", "estInterestSaved");
+  const emergencyFundEnding = runningEF;
+  const readinessProjected = projectReadinessScore(inputs, runningEF, runningHighAprDebt);
+  const nextStep = readinessProjected >= 80 ? "paper_trading" : "continue_foundation";
+  
+  return {
+    planId: generateUUID(),
+    generatedAt: new Date().toISOString(),
+    inputs,
+    assumptions: {
+      inflation: 0.03,
+      minEmergencyMonths: 6,
+      incomeBoostRangeMonthly: [200, 800],
+      maxRiskCapitalShare: 0.20
+    },
+    months,
+    rollup: {
+      totalMonthlySavings,
+      totalOneTimeSavings: 0,
+      totalInterestSaved,
+      emergencyFundEnding,
+      readinessProjected,
+      nextStep
+    },
+    cta: {
+      addToActionPlan: true,
+      scheduleMonthlyReassessment: true
+    }
+  };
+}`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Key Formulas Used in Algorithm</h4>
+          <div className="mb-6">
+            <p className="font-semibold mb-2">1. Emergency Fund Contribution</p>
+            <div className="bg-muted p-3 rounded-lg mb-4">
+              <code className="text-sm">
+                monthlyEfContribution = (emergencyFundReq - liquidAssets) / 6
+              </code>
+            </div>
+
+            <p className="font-semibold mb-2">2. Debt Paydown (Avalanche Method)</p>
+            <div className="bg-muted p-3 rounded-lg mb-4">
+              <code className="text-sm">
+{`// Sort debts by APR descending
+primaryDebt = debts.sort((a, b) => b.apr - a.apr)[0];
+
+// Allocate 30% of monthly surplus to extra payment
+extraPayment = cashFlowMonthly * 0.30;
+
+// Calculate principal reduction (payment - interest accrued)
+monthlyInterest = (primaryDebt.balance * primaryDebt.apr / 12) / 100;
+principalPaydown = extraPayment - monthlyInterest;`}
+              </code>
+            </div>
+
+            <p className="font-semibold mb-2">3. Interest Saved Calculation</p>
+            <div className="bg-muted p-3 rounded-lg mb-4">
+              <code className="text-sm">
+{`// Simple approximation for 6-month interest savings
+interestSaved = (principalPaydown * primaryDebt.apr / 100) * (6 / 12);`}
+              </code>
+            </div>
+
+            <p className="font-semibold mb-2">4. Readiness Score Projection</p>
+            <div className="bg-muted p-3 rounded-lg mb-4">
+              <code className="text-sm">
+{`// Recalculate readiness factors with projected end-state
+projectedEF = endingEF / emergencyFundReq;  // New EF coverage
+projectedDebt = endingHighAprDebt;           // Reduced debt balance
+
+// Recalculate 5-factor score with new values
+newReadinessScore = recalculateReadiness({
+  efCoverage: projectedEF,
+  highAprDebt: projectedDebt,
+  // other factors remain same
+});`}
+              </code>
+            </div>
+          </div>
+
+          <h3 className="text-2xl font-semibold mb-4">7.4 UI Component (SixMonthPlanDialog)</h3>
+          <p className="mb-4">
+            The plan is displayed in a full-screen dialog modal with the following sections:
+          </p>
+
+          <h4 className="text-xl font-semibold mb-3">Dialog Structure</h4>
+          <ul className="list-disc pl-6 mb-6 space-y-2">
+            <li><strong>Header:</strong> Plan title, generation date, download JSON button</li>
+            <li><strong>Executive Summary:</strong> Rollup metrics (total savings, interest saved, projected readiness)</li>
+            <li><strong>Monthly Breakdown:</strong> 6 accordion sections (one per month) containing:
+              <ul className="list-disc pl-6 mt-2 space-y-1">
+                <li>Month theme (e.g., "Foundation Building", "Debt Avalanche")</li>
+                <li>Task list with titles, details, and estimated impacts</li>
+                <li>KPI cards showing cash flow, EF progress %, high-APR debt balance</li>
+                <li>Blocked actions (if any) with unlock conditions</li>
+              </ul>
+            </li>
+            <li><strong>Next Steps:</strong> Recommended action based on projected readiness:
+              <ul className="list-disc pl-6 mt-2 space-y-1">
+                <li>If projected readiness ≥ 80: "Begin Paper Trading" CTA</li>
+                <li>If projected readiness &lt; 80: "Continue Foundation Building" with specific recommendations</li>
+              </ul>
+            </li>
+          </ul>
+
+          <h4 className="text-xl font-semibold mb-3">Plan Persistence</h4>
+          <p className="mb-4">
+            Generated plans are stored in <code>FinancialDataContext.sixMonthPlan</code> and persisted to localStorage. Users can:
+          </p>
+          <ul className="list-disc pl-6 mb-6 space-y-1">
+            <li>Download plan as JSON file for external tracking</li>
+            <li>Regenerate plan after updating financial data</li>
+            <li>View historical plans (if multiple generations are tracked)</li>
+          </ul>
+
+          <h3 className="text-2xl font-semibold mb-4">7.5 Trigger Button Logic (Smart Navigation)</h3>
+          <p className="mb-4">
+            The "Build 6-Month Plan" button in the Goals → RPIC Result Card uses intelligent logic based on foundation score:
+          </p>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-6">
+            <code className="block whitespace-pre-wrap">
+{`function getTriggerButtonBehavior(foundationScore: number | null) {
+  if (!foundationScore) {
+    return {
+      text: "Complete Snapshot",
+      action: () => navigateToDashboard(),
+      variant: "outline"
+    };
+  }
+  
+  if (foundationScore >= 80) {
+    return {
+      text: "Go to Investments",
+      action: () => navigateToInvestments(),
+      variant: "default"
+    };
+  }
+  
+  if (foundationScore >= 60 && foundationScore < 80) {
+    return {
+      text: "Build 6-Month Plan",
+      action: () => openSixMonthPlanDialog(),
+      variant: "default"
+    };
+  }
+  
+  // foundationScore < 60
+  return {
+    text: "Build 6-Month Plan",
+    action: () => openSixMonthPlanDialog(),
+    variant: "destructive" // Red to emphasize urgent need
+  };
+}`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Navigation Behavior Summary</h4>
+          <div className="space-y-3 mb-6">
+            <div className="border-l-4 border-green-500 pl-4 py-2 bg-green-50">
+              <p className="font-semibold mb-1">Foundation Score ≥ 80 (Ready)</p>
+              <p className="text-sm">Button: "Go to Investments" → Navigate to Investments tab (Strategy Selection)</p>
+            </div>
+
+            <div className="border-l-4 border-amber-500 pl-4 py-2 bg-amber-50">
+              <p className="font-semibold mb-1">Foundation Score 60-79 (Good Progress)</p>
+              <p className="text-sm">Button: "Build 6-Month Plan" → Open SixMonthPlanDialog to complete final improvements</p>
+            </div>
+
+            <div className="border-l-4 border-red-500 pl-4 py-2 bg-red-50">
+              <p className="font-semibold mb-1">Foundation Score &lt; 60 (Needs Work)</p>
+              <p className="text-sm">Button: "Build 6-Month Plan" (red/destructive) → Open SixMonthPlanDialog with urgent improvements</p>
+            </div>
+
+            <div className="border-l-4 border-gray-500 pl-4 py-2 bg-gray-50">
+              <p className="font-semibold mb-1">No Foundation Score (No Snapshot)</p>
+              <p className="text-sm">Button: "Complete Snapshot" → Navigate to Dashboard to upload financial data</p>
+            </div>
+          </div>
+
+          <h3 className="text-2xl font-semibold mb-4">7.6 Limitations & Future Enhancements</h3>
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+            <p className="font-semibold mb-2">Current Limitations:</p>
+            <ul className="list-disc pl-6 space-y-1 text-sm">
+              <li><strong>Template-Based:</strong> Task recommendations use predefined templates, not AI-powered personalization</li>
+              <li><strong>Estimated Impacts:</strong> Savings estimates are ranges (e.g., $50-$150), not precise calculations</li>
+              <li><strong>No Progress Tracking:</strong> Users must manually track completion of tasks (no built-in checkoff system)</li>
+              <li><strong>Single Iteration:</strong> Plan generates once; doesn't adapt if user deviates mid-execution</li>
+            </ul>
+          </div>
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+            <p className="font-semibold mb-2">Future Enhancements (Production):</p>
+            <ul className="list-disc pl-6 space-y-1 text-sm">
+              <li><strong>AI-Powered Personalization:</strong> Use Lovable AI to generate custom task recommendations based on transaction patterns</li>
+              <li><strong>Progress Tracking:</strong> Add checkboxes and completion tracking with monthly reassessment</li>
+              <li><strong>Adaptive Plans:</strong> Regenerate plan automatically when financial data updates</li>
+              <li><strong>Real Impact Calculations:</strong> Use actual transaction data to project precise savings (e.g., analyze subscription costs)</li>
+              <li><strong>Goal Integration:</strong> Link plan tasks to specific RPIC milestones for motivation</li>
+            </ul>
+          </div>
+        </section>
+
+        {/* 8. Key Calculations */}
+        <section id="formulas" className="mb-12 page-break-before">
+          <h2 className="text-3xl font-bold mb-6">8. Key Calculations and Formulas</h2>
+          <p className="mb-4">
+            This section provides complete, production-ready TypeScript code for all major calculations in the system. Each formula includes detailed comments, edge case handling, and numerical examples.
+          </p>
+
+          <h3 className="text-2xl font-semibold mb-4">8.1 Transaction Classification (Complete)</h3>
+          <p className="mb-4">
+            The foundation of budget analysis: filtering operational income/expenses and categorizing into needs/wants/savings.
+          </p>
+
+          <h4 className="text-xl font-semibold mb-3">classifyTransactions() - Main Function</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-6">
+            <code className="block whitespace-pre-wrap">
+{`export function classifyTransactions(txns: StagingTransaction[]) {
+  // Step 1: Filter valid operational income (exclude transfers, refunds, etc.)
+  const validIncome = txns.filter(txn => 
+    txn.sign === "credit" && isValidIncome(txn)
+  );
+  
+  // Step 2: Filter operational expenses (debits only, exclude transfers)
+  const operationalExpenses = txns.filter(txn => 
+    txn.sign === "debit" && !isTransferOrRefund(txn)
+  );
+  
+  // Step 3: Classify expenses into needs/wants/savings
+  const classified = operationalExpenses.map(txn => ({
+    ...txn,
+    category: mapSubcategoryToCategory(txn.subcategory),
+  }));
+  
+  // Calculate totals
+  const totalIncome = validIncome.reduce((sum, t) => sum + t.amount, 0);
+  const totalExpenses = classified.reduce((sum, t) => sum + t.amount, 0);
+  
+  return { 
+    validIncome, 
+    classified,
+    totalIncome,
+    totalExpenses,
+    unspentIncome: totalIncome - totalExpenses
+  };
+}`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">isValidIncome() - Income Filter</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-6">
+            <code className="block whitespace-pre-wrap">
+{`function isValidIncome(txn: StagingTransaction): boolean {
+  const desc = txn.desc.toLowerCase();
+  const amount = txn.amount;
+  
+  // Exclude transfers between accounts
+  const transferKeywords = ["transfer", "xfer", "payment from", "move money"];
+  if (transferKeywords.some(kw => desc.includes(kw))) return false;
+  
+  // Exclude credit card payments and refunds
+  const nonIncomeKeywords = [
+    "credit card", "cc payment", "refund", "return", 
+    "reimbursement", "cashback"
+  ];
+  if (nonIncomeKeywords.some(kw => desc.includes(kw))) return false;
+  
+  // Exclude small amounts (likely fees or adjustments)
+  if (amount < 100) return false;
+  
+  // Include explicit income keywords
+  const incomeKeywords = [
+    "payroll", "salary", "direct deposit", "dd", "wages",
+    "dividend", "interest", "distribution", "bonus",
+    "freelance", "gig", "1099", "consulting", "commission"
+  ];
+  if (incomeKeywords.some(kw => desc.includes(kw))) return true;
+  
+  // Include large credits (likely income even without keywords)
+  if (amount > 1000) return true;
+  
+  // Default: exclude if no positive match
+  return false;
+}
+
+// Example usages:
+// isValidIncome({ desc: "Payroll Direct Deposit", amount: 5000, sign: "credit" })  → true
+// isValidIncome({ desc: "Transfer from Savings", amount: 500, sign: "credit" })     → false
+// isValidIncome({ desc: "Refund Amazon", amount: 50, sign: "credit" })               → false
+// isValidIncome({ desc: "Large Deposit", amount: 3000, sign: "credit" })             → true (>$1000)`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">mapSubcategoryToCategory() - Expense Categorization</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-6">
+            <code className="block whitespace-pre-wrap">
+{`function mapSubcategoryToCategory(
+  subcategory: string
+): "need" | "want" | "saving" {
+  // Needs: Essential expenses (50% target)
+  const needsSubcategories = [
+    // Housing & Utilities
+    "housing", "rent", "mortgage", "utilities", "internet", "phone",
+    // Food
+    "groceries", "food_delivery",
+    // Transportation
+    "gas", "public_transit", "car_maintenance", "parking", "tolls", "car_payment",
+    // Insurance & Healthcare
+    "insurance", "healthcare", "pharmacy", "medical", "dental", "vision",
+    // Education & Childcare
+    "childcare", "education", "tuition", "student_loan",
+    // Minimum Debt
+    "minimum_debt_payment"
+  ];
+  
+  // Savings: Wealth-building activities (20% target)
+  const savingsSubcategories = [
+    "investment", "brokerage", "retirement_contribution", "401k", "ira",
+    "savings_transfer", "extra_debt_payment", "emergency_fund"
+  ];
+  
+  if (needsSubcategories.includes(subcategory.toLowerCase())) return "need";
+  if (savingsSubcategories.includes(subcategory.toLowerCase())) return "saving";
+  
+  // Default: Everything else is a want (30% target)
+  return "want";
+}
+
+// Example usages:
+// mapSubcategoryToCategory("groceries")        → "need"
+// mapSubcategoryToCategory("restaurants")      → "want"
+// mapSubcategoryToCategory("401k")             → "saving"
+// mapSubcategoryToCategory("streaming")        → "want" (default)`}
+            </code>
+          </div>
+
+          <h3 className="text-2xl font-semibold mb-4 mt-8">8.2 Readiness Score Factors (Detailed)</h3>
+          <p className="mb-4">
+            Complete implementation of all 5 readiness factors with numerical examples.
+          </p>
+
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-6">
+            <code className="block whitespace-pre-wrap">
+{`export function calculateReadinessScore(
+  snapshot: FinancialSnapshot,
+  emergencyFundMonths: number = 6
+): { score: number; factors: ReadinessFactor[] } {
+  
+  // Extract needed values from snapshot
+  const liquidAssets = calculateLiquidAssets(snapshot.holdings);
+  const monthlyExpenses = calculateMonthlyExpenses(snapshot);
+  const monthlyIncome = calculateMonthlyIncome(snapshot);
+  const liabilities = snapshot.liabilities;
+  const netWorth = snapshot.netWorth.net;
+  
+  // Calculate 5 factors (each worth 20 points)
+  const factor1 = calculateEmergencyFundScore(
+    liquidAssets, monthlyExpenses, emergencyFundMonths
+  );
+  const factor2 = calculateHighInterestDebtScore(liabilities, netWorth);
+  const factor3 = calculateIncomeStabilityScore(snapshot);
+  const factor4 = calculateCashFlowScore(monthlyIncome, monthlyExpenses);
+  const factor5 = calculateCapitalAvailabilityScore(
+    liquidAssets, monthlyExpenses * emergencyFundMonths
+  );
+  
+  // Total score (0-100)
+  const totalScore = factor1.score + factor2.score + factor3.score + 
+                     factor4.score + factor5.score;
+  
+  return {
+    score: Math.round(totalScore),
+    factors: [factor1, factor2, factor3, factor4, factor5]
+  };
+}
+
+// ============ Factor 1: Emergency Fund Coverage (20%) ============
+function calculateEmergencyFundScore(
+  liquidAssets: number,
+  monthlyExpenses: number,
+  targetMonths: number
+): ReadinessFactor {
+  const requiredEF = monthlyExpenses * targetMonths;
+  const efMonths = liquidAssets / monthlyExpenses;
+  const rawScore = Math.min((efMonths / targetMonths) * 100, 100);
+  const weightedScore = rawScore * 0.20; // 20% of total
+  
+  return {
+    name: "Emergency Fund Coverage",
+    score: weightedScore,
+    maxScore: 20,
+    status: weightedScore >= 16 ? "pass" : weightedScore >= 12 ? "warning" : "fail",
+    details: \`\${efMonths.toFixed(1)} months of expenses saved (target: \${targetMonths})\`
+  };
+}
+// Example: $30k liquid, $5k/month, 6-month target
+// efMonths = 6, rawScore = 100, weightedScore = 20 → PASS
+
+// ============ Factor 2: High-Interest Debt (20%) ============
+function calculateHighInterestDebtScore(
+  liabilities: Liability[],
+  netWorth: number
+): ReadinessFactor {
+  const highAprDebt = liabilities
+    .filter(l => l.apr > 7)
+    .reduce((sum, l) => sum + l.balance, 0);
+  
+  if (highAprDebt === 0) {
+    return {
+      name: "High-Interest Debt",
+      score: 20,
+      maxScore: 20,
+      status: "pass",
+      details: "No high-interest debt (APR > 7%)"
+    };
+  }
+  
+  const debtRatio = highAprDebt / netWorth;
+  const rawScore = Math.max(0, 100 - (debtRatio * 100));
+  const weightedScore = rawScore * 0.20;
+  
+  return {
+    name: "High-Interest Debt",
+    score: weightedScore,
+    maxScore: 20,
+    status: weightedScore >= 16 ? "pass" : weightedScore >= 12 ? "warning" : "fail",
+    details: \`$\${highAprDebt.toLocaleString()} high-APR debt (\${(debtRatio * 100).toFixed(1)}% of net worth)\`
+  };
+}
+// Example: $15k debt, $150k net worth
+// debtRatio = 0.10, rawScore = 90, weightedScore = 18 → PASS
+
+// ============ Factor 3: Income Stability (20%) ============
+function calculateIncomeStabilityScore(
+  snapshot: FinancialSnapshot
+): ReadinessFactor {
+  // Extract monthly incomes from last 6-12 months of transactions
+  const monthlyIncomes = extractMonthlyIncomes(snapshot.stagingTxns);
+  
+  if (monthlyIncomes.length < 3) {
+    return {
+      name: "Income Stability",
+      score: 0,
+      maxScore: 20,
+      status: "fail",
+      details: "Insufficient data (need 3+ months)"
+    };
+  }
+  
+  // Calculate coefficient of variation (CV = stdDev / mean)
+  const mean = monthlyIncomes.reduce((a, b) => a + b) / monthlyIncomes.length;
+  const variance = monthlyIncomes
+    .map(income => Math.pow(income - mean, 2))
+    .reduce((a, b) => a + b) / monthlyIncomes.length;
+  const stdDev = Math.sqrt(variance);
+  const cv = stdDev / mean;
+  
+  // Lower CV = higher stability
+  // CV < 0.10 (10% variation) = 100 points
+  // CV > 0.50 (50% variation) = 0 points
+  const rawScore = Math.max(0, 100 - (cv * 200));
+  const weightedScore = rawScore * 0.20;
+  
+  return {
+    name: "Income Stability",
+    score: weightedScore,
+    maxScore: 20,
+    status: weightedScore >= 16 ? "pass" : weightedScore >= 12 ? "warning" : "fail",
+    details: \`CV: \${(cv * 100).toFixed(1)}% (lower is better)\`
+  };
+}
+// Example: Incomes [5000, 5100, 4900, 5050, 4950]
+// mean = 5000, cv = 0.015, rawScore = 97, weightedScore = 19.4 → PASS
+
+// ============ Factor 4: Monthly Cash Flow (20%) ============
+function calculateCashFlowScore(
+  monthlyIncome: number,
+  monthlyExpenses: number
+): ReadinessFactor {
+  const monthlyCashFlow = monthlyIncome - monthlyExpenses;
+  const cashFlowRatio = monthlyCashFlow / monthlyExpenses;
+  
+  // 50%+ surplus = 100 points, 0% = 0 points
+  const rawScore = Math.max(0, Math.min((cashFlowRatio / 0.50) * 100, 100));
+  const weightedScore = rawScore * 0.20;
+  
+  return {
+    name: "Monthly Cash Flow",
+    score: weightedScore,
+    maxScore: 20,
+    status: weightedScore >= 16 ? "pass" : weightedScore >= 12 ? "warning" : "fail",
+    details: \`$\${monthlyCashFlow.toLocaleString()} surplus (\${(cashFlowRatio * 100).toFixed(0)}% of expenses)\`
+  };
+}
+// Example: $6000 income, $4500 expenses
+// cashFlow = 1500, ratio = 0.333, rawScore = 66.6, weightedScore = 13.3 → WARNING
+
+// ============ Factor 5: Capital Availability (20%) ============
+function calculateCapitalAvailabilityScore(
+  liquidAssets: number,
+  emergencyFund: number
+): ReadinessFactor {
+  const availableCapital = Math.max(0, liquidAssets - emergencyFund);
+  
+  // $10k+ available = 100 points
+  const rawScore = Math.min((availableCapital / 10000) * 100, 100);
+  const weightedScore = rawScore * 0.20;
+  
+  return {
+    name: "Capital Availability",
+    score: weightedScore,
+    maxScore: 20,
+    status: weightedScore >= 16 ? "pass" : weightedScore >= 12 ? "warning" : "fail",
+    details: \`$\${availableCapital.toLocaleString()} available after emergency fund\`
+  };
+}
+// Example: $35k liquid, $25k EF
+// available = 10k, rawScore = 100, weightedScore = 20 → PASS`}
+            </code>
+          </div>
+
+          <h3 className="text-2xl font-semibold mb-4 mt-8">8.3 RPIC Calculations (Complete)</h3>
+          <p className="mb-4">
+            Full implementation of retirement passive income capital calculations with timeline projections.
+          </p>
+
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-6">
+            <code className="block whitespace-pre-wrap">
+{`// ============ RPIC Calculation ============
+export function calculateRpic(inputs: RpicInputs) {
+  // Step 1: Adjust for lifestyle and geography
+  const adjustedMonthly = 
+    inputs.targetMonthly * 
+    inputs.lifestyleMultiplier * 
+    inputs.geographyMultiplier;
+  
+  const annualRpic = adjustedMonthly * 12;
+  
+  // Step 2: Calculate required capital (two scenarios)
+  const hybridReturn = 0.12;      // 12% expected return (active + passive mix)
+  const traditionalReturn = 0.04; // 4% traditional rule
+  
+  const hybridCapital = annualRpic / hybridReturn;
+  const traditionalCapital = annualRpic / traditionalReturn;
+  const capitalSavings = traditionalCapital - hybridCapital;
+  
+  return {
+    adjustedMonthly,
+    annualRpic,
+    hybridCapital,
+    traditionalCapital,
+    capitalSavings,
+    efficiencyPercent: (capitalSavings / traditionalCapital) * 100 // Usually ~67%
+  };
+}
+
+// Example: Target $5k/month, same lifestyle (1.0x), same location (1.0x)
+// adjustedMonthly = 5000, annualRpic = 60000
+// hybridCapital = 60000 / 0.12 = $500k
+// traditionalCapital = 60000 / 0.04 = $1.5M
+// capitalSavings = $1M (67% more efficient)
+
+// ============ Timeline Calculation ============
+export function calculateTimeline(
+  targetCapital: number,
+  startingCapital: number,
+  monthlyContribution: number,
+  annualReturn: number
+): { years: number; feasible: boolean } {
+  
+  const monthlyReturn = annualReturn / 12;
+  
+  // Edge case: Already at goal
+  if (startingCapital >= targetCapital) {
+    return { years: 0, feasible: true };
+  }
+  
+  // Edge case: No contributions and not at goal
+  if (monthlyContribution <= 0 && startingCapital < targetCapital) {
+    return { years: Infinity, feasible: false };
+  }
+  
+  // Future Value formula solved for n (number of months)
+  // FV = PV * (1 + r)^n + PMT * [((1 + r)^n - 1) / r]
+  // This requires iterative solution or logarithmic approximation
+  
+  let months = 0;
+  let balance = startingCapital;
+  const maxMonths = 600; // 50 years cap
+  
+  while (balance < targetCapital && months < maxMonths) {
+    balance = balance * (1 + monthlyReturn) + monthlyContribution;
+    months++;
+  }
+  
+  if (months >= maxMonths) {
+    return { years: Infinity, feasible: false };
+  }
+  
+  return { 
+    years: Math.round(months / 12 * 10) / 10, // Round to 1 decimal
+    feasible: true 
+  };
+}
+
+// Example: Target $500k, starting $50k, contribute $2k/month, 8% return
+// Iterative calculation → approximately 11.2 years
+
+// ============ Required Monthly Contribution (Reverse Calc) ============
+export function calculateRequiredMonthlyContribution(
+  targetCapital: number,
+  startingCapital: number,
+  targetYears: number,
+  annualReturn: number
+): number {
+  
+  const monthlyReturn = annualReturn / 12;
+  const months = targetYears * 12;
+  
+  // Rearrange FV formula to solve for PMT:
+  // PMT = (FV - PV * (1 + r)^n) / [((1 + r)^n - 1) / r]
+  
+  const futureValueOfPV = startingCapital * Math.pow(1 + monthlyReturn, months);
+  const futureValueNeeded = targetCapital - futureValueOfPV;
+  const annuityFactor = (Math.pow(1 + monthlyReturn, months) - 1) / monthlyReturn;
+  
+  const requiredPMT = futureValueNeeded / annuityFactor;
+  
+  return Math.max(0, requiredPMT); // Can't be negative
+}
+
+// Example: Need $500k in 15 years, starting $50k, 8% return
+// Required monthly contribution ≈ $1,247`}
+            </code>
+          </div>
+
+          <h3 className="text-2xl font-semibold mb-4 mt-8">8.4 Six-Month Plan Formulas (Summary)</h3>
+          <p className="mb-4">
+            Key calculations used in the Six-Month Plan Generator (see Section 7.3 for full algorithm).
+          </p>
+
           <div className="space-y-4 mb-6">
             <div>
-              <p className="font-semibold mb-2">Net Worth</p>
+              <p className="font-semibold mb-2">Emergency Fund Monthly Contribution</p>
               <div className="bg-muted p-3 rounded-lg">
-                <code className="text-sm">Net Worth = Total Assets - Total Liabilities</code>
+                <code className="text-sm">
+                  monthlyEfContribution = (emergencyFundReq - liquidAssets) / 6
+                </code>
               </div>
             </div>
+
             <div>
-              <p className="font-semibold mb-2">Liquid Assets</p>
+              <p className="font-semibold mb-2">Debt Avalanche (Highest APR First)</p>
               <div className="bg-muted p-3 rounded-lg">
-                <code className="text-sm">Liquid Assets = Cash + Investments (liquid securities)</code>
+                <code className="text-sm">
+{`primaryDebt = debts.sort((a, b) => b.apr - a.apr)[0];
+extraPayment = cashFlowMonthly * 0.30;
+monthlyInterest = (primaryDebt.balance * primaryDebt.apr / 12) / 100;
+principalPaydown = extraPayment - monthlyInterest;`}
+                </code>
               </div>
             </div>
+
             <div>
-              <p className="font-semibold mb-2">Emergency Fund</p>
+              <p className="font-semibold mb-2">Interest Saved (Simple Approximation)</p>
               <div className="bg-muted p-3 rounded-lg">
-                <code className="text-sm">Emergency Fund = Liquid Assets × 0.30</code>
+                <code className="text-sm">
+                  interestSaved = (principalPaydown * primaryDebt.apr / 100) * (6 / 12)
+                </code>
               </div>
             </div>
+
             <div>
-              <p className="font-semibold mb-2">Available to Invest</p>
+              <p className="font-semibold mb-2">Expense Reduction (Template Estimates)</p>
               <div className="bg-muted p-3 rounded-lg">
-                <code className="text-sm">Available Capital = Liquid Assets - Emergency Fund</code>
+                <code className="text-sm">
+{`Month 1 - Subscriptions: $50-$150/month
+Month 2 - Utilities: $30-$80/month
+Month 3 - Groceries: $100-$200/month`}
+                </code>
+              </div>
+            </div>
+
+            <div>
+              <p className="font-semibold mb-2">Income Boost (Template Estimates)</p>
+              <div className="bg-muted p-3 rounded-lg">
+                <code className="text-sm">
+{`Month 3 - Freelance/Gig: $200-$800/month
+Month 4 - Salary Negotiation: $0-$500/month (variable)`}
+                </code>
               </div>
             </div>
           </div>
 
-          <h3 className="text-2xl font-semibold mb-4">Budget Analysis</h3>
-          <div className="space-y-4 mb-6">
-            <div>
-              <p className="font-semibold mb-2">Average Monthly Income (Corrected)</p>
-              <div className="bg-muted p-3 rounded-lg">
-                <code className="text-sm">Avg Monthly Income = Total Valid Income / Period Months</code>
-              </div>
-            </div>
-            <div>
-              <p className="font-semibold mb-2">50/30/20 Percentages</p>
-              <div className="bg-muted p-3 rounded-lg">
-                <code className="text-sm">
-                  {`Needs % = (Total Needs / Total Income) × 100
-Wants % = (Total Wants / Total Income) × 100
-Savings % = (Total Savings / Total Income) × 100`}
-                </code>
-              </div>
-            </div>
-          </div>
+          <h3 className="text-2xl font-semibold mb-4 mt-8">8.5 Capital Allocation Waterfall</h3>
+          <p className="mb-4">
+            Priority-based capital flow from liquid assets to investment accounts.
+          </p>
 
-          <h3 className="text-2xl font-semibold mb-4">Investment Readiness</h3>
-          <div className="space-y-4 mb-6">
-            <div>
-              <p className="font-semibold mb-2">Readiness Score (5 Factors × 20 pts)</p>
-              <div className="bg-muted p-3 rounded-lg">
-                <code className="text-sm">
-                  {`Emergency Fund Score = (currentFund / targetFund) × 20
-DTI Score = max(0, 20 - (DTI - 20) / 2)
-Income Stability Score = based on variance (max 20)
-Expense Discipline Score = 50/30/20 adherence (max 20)
-Capital Available Score = min(20, availableCapital / 5000)
-Total Score = sum of all factors (max 100)`}
-                </code>
-              </div>
-            </div>
-          </div>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-6">
+            <code className="block whitespace-pre-wrap">
+{`export function calculateCapitalAllocation(
+  liquidAssets: number,
+  monthlyExpenses: number,
+  emergencyFundMonths: number,
+  highInterestDebt: number,
+  rpicTargetPassiveCapital: number = 0
+): CapitalAllocation {
+  
+  // Priority 1: Emergency Fund
+  const emergencyFund = monthlyExpenses * emergencyFundMonths;
+  const afterEF = Math.max(0, liquidAssets - emergencyFund);
+  
+  // Priority 2: High-Interest Debt Buffer (50% of debt)
+  const debtBuffer = highInterestDebt * 0.5;
+  const afterDebt = Math.max(0, afterEF - debtBuffer);
+  
+  // Priority 3: Dynamic Trading Account Cap
+  const defaultCap = 100000; // $100k default
+  const dynamicCap = rpicTargetPassiveCapital > 0 
+    ? rpicTargetPassiveCapital * 0.40  // 40% of RPIC target
+    : defaultCap;
+  
+  const maxTradingAccountCap = Math.max(dynamicCap, 25000); // Min $25k for PDT
+  
+  // Priority 4: Active Trading Account (capped)
+  const tradingAccount = Math.min(afterDebt, maxTradingAccountCap);
+  const afterTrading = Math.max(0, afterDebt - tradingAccount);
+  
+  // Priority 5: Passive Income Reserve (overflow when cap reached)
+  const passiveReserve = afterTrading;
+  const feedingToPassive = tradingAccount >= maxTradingAccountCap && passiveReserve > 0;
+  
+  return {
+    liquidAssets,
+    emergencyFund,
+    debtBuffer,
+    tradingAccount,
+    maxTradingAccountCap,
+    passiveReserve,
+    feedingToPassive,
+    waterfall: [
+      { stage: "Liquid Assets", amount: liquidAssets },
+      { stage: "Emergency Fund", amount: emergencyFund },
+      { stage: "Debt Buffer", amount: debtBuffer },
+      { stage: "Trading Account", amount: tradingAccount },
+      { stage: "Passive Reserve", amount: passiveReserve }
+    ]
+  };
+}
 
-          <h3 className="text-2xl font-semibold mb-4">RPIC Calculations</h3>
-          <div className="space-y-4 mb-6">
-            <div>
-              <p className="font-semibold mb-2">Adjusted Monthly Passive Income</p>
-              <div className="bg-muted p-3 rounded-lg">
-                <code className="text-sm">
-                  Adjusted = Target × Lifestyle Multiplier × Geography Multiplier
-                </code>
-              </div>
-            </div>
-            <div>
-              <p className="font-semibold mb-2">Annual RPIC</p>
-              <div className="bg-muted p-3 rounded-lg">
-                <code className="text-sm">Annual RPIC = Adjusted Monthly × 12</code>
-              </div>
-            </div>
-            <div>
-              <p className="font-semibold mb-2">Required Capital</p>
-              <div className="bg-muted p-3 rounded-lg">
-                <code className="text-sm">
-                  {`Hybrid: Capital = Annual RPIC / 0.12
-Traditional: Capital = Annual RPIC / 0.04`}
-                </code>
-              </div>
-            </div>
-            <div>
-              <p className="font-semibold mb-2">Years to Goal (Future Value Formula)</p>
-              <div className="bg-muted p-3 rounded-lg">
-                <code className="text-sm">
-                  {`FV = PV × (1 + r)^n + PMT × [((1 + r)^n - 1) / r]
-Solve for n, then: Years = n / 12`}
-                </code>
-              </div>
-            </div>
-          </div>
+// Example 1: $100k liquid, $5k/month expenses, 6-month EF, $20k high-APR debt, $500k RPIC target
+// emergencyFund = 30k
+// debtBuffer = 10k
+// afterDebt = 60k
+// dynamicCap = 500k * 0.40 = 200k
+// tradingAccount = min(60k, 200k) = 60k
+// passiveReserve = 0
+// feedingToPassive = false (not at cap yet)
 
-          <h3 className="text-2xl font-semibold mb-4">Capital Allocation Waterfall</h3>
-          <div className="bg-muted p-4 rounded-lg mb-6">
-            <code className="text-sm">
-              {`1. availableCapital = liquidAssets - emergencyFund
-2. highInterestDebtBuffer = highInterestDebt × 0.5
-3. capitalAfterDebtBuffer = availableCapital - highInterestDebtBuffer
-4. allocableCapital = max(0, capitalAfterDebtBuffer)
-5. recommendedStart = min(allocableCapital × 0.2, 5000)`}
+// Example 2: $300k liquid, same expenses/debt, $500k RPIC target
+// emergencyFund = 30k
+// debtBuffer = 10k
+// afterDebt = 260k
+// dynamicCap = 200k
+// tradingAccount = 200k (capped)
+// passiveReserve = 60k (overflow)
+// feedingToPassive = true (feeding mode activated)`}
             </code>
           </div>
         </section>
 
-        {/* 8. User Flow */}
+        {/* 9. User Flow */}
         <section id="user-flow" className="mb-12 page-break-before">
-          <h2 className="text-3xl font-bold mb-6">8. Typical User Flow</h2>
+          <h2 className="text-3xl font-bold mb-6">9. Typical User Flow</h2>
 
           <h3 className="text-2xl font-semibold mb-4">First Time (Onboarding)</h3>
           <ol className="list-decimal pl-6 mb-6 space-y-3">
@@ -1631,9 +2475,9 @@ Solve for n, then: Years = n / 12`}
           </ul>
         </section>
 
-        {/* 9. Glossary */}
+        {/* 10. Glossary */}
         <section id="glossary" className="mb-12">
-          <h2 className="text-3xl font-bold mb-6">9. Glossary of Terms</h2>
+          <h2 className="text-3xl font-bold mb-6">10. Glossary of Terms</h2>
 
           <dl className="space-y-4">
             <div>
