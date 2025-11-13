@@ -43,17 +43,36 @@ const Documentation = () => {
             <a href="#overview" className="block text-primary hover:underline">1. System Overview</a>
             <a href="#architecture" className="block text-primary hover:underline ml-4">1.1 Architecture and Data Flow</a>
             <a href="#tech-stack" className="block text-primary hover:underline ml-4">1.2 Technology Stack</a>
+            <a href="#data-sources" className="block text-primary hover:underline ml-4">1.3 Data Sources & Calculation Logic</a>
             <a href="#command-center" className="block text-primary hover:underline">2. Command Center - Data Ingestion</a>
             <a href="#dashboard" className="block text-primary hover:underline">3. Dashboard - Net Worth Overview</a>
             <a href="#budget" className="block text-primary hover:underline">4. Budget Analyzer - 50/30/20 Analysis</a>
             <a href="#classification" className="block text-primary hover:underline ml-4">4.1 Transaction Classification System</a>
             <a href="#calculation" className="block text-primary hover:underline ml-4">4.2 50/30/20 Calculation Flow</a>
             <a href="#visualizations" className="block text-primary hover:underline ml-4">4.3 Visualizations and Components</a>
+            <a href="#data-labeling" className="block text-primary hover:underline ml-4">4.4 Data Labeling System</a>
             <a href="#investments" className="block text-primary hover:underline">5. Investment Planning - Active Investment Readiness</a>
+            <a href="#investments" className="block text-primary hover:underline ml-4">5.1 Strategy Assessment (Updated)</a>
+            <a href="#investments" className="block text-primary hover:underline ml-4">5.2 Broker Setup Wizard (NEW)</a>
+            <a href="#investments" className="block text-primary hover:underline ml-4">5.3 Readiness Score (Enhanced)</a>
+            <a href="#investments" className="block text-primary hover:underline ml-4">5.4 Paper Trading</a>
+            <a href="#investments" className="block text-primary hover:underline ml-4">5.5 Accessibility & Warnings (NEW)</a>
             <a href="#goals" className="block text-primary hover:underline">6. Goals - RPIC Calculator</a>
-            <a href="#formulas" className="block text-primary hover:underline">7. Key Calculations and Formulas</a>
-            <a href="#user-flow" className="block text-primary hover:underline">8. Typical User Flow</a>
-            <a href="#glossary" className="block text-primary hover:underline">9. Glossary of Terms</a>
+            <a href="#six-month-plan" className="block text-primary hover:underline">7. Six-Month Foundation Plan Generator</a>
+            <a href="#six-month-plan" className="block text-primary hover:underline ml-4">7.1 Overview</a>
+            <a href="#six-month-plan" className="block text-primary hover:underline ml-4">7.2 Plan Inputs</a>
+            <a href="#six-month-plan" className="block text-primary hover:underline ml-4">7.3 Plan Generation Algorithm</a>
+            <a href="#six-month-plan" className="block text-primary hover:underline ml-4">7.4 UI Component (SixMonthPlanDialog)</a>
+            <a href="#six-month-plan" className="block text-primary hover:underline ml-4">7.5 Trigger Button Logic (Smart Navigation)</a>
+            <a href="#six-month-plan" className="block text-primary hover:underline ml-4">7.6 Limitations & Future Enhancements</a>
+            <a href="#formulas" className="block text-primary hover:underline">8. Key Calculations and Formulas</a>
+            <a href="#formulas" className="block text-primary hover:underline ml-4">8.1 Transaction Classification (Complete)</a>
+            <a href="#formulas" className="block text-primary hover:underline ml-4">8.2 Readiness Score Factors (Detailed)</a>
+            <a href="#formulas" className="block text-primary hover:underline ml-4">8.3 RPIC Calculations (Complete)</a>
+            <a href="#formulas" className="block text-primary hover:underline ml-4">8.4 Six-Month Plan Formulas (Summary)</a>
+            <a href="#formulas" className="block text-primary hover:underline ml-4">8.5 Capital Allocation Waterfall</a>
+            <a href="#user-flow" className="block text-primary hover:underline">9. Typical User Flow</a>
+            <a href="#glossary" className="block text-primary hover:underline">10. Glossary of Terms</a>
           </nav>
         </div>
 
@@ -2495,6 +2514,27 @@ Month 4 - Salary Negotiation: $0-$500/month (variable)`}
             </div>
 
             <div>
+              <dt className="font-semibold text-lg mb-1">Avalanche Method</dt>
+              <dd className="text-muted-foreground">
+                Debt payoff strategy that prioritizes paying down the highest APR debt first, minimizing total interest paid over time. Used in the Six-Month Plan Generator.
+              </dd>
+            </div>
+
+            <div>
+              <dt className="font-semibold text-lg mb-1">Broker Setup Wizard</dt>
+              <dd className="text-muted-foreground">
+                5-step guided process in the Investments tab for opening, funding, and connecting a brokerage account with options approval. Progress is saved and resumes from the last completed step.
+              </dd>
+            </div>
+
+            <div>
+              <dt className="font-semibold text-lg mb-1">Coefficient of Variation (CV)</dt>
+              <dd className="text-muted-foreground">
+                Statistical measure of income stability calculated as (standard deviation / mean) × 100. Lower CV indicates more stable income. Used in Readiness Score Factor 3.
+              </dd>
+            </div>
+
+            <div>
               <dt className="font-semibold text-lg mb-1">Debt-to-Income Ratio (DTI)</dt>
               <dd className="text-muted-foreground">
                 Percentage of monthly income allocated to debt payments. Lower DTI indicates better financial health.
@@ -2509,9 +2549,30 @@ Month 4 - Salary Negotiation: $0-$500/month (variable)`}
             </div>
 
             <div>
+              <dt className="font-semibold text-lg mb-1">Feeding Mode</dt>
+              <dd className="text-muted-foreground">
+                Capital allocation state triggered when the active trading account reaches or exceeds its cap ($100k default or 40% of RPIC target). Excess capital automatically flows to the Passive Income Reserve instead of the trading account.
+              </dd>
+            </div>
+
+            <div>
+              <dt className="font-semibold text-lg mb-1">Foundation Score</dt>
+              <dd className="text-muted-foreground">
+                Synonym for Readiness Score. 0-100 score evaluating financial readiness for active investments based on 5 equally weighted factors (emergency fund, debt, income stability, cash flow, capital availability).
+              </dd>
+            </div>
+
+            <div>
               <dt className="font-semibold text-lg mb-1">Liquid Assets</dt>
               <dd className="text-muted-foreground">
                 Assets that can be quickly converted to cash without significant loss of value (cash, stocks, bonds).
+              </dd>
+            </div>
+
+            <div>
+              <dt className="font-semibold text-lg mb-1">Multi-Strategy Trading</dt>
+              <dd className="text-muted-foreground">
+                Ability to select and execute multiple trading strategies simultaneously (e.g., options wheel + swing trading). Unlocks when trading account reaches $50,000.
               </dd>
             </div>
 
@@ -2537,9 +2598,16 @@ Month 4 - Salary Negotiation: $0-$500/month (variable)`}
             </div>
 
             <div>
+              <dt className="font-semibold text-lg mb-1">Paper Trading Gate</dt>
+              <dd className="text-muted-foreground">
+                Requirements that must be met before allocating real capital to active trading: (1) Complete 40+ simulated trades, (2) Achieve 95%+ plan adherence, (3) Complete 70%+ of pre-trade checklist. Validates discipline and strategy execution.
+              </dd>
+            </div>
+
+            <div>
               <dt className="font-semibold text-lg mb-1">Readiness Score</dt>
               <dd className="text-muted-foreground">
-                0-100 score evaluating a user's readiness for active investments based on 5 key factors.
+                0-100 score evaluating a user's readiness for active investments based on 5 key factors (each worth 20 points): emergency fund coverage, high-interest debt, income stability, monthly cash flow, capital availability.
               </dd>
             </div>
 
@@ -2554,6 +2622,20 @@ Month 4 - Salary Negotiation: $0-$500/month (variable)`}
               <dt className="font-semibold text-lg mb-1">RPIC Index</dt>
               <dd className="text-muted-foreground">
                 Progress percentage toward target RPIC. RPIC Index = (Current Capital / Target RPIC) × 100.
+              </dd>
+            </div>
+
+            <div>
+              <dt className="font-semibold text-lg mb-1">Six-Month Foundation Plan</dt>
+              <dd className="text-muted-foreground">
+                Client-side generated 6-month financial improvement plan with specific monthly tasks (expense cuts, debt paydown, income boosts) tailored to the user's snapshot. Includes estimated dollar impacts, KPI tracking, and projected readiness score at completion.
+              </dd>
+            </div>
+
+            <div>
+              <dt className="font-semibold text-lg mb-1">Strategy Assessment</dt>
+              <dd className="text-muted-foreground">
+                4-question self-assessment in the Investments tab (capital, risk tolerance, time availability, experience) that generates personalized trading strategy recommendations with match percentages. Users can select multiple strategies simultaneously.
               </dd>
             </div>
 
