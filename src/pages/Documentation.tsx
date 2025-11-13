@@ -420,61 +420,138 @@ const incomeBoosts = {
 
           <h3 id="classification" className="text-2xl font-semibold mb-4">4.1 Transaction Classification System</h3>
           <p className="mb-4">
-            The system uses an automatic classifier (<code>transactionClassifier.ts</code>) that categorizes each transaction based on keywords and patterns.
+            The system uses an automatic classifier (<code>transactionClassifier.ts</code>) that categorizes each transaction based on keywords and patterns. The classification process has two main stages: income filtering and expense categorization.
           </p>
 
-          <h4 className="text-xl font-semibold mb-3">Operational Income Filtering</h4>
+          <h4 className="text-xl font-semibold mb-3">Complete Classification Algorithm</h4>
           <p className="mb-4">
-            The <code>isValidIncome()</code> function identifies real income, excluding non-operational movements:
+            The <code>classifyTransactions()</code> function in <code>src/utils/transactionClassifier.ts</code> implements the full classification pipeline:
           </p>
-          <div className="mb-4">
-            <p className="font-semibold mb-2">Valid Income (INCLUDED):</p>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-6">
+            <code className="block whitespace-pre-wrap">
+{`export function classifyTransactions(txns: StagingTransaction[]) {
+  // Step 1: Filter valid operational income
+  const validIncome = txns.filter(txn => 
+    txn.sign === "credit" && isValidIncome(txn)
+  );
+  
+  // Step 2: Filter operational expenses (debits only)
+  const operationalExpenses = txns.filter(txn => 
+    txn.sign === "debit" && !isTransferOrRefund(txn)
+  );
+  
+  // Step 3: Classify expenses into needs/wants/savings
+  const classified = operationalExpenses.map(txn => ({
+    ...txn,
+    category: mapSubcategoryToCategory(txn.subcategory),
+  }));
+  
+  return { validIncome, classified };
+}`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Income Filtering: isValidIncome()</h4>
+          <p className="mb-4">
+            The <code>isValidIncome()</code> function identifies real operational income by excluding non-income credits:
+          </p>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`function isValidIncome(txn: StagingTransaction): boolean {
+  const desc = txn.desc.toLowerCase();
+  const amount = txn.amount;
+  
+  // Exclude transfers between accounts
+  const transferKeywords = ["transfer", "xfer", "payment from"];
+  if (transferKeywords.some(kw => desc.includes(kw))) return false;
+  
+  // Exclude credit card payments and refunds
+  const nonIncomeKeywords = ["credit card", "cc payment", "refund", "return"];
+  if (nonIncomeKeywords.some(kw => desc.includes(kw))) return false;
+  
+  // Exclude small amounts (likely fees or adjustments)
+  if (amount < 100) return false;
+  
+  // Valid income keywords
+  const incomeKeywords = [
+    "payroll", "salary", "direct deposit", "dd",
+    "dividend", "interest", "distribution",
+    "freelance", "gig", "1099", "consulting"
+  ];
+  
+  return incomeKeywords.some(kw => desc.includes(kw)) || amount > 1000;
+}`}
+            </code>
+          </div>
+          <div className="mb-6">
+            <p className="font-semibold mb-2">Valid Income Examples (INCLUDED):</p>
             <ul className="list-disc pl-6 mb-4 space-y-1">
-              <li>Payroll / Salaries</li>
-              <li>Investment Income (dividends, interest)</li>
-              <li>Gig/Freelance Income</li>
+              <li>Payroll / Direct Deposit / Salary</li>
+              <li>Investment Income (dividends, interest, distributions)</li>
+              <li>Freelance / Gig Work / Consulting Income (1099)</li>
+              <li>Large credits over $1,000 (likely income even without keywords)</li>
             </ul>
             <p className="font-semibold mb-2">Excluded Movements (NOT INCOME):</p>
             <ul className="list-disc pl-6 mb-4 space-y-1">
-              <li>Internal Transfers (transfers between own accounts)</li>
-              <li>Credit Card Payments</li>
-              <li>Refunds / Reimbursements</li>
-              <li>Asset Sales</li>
+              <li>Internal Transfers ("transfer", "xfer", "payment from")</li>
+              <li>Credit Card Payments ("cc payment", "credit card")</li>
+              <li>Refunds / Returns ("refund", "return")</li>
+              <li>Small amounts under $100 (fees, adjustments)</li>
             </ul>
           </div>
 
-          <h4 className="text-xl font-semibold mb-3">Expense Classification</h4>
+          <h4 className="text-xl font-semibold mb-3">Expense Classification: mapSubcategoryToCategory()</h4>
           <p className="mb-4">
-            The <code>mapSubcategoryToCategory()</code> function maps subcategories to the three main categories:
+            The <code>mapSubcategoryToCategory()</code> function maps transaction subcategories to the 50/30/20 framework:
           </p>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`function mapSubcategoryToCategory(subcategory: string): TransactionCategory {
+  const needsSubcategories = [
+    "housing", "utilities", "internet", "phone",
+    "groceries", "food_delivery",
+    "gas", "public_transit", "car_maintenance", "parking", "tolls",
+    "insurance", "healthcare", "pharmacy", "medical",
+    "childcare", "education", "tuition",
+    "minimum_debt_payment"
+  ];
+  
+  const savingsSubcategories = [
+    "investment", "brokerage", "retirement_contribution",
+    "savings_transfer", "extra_debt_payment", "emergency_fund"
+  ];
+  
+  if (needsSubcategories.includes(subcategory)) return "need";
+  if (savingsSubcategories.includes(subcategory)) return "saving";
+  return "want"; // Default: everything else is a want
+}`}
+            </code>
+          </div>
           <div className="mb-4">
-            <p className="font-semibold mb-2">Needs (50%):</p>
+            <p className="font-semibold mb-2">Needs (50%) - Essential Expenses:</p>
             <ul className="list-disc pl-6 mb-3 space-y-1 text-sm">
-              <li>housing, utilities, internet, phone</li>
-              <li>groceries, food_delivery</li>
-              <li>gas, public_transit, car_maintenance, parking, tolls</li>
-              <li>insurance (health, car, home, life)</li>
-              <li>healthcare, pharmacy, medical</li>
-              <li>childcare, education, tuition</li>
-              <li>minimum_debt_payment</li>
+              <li><strong>Housing & Utilities:</strong> housing, utilities, internet, phone</li>
+              <li><strong>Food:</strong> groceries, food_delivery</li>
+              <li><strong>Transportation:</strong> gas, public_transit, car_maintenance, parking, tolls</li>
+              <li><strong>Insurance & Healthcare:</strong> insurance, healthcare, pharmacy, medical</li>
+              <li><strong>Education:</strong> childcare, education, tuition</li>
+              <li><strong>Minimum Debt:</strong> minimum_debt_payment</li>
             </ul>
 
-            <p className="font-semibold mb-2">Wants (30%):</p>
+            <p className="font-semibold mb-2">Wants (30%) - Discretionary Spending:</p>
             <ul className="list-disc pl-6 mb-3 space-y-1 text-sm">
-              <li>restaurants, bars, coffee_shops</li>
-              <li>entertainment, streaming, subscriptions</li>
-              <li>shopping, clothing, personal_care</li>
-              <li>travel, vacation, hotels</li>
-              <li>hobbies, sports, gym_membership</li>
-              <li>pet_care (non-essential)</li>
+              <li><strong>Dining & Entertainment:</strong> restaurants, bars, coffee_shops, entertainment, streaming, subscriptions</li>
+              <li><strong>Shopping:</strong> shopping, clothing, personal_care</li>
+              <li><strong>Travel:</strong> travel, vacation, hotels</li>
+              <li><strong>Hobbies:</strong> hobbies, sports, gym_membership</li>
+              <li><strong>Other:</strong> pet_care (non-essential), any uncategorized expenses</li>
             </ul>
 
-            <p className="font-semibold mb-2">Savings (20%):</p>
+            <p className="font-semibold mb-2">Savings (20%) - Wealth Building:</p>
             <ul className="list-disc pl-6 mb-3 space-y-1 text-sm">
-              <li>investment, brokerage, retirement_contribution</li>
-              <li>savings_transfer</li>
-              <li>extra_debt_payment (above minimum)</li>
-              <li>emergency_fund</li>
+              <li><strong>Investments:</strong> investment, brokerage, retirement_contribution</li>
+              <li><strong>Savings:</strong> savings_transfer, emergency_fund</li>
+              <li><strong>Debt Payoff:</strong> extra_debt_payment (above minimum)</li>
             </ul>
           </div>
 
@@ -620,201 +697,581 @@ avgIncomeAmount = totalValidIncome / period.months`}
             <li>Indicates available surplus for additional savings or investments</li>
             <li>Updates dynamically based on selected time period (30, 60, or 90 days)</li>
           </ul>
+
+          <h3 id="data-labeling" className="text-2xl font-semibold mb-4 mt-8">4.4 Data Labeling System</h3>
+          <p className="mb-4">
+            Throughout the Budget Analyzer (and entire application), small labels indicate the data source and calculation methodology. This transparency helps distinguish prototype placeholders from production-ready calculations.
+          </p>
+          
+          <h4 className="text-xl font-semibold mb-3">Label Types and Meanings</h4>
+          <div className="space-y-4 mb-6">
+            <div className="border-l-4 border-green-500 pl-4 py-2 bg-green-50">
+              <p className="font-mono text-xs mb-1">(calculated from transactions)</p>
+              <p className="text-sm">Real calculations derived from uploaded transaction data. Fully functional and production-ready.</p>
+              <p className="text-sm font-semibold mt-2">Examples:</p>
+              <ul className="list-disc pl-6 text-sm">
+                <li>Income & Expenses in IncomeExpensesKPI</li>
+                <li>50/30/20 breakdown in BudgetDonut</li>
+                <li>Monthly trends in MonthlyStackedBars</li>
+              </ul>
+            </div>
+
+            <div className="border-l-4 border-blue-500 pl-4 py-2 bg-blue-50">
+              <p className="font-mono text-xs mb-1">(calculated from snapshot)</p>
+              <p className="text-sm">Real calculations derived from holdings and liabilities data. Production-ready.</p>
+              <p className="text-sm font-semibold mt-2">Examples:</p>
+              <ul className="list-disc pl-6 text-sm">
+                <li>Net Worth calculation (assets - liabilities)</li>
+                <li>Liquid Assets (sum of liquid holdings)</li>
+                <li>Holdings and Liabilities tables</li>
+              </ul>
+            </div>
+
+            <div className="border-l-4 border-purple-500 pl-4 py-2 bg-purple-50">
+              <p className="font-mono text-xs mb-1">(calculated from your inputs)</p>
+              <p className="text-sm">Calculations based on user-provided values in Goals/RPIC forms. Production-ready logic.</p>
+              <p className="text-sm font-semibold mt-2">Examples:</p>
+              <ul className="list-disc pl-6 text-sm">
+                <li>RPIC Monthly/Annual calculations</li>
+                <li>Required Capital table</li>
+                <li>Timeline projections</li>
+              </ul>
+            </div>
+
+            <div className="border-l-4 border-amber-500 pl-4 py-2 bg-amber-50">
+              <p className="font-mono text-xs mb-1">(progress from wizard)</p>
+              <p className="text-sm">User progress tracked through the Broker Setup wizard. State persisted in localStorage.</p>
+              <p className="text-sm font-semibold mt-2">Examples:</p>
+              <ul className="list-disc pl-6 text-sm">
+                <li>Broker Setup completion status</li>
+                <li>Selected broker and account type</li>
+                <li>Options approval level</li>
+              </ul>
+            </div>
+
+            <div className="border-l-4 border-gray-500 pl-4 py-2 bg-gray-50">
+              <p className="font-mono text-xs mb-1">(fixed examples)</p>
+              <p className="text-sm">Hardcoded mock data for prototype demonstration. Requires backend integration or AI in production.</p>
+              <p className="text-sm font-semibold mt-2">Examples:</p>
+              <ul className="list-disc pl-6 text-sm">
+                <li>Connection Status (3 mock accounts)</li>
+                <li>Paper Trading Progress (mock 40 trades)</li>
+                <li>Personalized Recommendations quick wins</li>
+                <li>Key Insights cards</li>
+              </ul>
+            </div>
+
+            <div className="border-l-4 border-orange-500 pl-4 py-2 bg-orange-50">
+              <p className="font-mono text-xs mb-1">(strange calculation)</p>
+              <p className="text-sm">Complex calculations using non-standard methodology that may require refinement before production.</p>
+              <p className="text-sm font-semibold mt-2">Examples:</p>
+              <ul className="list-disc pl-6 text-sm">
+                <li>Unspent Income calculation (differs from traditional approaches)</li>
+                <li>Readiness Score factor calculations (some use heuristics)</li>
+                <li>Recommended Action Plan generation</li>
+              </ul>
+            </div>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Labeling Implementation</h4>
+          <p className="mb-4">
+            Labels are implemented consistently across all components using Tailwind CSS classes:
+          </p>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`<span className="text-xs text-muted-foreground font-normal ml-2">
+  (calculated from transactions)
+</span>`}
+            </code>
+          </div>
+          <p className="mb-4">
+            This uniform styling ensures labels are visible but non-intrusive, maintaining UI hierarchy while providing crucial transparency.
+          </p>
         </section>
 
         {/* 5. Investments */}
         <section id="investments" className="mb-12 page-break-before">
           <h2 className="text-3xl font-bold mb-6">5. Investment Planning - Active Investment Readiness</h2>
           <p className="mb-4">
-            The Investments module guides the user through a step-by-step process to determine their readiness for active investments.
+            The Investments module guides users through a comprehensive 5-step process to assess readiness for active trading, select appropriate strategies, set up brokerage accounts, and validate skills through paper trading before allocating real capital.
           </p>
 
-          <h3 className="text-2xl font-semibold mb-4">Step 1: Readiness Score</h3>
+          <h3 className="text-2xl font-semibold mb-4">5.1 Strategy Assessment (Updated)</h3>
           <p className="mb-4">
-            Evaluates 5 key factors:
+            Users complete a self-assessment to receive personalized trading strategy recommendations based on capital, risk tolerance, time availability, and experience level.
           </p>
+
+          <h4 className="text-xl font-semibold mb-3">Assessment Questions (4 Questions)</h4>
           <div className="mb-6">
-            <h4 className="text-xl font-semibold mb-3">1. Emergency Fund Status</h4>
-            <div className="bg-muted p-4 rounded-lg mb-4">
-              <code className="text-sm">
-                {`emergencyFund = liquidAssets × 0.30
-score = (emergencyFund / (monthlyExpenses × 6)) × 20
-max score = 20 points`}
-              </code>
-            </div>
-
-            <h4 className="text-xl font-semibold mb-3">2. Debt-to-Income Ratio</h4>
-            <div className="bg-muted p-4 rounded-lg mb-4">
-              <code className="text-sm">
-                {`DTI = (totalDebtPayments / monthlyIncome) × 100
-score = max(0, 20 - (DTI - 20) / 2)
-max score = 20 points`}
-              </code>
-            </div>
-
-            <h4 className="text-xl font-semibold mb-3">3. Income Stability</h4>
-            <div className="bg-muted p-4 rounded-lg mb-4">
-              <code className="text-sm">
-                {`Based on variance of monthly income
-Low variance = 20 points
-High variance = lower score`}
-              </code>
-            </div>
-
-            <h4 className="text-xl font-semibold mb-3">4. Expense Discipline</h4>
-            <div className="bg-muted p-4 rounded-lg mb-4">
-              <code className="text-sm">
-                {`Based on 50/30/20 rule adherence
-Perfect adherence = 20 points
-Deviations reduce score`}
-              </code>
-            </div>
-
-            <h4 className="text-xl font-semibold mb-3">5. Capital Available</h4>
-            <div className="bg-muted p-4 rounded-lg mb-4">
-              <code className="text-sm">
-                {`availableCapital = liquidAssets - emergencyFund
-score = min(20, availableCapital / 5000)
-max score = 20 points`}
-              </code>
-            </div>
-
-            <p className="mt-4 mb-2"><strong>Total Readiness Score:</strong></p>
-            <div className="bg-muted p-4 rounded-lg mb-4">
-              <code>Total = sum of all 5 factors (max 100 points)</code>
-            </div>
-            <ul className="list-disc pl-6 mb-4 space-y-1">
-              <li>80-100: Excellent - Ready for active investing</li>
-              <li>60-79: Good - Minor improvements needed</li>
-              <li>40-59: Fair - Foundation work required</li>
-              <li>0-39: Poor - Focus on financial basics first</li>
-            </ul>
-          </div>
-
-          <h3 className="text-2xl font-semibold mb-4">Step 2: Optimize Assets</h3>
-          <p className="mb-4">
-            Identifies opportunities to free up capital:
-          </p>
-          <ul className="list-disc pl-6 mb-6 space-y-2">
-            <li><strong>Equity Opportunities</strong>: Assets that could be sold or refinanced</li>
-            <li><strong>Debt Payoff Scenarios</strong>: Simulations of high-interest debt payoff</li>
-            <li>Shows impact on capital availability</li>
-          </ul>
-
-          <h3 className="text-2xl font-semibold mb-4">Step 3: Strategy Selection</h3>
-          <p className="mb-4">
-            Presents active investment strategies:
-          </p>
-          <ul className="list-disc pl-6 mb-6 space-y-2">
-            <li>Long-term Holdings (LEAP options, wheel strategy)</li>
-            <li>Cash-Secured Puts</li>
-            <li>Swing Trading</li>
-            <li>Income Generation (covered calls, cash-secured puts)</li>
-          </ul>
-          <p className="mb-4">
-            Each strategy includes description, risk, expected return, and minimum required capital.
-          </p>
-
-          <h3 className="text-2xl font-semibold mb-4">Step 4: Paper Trading</h3>
-          <p className="mb-4">
-            Trading simulation with specific gate requirements:
-          </p>
-          <ul className="list-disc pl-6 mb-6 space-y-2">
-            <li><strong>Gate 1</strong>: Complete 40+ simulated trades</li>
-            <li><strong>Gate 2</strong>: 95%+ adherence to trading plan</li>
-            <li><strong>Gate 3</strong>: 70%+ completion of pre-trade checklist</li>
-          </ul>
-          <p className="mb-4">
-            User must pass all gates before receiving real capital recommendation.
-          </p>
-
-          <h3 className="text-2xl font-semibold mb-4">Step 5: Capital Allocation</h3>
-          <p className="mb-4">
-            The Capital Allocation module implements a waterfall logic to determine how available capital flows through different financial priorities and into investment accounts.
-          </p>
-
-          <h4 className="text-xl font-semibold mb-3">Capital Allocation Waterfall</h4>
-          <p className="mb-4">
-            Capital flows through the following priority levels:
-          </p>
-          <div className="bg-muted p-4 rounded-lg mb-4">
-            <code className="text-sm">
-              {`1. Total Liquid Assets (starting point)
-2. Emergency Fund = monthlyExpenses × emergencyFundMonths (user-defined: 3-12 months)
-3. Debt Payoff Buffer = highInterestDebt × 0.5
-4. Active Trading Account (capped at maxTradingAccountCap)
-5. Passive Income Reserve (receives overflow when trading account reaches cap)`}
-            </code>
-          </div>
-
-          <h4 className="text-xl font-semibold mb-3">Dynamic Trading Account Cap</h4>
-          <p className="mb-4">
-            The trading account cap is calculated dynamically based on the user's RPIC (Retirement Planning & Income Calculator) target:
-          </p>
-          <div className="bg-muted p-4 rounded-lg mb-4">
-            <code className="text-sm">
-              {`dynamicCap = rpicTargetPassiveCapital × 0.40
-Default Cap = $100,000 (if no RPIC target set)
-
-Example:
-- If RPIC target passive capital = $500,000
-- Dynamic cap = $500,000 × 0.40 = $200,000`}
-            </code>
-          </div>
-          <p className="mb-4">
-            This ensures the active trading account size is proportional to the user's long-term wealth goals.
-          </p>
-
-          <h4 className="text-xl font-semibold mb-3">"Feeding Mode" - Capital Flow to Passive Reserve</h4>
-          <p className="mb-4">
-            When the active trading account reaches or exceeds the cap, the system enters "Feeding Mode":
-          </p>
-          <ul className="list-disc pl-6 mb-4 space-y-2">
-            <li><strong>Automatic Overflow:</strong> Additional capital automatically flows to the Passive Income Reserve</li>
-            <li><strong>Stability Tracking:</strong> System tracks months above cap and average returns</li>
-            <li><strong>Full Transition Gate:</strong> After 12+ months above cap with 20%+ average returns, user may consider full transition to passive investing</li>
-            <li><strong>Risk Management:</strong> Prevents over-concentration in active trading</li>
-          </ul>
-
-          <h4 className="text-xl font-semibold mb-3">Strategy Selection</h4>
-          <p className="mb-4">
-            The StrategySelector component manages trading strategy choices:
-          </p>
-          <ul className="list-disc pl-6 mb-4 space-y-2">
-            <li><strong>Initial State:</strong> Only one strategy allowed when starting</li>
-            <li><strong>Multi-Strategy Unlock:</strong> Unlocked when trading account reaches $50,000</li>
-            <li><strong>Available Strategies:</strong>
-              <ul className="list-disc pl-6 mt-2 space-y-1">
-                <li>Options Wheel (Cash-secured puts + covered calls)</li>
-                <li>Swing Trading (Multi-day to multi-week positions)</li>
-                <li>Day Trading (Intraday positions - highest risk)</li>
-                <li>Spreads (Multi-leg options strategies)</li>
-                <li>Covered Calls (Income generation on existing holdings)</li>
+            <div className="mb-4">
+              <p className="font-semibold mb-2">Question 1: Capital Available for Active Trading</p>
+              <ul className="list-disc pl-6 mb-2 space-y-1 text-sm">
+                <li><strong>Limited (&lt;$10k):</strong> Just getting started with limited funds</li>
+                <li><strong>Moderate ($10k-$25k):</strong> Some capital but still building wealth</li>
+                <li><strong>Good ($25k-$50k):</strong> Comfortable capital for diversified strategies</li>
+                <li><strong>Strong ($50k-$100k):</strong> Significant capital for multiple strategies</li>
+                <li><strong>Substantial (&gt;$100k):</strong> Extensive capital for sophisticated approaches</li>
               </ul>
-            </li>
-            <li><strong>Risk Levels:</strong> Each strategy labeled as Low, Medium, or High risk</li>
-            <li><strong>Capital Requirements:</strong> Each strategy has minimum capital requirements</li>
-          </ul>
+            </div>
 
-          <h4 className="text-xl font-semibold mb-3">Recommended Allocation Parameters</h4>
-          <p className="mb-4">
-            The Capital Allocation view displays a "Recommended Allocation" card with the label <strong>"(strange calculation - fixed examples)"</strong> to indicate that:
-          </p>
-          <ul className="list-disc pl-6 mb-4 space-y-2">
-            <li>The allocation calculations use fixed example values for demonstration</li>
-            <li>The methodology differs from standard financial planning approaches</li>
-            <li>Future iterations may refine the calculation logic</li>
-          </ul>
+            <div className="mb-4">
+              <p className="font-semibold mb-2">Question 2: Risk Comfort Level</p>
+              <ul className="list-disc pl-6 mb-2 space-y-1 text-sm">
+                <li><strong>Very Conservative:</strong> 5% account drop causes stress</li>
+                <li><strong>Conservative:</strong> 10% drop is uncomfortable but manageable</li>
+                <li><strong>Moderate:</strong> 15% drop is acceptable for higher returns</li>
+                <li><strong>Aggressive:</strong> 20% drop is tolerable with conviction</li>
+                <li><strong>Very Aggressive:</strong> 25% drop seen as buying opportunity</li>
+              </ul>
+            </div>
 
-          <h4 className="text-xl font-semibold mb-3">Emergency Fund Instrument Selection</h4>
+            <div className="mb-4">
+              <p className="font-semibold mb-2">Question 3: Time Dedication</p>
+              <ul className="list-disc pl-6 mb-2 space-y-1 text-sm">
+                <li><strong>Very Limited (&lt;30 min/day):</strong> Busy schedule, need passive approaches</li>
+                <li><strong>Limited (30-60 min/day):</strong> Can check markets daily, minimal active trading</li>
+                <li><strong>Moderate (1-2 hours/day):</strong> Can actively monitor and trade regularly</li>
+              </ul>
+              <p className="text-sm italic mt-2">Note: Options are capped at 2 hours/day as more is unsustainable long-term and indicates unrealistic expectations.</p>
+            </div>
+
+            <div className="mb-4">
+              <p className="font-semibold mb-2">Question 4: Trading Experience</p>
+              <ul className="list-disc pl-6 mb-2 space-y-1 text-sm">
+                <li><strong>Complete Beginner:</strong> Never traded stocks or options</li>
+                <li><strong>Novice:</strong> Bought stocks, no options experience</li>
+                <li><strong>Intermediate:</strong> Some options trades, still learning</li>
+                <li><strong>Advanced:</strong> Consistent options trading, profitable over 1+ years</li>
+                <li><strong>Expert:</strong> Professional-level skills, 3+ years consistent profitability</li>
+              </ul>
+            </div>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Recommended Strategies Logic</h4>
           <p className="mb-4">
-            Users can select where to hold their emergency fund:
+            Based on answers, strategies are scored and displayed with match percentages. Users can select multiple strategies simultaneously (multi-select enabled).
           </p>
-          <ul className="list-disc pl-6 mb-4 space-y-2">
-            <li><strong>TBIL:</strong> Treasury Bills - Safest, government-backed</li>
-            <li><strong>HYSA:</strong> High-Yield Savings Account - FDIC insured, liquid</li>
-            <li><strong>Money Market:</strong> Money Market Fund - Balanced liquidity and yield</li>
-            <li><strong>Other:</strong> Custom solution</li>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`function calculateStrategyMatch(answers: StrategyAssessmentAnswers, strategy: StrategyInfo): number {
+  let matchScore = 0;
+  
+  // Capital match (30% weight)
+  if (strategy.minCapital <= capitalFromAnswer(answers.capital)) {
+    matchScore += 30;
+  }
+  
+  // Risk match (30% weight)
+  const userRisk = riskLevelFromAnswer(answers.risk);
+  if (userRisk === strategy.riskLevel) {
+    matchScore += 30;
+  } else if (Math.abs(userRisk - strategy.riskLevel) === 1) {
+    matchScore += 15; // Adjacent risk level
+  }
+  
+  // Time match (20% weight)
+  const userTime = timeFromAnswer(answers.time);
+  if (userTime >= strategy.timeCommitment) {
+    matchScore += 20;
+  }
+  
+  // Experience match (20% weight)
+  const userExp = experienceFromAnswer(answers.experience);
+  if (userExp >= strategy.requiredExperience) {
+    matchScore += 20;
+  }
+  
+  return matchScore; // 0-100%
+}`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Strategy Selection (Multi-Select)</h4>
+          <p className="mb-4">
+            Users can select multiple strategies using checkboxes. Selected strategies persist across sessions via localStorage. The confirmation card displays all selected strategies for user awareness.
+          </p>
+
+          <h4 className="text-xl font-semibold mb-3">Persistence</h4>
+          <p className="mb-4">
+            Both <code>strategyAssessmentAnswers</code> and <code>selectedStrategies</code> are stored in FinancialDataContext and persisted to localStorage, ensuring user progress is maintained across tab navigation and page refreshes.
+          </p>
+
+          <h3 className="text-2xl font-semibold mb-4 mt-8">5.2 Broker Setup Wizard (NEW)</h3>
+          <p className="mb-4">
+            A dedicated tab in Investments guides users through the complete process of opening, funding, and connecting a brokerage account with options approval. The wizard tracks progress and resumes from the last completed step.
+          </p>
+
+          <h4 className="text-xl font-semibold mb-3">Wizard Steps (5 Steps)</h4>
+          <div className="mb-6">
+            <div className="mb-4">
+              <p className="font-semibold mb-2">Step 1: Choose Broker</p>
+              <p className="mb-2">Comparison table of 6 brokers (Tradier, IBKR, Schwab, E*TRADE, Fidelity, TradeZero) filtered and scored based on selected strategy requirements:</p>
+              <ul className="list-disc pl-6 mb-2 space-y-1 text-sm">
+                <li><strong>Account Type Required:</strong> Cash, Margin, or Retirement</li>
+                <li><strong>Options Level Required:</strong> Level 0-4 based on strategy complexity</li>
+                <li><strong>Minimum Balance:</strong> Varies by broker and account type</li>
+              </ul>
+              <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-2 mt-2">
+                <code className="block whitespace-pre-wrap">
+{`Strategy Requirements:
+- options_wheel: Options Level 2+, Cash or Margin
+- spreads: Options Level 3+, Margin required
+- swing_trading: Level 0-1, Cash or Margin
+- day_trading: Level 0-1, Margin required ($25k+ PDT rule)
+- covered_calls: Level 1+, Cash or Margin`}
+                </code>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <p className="font-semibold mb-2">Step 2: Select Account Type & Options Approval Level</p>
+              <p className="mb-2">User chooses account type and target options level:</p>
+              <ul className="list-disc pl-6 mb-2 space-y-1 text-sm">
+                <li><strong>Account Types:</strong> Cash, Margin, Retirement</li>
+                <li><strong>Options Levels:</strong>
+                  <ul className="list-disc pl-6 mt-1 space-y-1">
+                    <li>Level 0: Stocks only</li>
+                    <li>Level 1: Covered calls and protective puts</li>
+                    <li>Level 2: Long calls/puts (buying options)</li>
+                    <li>Level 3: Spreads (multi-leg strategies)</li>
+                    <li>Level 4: Naked options (highest risk)</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+
+            <div className="mb-4">
+              <p className="font-semibold mb-2">Step 3: Complete Funding Checklist</p>
+              <p className="mb-2">Checklist to track account opening and initial funding:</p>
+              <ul className="list-disc pl-6 mb-2 space-y-1 text-sm">
+                <li>Open account on broker's website</li>
+                <li>Complete identity verification</li>
+                <li>Link bank account</li>
+                <li>Transfer initial funding (minimum required by broker)</li>
+                <li>Confirm funds settled</li>
+              </ul>
+            </div>
+
+            <div className="mb-4">
+              <p className="font-semibold mb-2">Step 4: Apply for Options Approval</p>
+              <p className="mb-2">Guidance for applying to the target options level:</p>
+              <ul className="list-disc pl-6 mb-2 space-y-1 text-sm">
+                <li>Submit options application through broker</li>
+                <li>Provide trading experience (be honest, brokers verify)</li>
+                <li>Disclose net worth and income (required for approval)</li>
+                <li>Wait for approval (typically 1-3 business days)</li>
+              </ul>
+              <p className="text-sm italic mt-2">Note: If denied, user can reapply after gaining more experience or adjusting financial profile.</p>
+            </div>
+
+            <div className="mb-4">
+              <p className="font-semibold mb-2">Step 5: Connect & Verify Account</p>
+              <p className="mb-2">Final step to connect account to the application:</p>
+              <ul className="list-disc pl-6 mb-2 space-y-1 text-sm">
+                <li>Generate API keys or use OAuth connection (broker-dependent)</li>
+                <li>Enter credentials securely</li>
+                <li>Verify connection with test API call</li>
+                <li>Confirm account balances and positions sync correctly</li>
+              </ul>
+            </div>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Wizard Persistence & Resume</h4>
+          <p className="mb-4">
+            The wizard saves progress to localStorage via <code>brokerSetup</code> in FinancialDataContext:
+          </p>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`interface BrokerSetup {
+  chosenBroker: BrokerId | null;          // Selected broker
+  accountType: 'cash' | 'margin' | 'retirement' | null;
+  targetOptionsLevel: 0 | 1 | 2 | 3 | 4;  // Target options level
+  wizardStep: number;                      // Current step (1-5)
+  progress: {
+    openAccount: boolean;
+    funded: boolean;
+    optionsSubmitted: boolean;
+    optionsApproved: boolean;
+    connected: boolean;
+  };
+  notes: string[];                         // User notes
+}`}
+            </code>
+          </div>
+          <p className="mb-4">
+            When users exit and reopen the wizard, it resumes from <code>wizardStep</code>, allowing them to take breaks without losing progress. After completion, the button changes to "Edit Broker Setup" for modifications.
+          </p>
+
+          <h4 className="text-xl font-semibold mb-3">Broker Comparison Scoring</h4>
+          <p className="mb-4">
+            Brokers are scored based on match with strategy requirements using <code>brokerRequirements.ts</code>:
+          </p>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`function scoreBrokerForStrategy(broker: BrokerRequirement, strategy: TradingStrategy): number {
+  let score = 100;
+  
+  // Check account type compatibility
+  if (!broker.accountTypes.includes(requiredAccountType)) score -= 30;
+  
+  // Check options level availability
+  if (broker.maxOptionsLevel < requiredOptionsLevel) score -= 40;
+  
+  // Check minimum balance feasibility
+  if (userCapital < broker.minBalance) score -= 20;
+  
+  // Bonus for lower fees
+  if (broker.commissionFree) score += 10;
+  
+  return Math.max(0, score);
+}`}
+            </code>
+          </div>
+
+          <h3 className="text-2xl font-semibold mb-4 mt-8">5.3 Readiness Score (Enhanced)</h3>
+          <p className="mb-4">
+            The Readiness Score evaluates financial foundation across 5 equally weighted factors (20% each). Each factor is scored 0-100, then multiplied by 0.20 to get its contribution to the total score (max 100).
+          </p>
+
+          <h4 className="text-xl font-semibold mb-3">Complete Factor Formulas (TypeScript)</h4>
+          <div className="mb-6">
+            <div className="mb-6">
+              <p className="font-semibold mb-2">Factor 1: Emergency Fund Coverage (20% weight)</p>
+              <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-2">
+                <code className="block whitespace-pre-wrap">
+{`function calculateEmergencyFundScore(
+  liquidAssets: number,
+  monthlyExpenses: number,
+  targetMonths: number = 6
+): number {
+  const requiredEF = monthlyExpenses * targetMonths;
+  const efMonths = liquidAssets / monthlyExpenses;
+  
+  // Score: 0-100 based on months of coverage
+  const rawScore = Math.min((efMonths / targetMonths) * 100, 100);
+  
+  // Weighted contribution: 20% of total
+  return rawScore * 0.20;
+}
+
+// Example: $30k liquid, $5k/month expenses, 6-month target
+// efMonths = 30000 / 5000 = 6 months
+// rawScore = (6 / 6) * 100 = 100
+// weightedScore = 100 * 0.20 = 20 points (full credit)`}
+                </code>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <p className="font-semibold mb-2">Factor 2: High-Interest Debt (20% weight)</p>
+              <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-2">
+                <code className="block whitespace-pre-wrap">
+{`function calculateHighInterestDebtScore(
+  liabilities: Liability[],
+  netWorth: number
+): number {
+  // Identify high-APR debt (>7%)
+  const highAprDebt = liabilities
+    .filter(l => l.apr > 7)
+    .reduce((sum, l) => sum + l.balance, 0);
+  
+  // If no high-APR debt, perfect score
+  if (highAprDebt === 0) return 100 * 0.20; // 20 points
+  
+  // Calculate debt-to-net-worth ratio
+  const debtRatio = highAprDebt / netWorth;
+  
+  // Score: 100 - (ratio * 100), minimum 0
+  const rawScore = Math.max(0, 100 - (debtRatio * 100));
+  
+  return rawScore * 0.20;
+}
+
+// Example: $15k high-APR debt, $150k net worth
+// debtRatio = 15000 / 150000 = 0.10 (10%)
+// rawScore = 100 - (0.10 * 100) = 90
+// weightedScore = 90 * 0.20 = 18 points`}
+                </code>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <p className="font-semibold mb-2">Factor 3: Income Stability (20% weight)</p>
+              <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-2">
+                <code className="block whitespace-pre-wrap">
+{`function calculateIncomeStabilityScore(
+  monthlyIncomes: number[] // Last 6-12 months
+): number {
+  if (monthlyIncomes.length < 3) return 0; // Insufficient data
+  
+  // Calculate coefficient of variation (CV = stdDev / mean)
+  const mean = monthlyIncomes.reduce((a, b) => a + b) / monthlyIncomes.length;
+  const variance = monthlyIncomes
+    .map(income => Math.pow(income - mean, 2))
+    .reduce((a, b) => a + b) / monthlyIncomes.length;
+  const stdDev = Math.sqrt(variance);
+  const cv = stdDev / mean;
+  
+  // Score: Lower CV = higher stability
+  // CV < 0.10 (10% variation) = 100 points
+  // CV > 0.50 (50% variation) = 0 points
+  const rawScore = Math.max(0, 100 - (cv * 200));
+  
+  return rawScore * 0.20;
+}
+
+// Example: Monthly incomes [5000, 5100, 4900, 5050, 4950]
+// mean = 5000, stdDev ≈ 75, cv = 75/5000 = 0.015 (1.5%)
+// rawScore = 100 - (0.015 * 200) = 97
+// weightedScore = 97 * 0.20 = 19.4 points`}
+                </code>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <p className="font-semibold mb-2">Factor 4: Monthly Cash Flow (20% weight)</p>
+              <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-2">
+                <code className="block whitespace-pre-wrap">
+{`function calculateCashFlowScore(
+  monthlyIncome: number,
+  monthlyExpenses: number
+): number {
+  const monthlyCashFlow = monthlyIncome - monthlyExpenses;
+  const cashFlowRatio = monthlyCashFlow / monthlyExpenses;
+  
+  // Score based on cash flow as % of expenses
+  // 50%+ surplus (ratio >= 0.50) = 100 points
+  // 0% surplus (ratio = 0) = 0 points
+  // Negative cash flow = 0 points
+  const rawScore = Math.max(0, Math.min((cashFlowRatio / 0.50) * 100, 100));
+  
+  return rawScore * 0.20;
+}
+
+// Example: $6000 income, $4500 expenses
+// cashFlow = 1500, ratio = 1500 / 4500 = 0.333 (33%)
+// rawScore = (0.333 / 0.50) * 100 = 66.6
+// weightedScore = 66.6 * 0.20 = 13.3 points`}
+                </code>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <p className="font-semibold mb-2">Factor 5: Capital Availability (20% weight)</p>
+              <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-2">
+                <code className="block whitespace-pre-wrap">
+{`function calculateCapitalAvailabilityScore(
+  liquidAssets: number,
+  emergencyFund: number,
+  nearTermGoals: number = 0
+): number {
+  // Capital available = liquid assets - (emergency fund + near-term goals)
+  const availableCapital = liquidAssets - (emergencyFund + nearTermGoals);
+  
+  // Score based on available capital
+  // $10k+ available = 100 points
+  // $0 available = 0 points
+  const rawScore = Math.min((availableCapital / 10000) * 100, 100);
+  
+  return Math.max(0, rawScore * 0.20);
+}
+
+// Example: $35k liquid, $25k EF, $2k near-term
+// availableCapital = 35000 - (25000 + 2000) = 8000
+// rawScore = (8000 / 10000) * 100 = 80
+// weightedScore = 80 * 0.20 = 16 points`}
+                </code>
+              </div>
+            </div>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Total Readiness Score Calculation</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`function calculateTotalReadinessScore(snapshot: FinancialSnapshot): number {
+  const efScore = calculateEmergencyFundScore(
+    liquidAssets, monthlyExpenses, targetMonths
+  );
+  const debtScore = calculateHighInterestDebtScore(
+    liabilities, netWorth
+  );
+  const stabilityScore = calculateIncomeStabilityScore(
+    monthlyIncomes
+  );
+  const cashFlowScore = calculateCashFlowScore(
+    monthlyIncome, monthlyExpenses
+  );
+  const capitalScore = calculateCapitalAvailabilityScore(
+    liquidAssets, emergencyFund, nearTermGoals
+  );
+  
+  // Sum of all 5 factors (each 0-20, total 0-100)
+  return efScore + debtScore + stabilityScore + cashFlowScore + capitalScore;
+}
+
+// Interpretation:
+// 80-100: Excellent - Ready for active investing
+// 60-79:  Good - Minor improvements recommended
+// 40-59:  Fair - Foundation work required
+// 0-39:   Poor - Focus on financial basics first`}
+            </code>
+          </div>
+
+          <h3 className="text-2xl font-semibold mb-4 mt-8">5.4 Paper Trading</h3>
+          <p className="mb-4">
+            Before allocating real capital, users must complete paper trading requirements to validate discipline and strategy execution:
+          </p>
+          <ul className="list-disc pl-6 mb-6 space-y-2">
+            <li><strong>Gate 1:</strong> Complete 40+ simulated trades following the selected strategy</li>
+            <li><strong>Gate 2:</strong> Achieve 95%+ adherence to trading plan (proper entry/exit, position sizing)</li>
+            <li><strong>Gate 3:</strong> Complete 70%+ of pre-trade checklist items (risk assessment, technical analysis, etc.)</li>
+          </ul>
+          <p className="mb-4">
+            Progress is tracked via <code>PaperTradingProgress</code> component. Only after passing all gates is real capital allocation recommended.
+          </p>
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+            <p className="text-sm">
+              <strong>Note:</strong> Current implementation uses <span className="font-mono text-xs">(fixed examples)</span> for paper trading progress. Production version would integrate with a paper trading API or manual trade logging system.
+            </p>
+          </div>
+
+          <h3 className="text-2xl font-semibold mb-4 mt-8">5.5 Accessibility & Warnings (NEW)</h3>
+          <p className="mb-4">
+            All Investments features are accessible regardless of readiness score to allow user autonomy and testing. However, prominent warnings appear when foundation score is below recommended levels.
+          </p>
+
+          <h4 className="text-xl font-semibold mb-3">Readiness Score Warnings</h4>
+          <p className="mb-4">
+            When readiness score &lt; 80, the following warnings display:
+          </p>
+          <div className="mb-4">
+            <p className="font-semibold mb-2">1. Global Alert (Top of Investments View)</p>
+            <div className="bg-destructive/10 border-l-4 border-destructive p-4 mb-4">
+              <p className="font-semibold text-destructive">⚠ Foundation Score is Below Recommended Level</p>
+              <p className="text-sm mt-2">
+                Your readiness score is &lt;80. Proceeding with active investments carries increased risk. Consider strengthening your financial foundation first by building emergency fund, paying down high-interest debt, and stabilizing cash flow.
+              </p>
+            </div>
+
+            <p className="font-semibold mb-2">2. Broker Setup Warning (NextActionCard)</p>
+            <p className="mb-2">If readiness &lt; 80, a warning badge displays:</p>
+            <div className="bg-amber-50 border-l-4 border-amber-400 p-4 mb-4">
+              <p className="font-semibold text-amber-700">⚠ Not Recommended Yet</p>
+              <p className="text-sm mt-2">
+                Opening a brokerage account is not recommended until your foundation score reaches 80+. Focus on improving emergency fund, debt management, and cash flow stability first.
+              </p>
+            </div>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Design Philosophy</h4>
+          <p className="mb-4">
+            This approach balances user autonomy with educational guidance:
+          </p>
+          <ul className="list-disc pl-6 mb-6 space-y-2">
+            <li><strong>No Hard Gates:</strong> Users can explore all features regardless of score</li>
+            <li><strong>Clear Warnings:</strong> Risks are communicated prominently without blocking access</li>
+            <li><strong>Informed Decisions:</strong> Users understand consequences and can proceed at their own discretion</li>
+            <li><strong>Testing Enabled:</strong> Allows thorough prototype evaluation without artificial restrictions</li>
           </ul>
         </section>
 
