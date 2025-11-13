@@ -115,6 +115,196 @@ const Documentation = () => {
           </div>
         </section>
 
+        {/* 1.3 Data Sources & Calculation Logic */}
+        <section id="data-sources" className="mb-12">
+          <h2 className="text-3xl font-bold mb-6">1.3 Data Sources & Calculation Logic</h2>
+          <p className="mb-4">
+            The application uses three distinct types of data throughout its components. Understanding this distinction is critical for evaluating prototype completeness:
+          </p>
+
+          <div className="mb-8">
+            <h3 className="text-2xl font-semibold mb-4">1.3.1 Real Calculations (Calculated from User Data)</h3>
+            <p className="mb-4">
+              These values are dynamically computed from uploaded transactions, holdings, liabilities, and user inputs. They reflect actual financial state:
+            </p>
+            
+            <div className="mb-6">
+              <h4 className="text-xl font-semibold mb-3">Dashboard Calculations</h4>
+              <ul className="list-disc pl-6 mb-4 space-y-2">
+                <li><strong>Net Worth</strong>: Sum of all holdings.balance - Sum of all liabilities.balance</li>
+                <li><strong>Liquid Assets</strong>: Sum of holdings where liquidity = "liquid" (checking, savings, money market)</li>
+                <li><strong>Income & Expenses</strong>: Calculated from transactions using <code className="bg-muted px-1 py-0.5 rounded">classifyTransactions()</code></li>
+                <li><strong>Unspent Income</strong>: Total Income - Total Expenses for selected period</li>
+              </ul>
+            </div>
+
+            <div className="mb-6">
+              <h4 className="text-xl font-semibold mb-3">Budget Analyzer Calculations</h4>
+              <ul className="list-disc pl-6 mb-4 space-y-2">
+                <li><strong>50/30/20 Breakdown</strong>: Transactions classified into needs/wants/savings categories</li>
+                <li><strong>Monthly Trends</strong>: Aggregated transaction totals grouped by month and category</li>
+                <li><strong>Budget Donut</strong>: Percentage distribution calculated from classified expense transactions</li>
+              </ul>
+              <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+                <p className="mb-2"><strong>Transaction Classification Algorithm:</strong></p>
+                <code className="block whitespace-pre-wrap">
+{`// Filter valid income (credits > $100, excluding transfers)
+const isValidIncome = (txn: Transaction) => 
+  txn.sign === "credit" && 
+  txn.amount > 100 && 
+  !txn.desc.toLowerCase().includes("transfer");
+
+// Map subcategory to needs/wants/savings
+const mapSubcategoryToCategory = (sub: string) => {
+  const needsKeywords = ["groceries", "utilities", "rent", "mortgage", "insurance", "healthcare"];
+  const savingsKeywords = ["savings", "investment", "401k", "ira", "retirement"];
+  // Default to "want" if not matched
+};`}
+                </code>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h4 className="text-xl font-semibold mb-3">Readiness Score Calculations</h4>
+              <p className="mb-2">Five factors scored 0-100, weighted equally (20% each):</p>
+              <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+                <code className="block whitespace-pre-wrap">
+{`// 1. Emergency Fund Coverage (20%)
+const efMonths = liquidAssets / monthlyExpenses;
+const efScore = Math.min(efMonths / targetMonths, 1) * 100;
+
+// 2. High-Interest Debt (20%)
+const highAprDebt = liabilities.filter(l => l.apr > 7);
+const debtScore = highAprDebt.length === 0 ? 100 : 
+  Math.max(0, 100 - (totalHighAprDebt / netWorth * 100));
+
+// 3. Income Stability (20%)
+const incomeCV = stdDev(monthlyIncomes) / mean(monthlyIncomes);
+const stabilityScore = Math.max(0, 100 - (incomeCV * 100));
+
+// 4. Monthly Cash Flow (20%)
+const cashFlowRatio = monthlyCashFlow / monthlyExpenses;
+const cashFlowScore = Math.min(cashFlowRatio * 50, 100);
+
+// 5. Capital Availability (20%)
+const availableCapital = liquidAssets - (emergencyFund + nearTermGoals);
+const capitalScore = Math.min(availableCapital / 10000, 1) * 100;
+
+// Total Score
+const readinessScore = (efScore + debtScore + stabilityScore + cashFlowScore + capitalScore) / 5;`}
+                </code>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h4 className="text-xl font-semibold mb-3">RPIC Calculations (Goals)</h4>
+              <ul className="list-disc pl-6 mb-4 space-y-2">
+                <li><strong>Monthly RPIC</strong>: (R + P + I + C) / 12</li>
+                <li><strong>Required Capital</strong>: Sum of retirement, personal goals, insurance needs, cushion fund</li>
+                <li><strong>Timeline</strong>: Years to goal calculated from current savings + projected contributions</li>
+              </ul>
+              <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+                <code className="block whitespace-pre-wrap">
+{`// RPIC Formula
+const rpicMonthly = (
+  retirementAnnual + 
+  personalGoalsAnnual + 
+  insuranceAnnual + 
+  cushionAnnual
+) / 12;
+
+// Timeline Calculation
+const yearsToGoal = (requiredCapital - currentSavings) / 
+  (monthlyContribution * 12 + expectedAnnualReturn);`}
+                </code>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h4 className="text-xl font-semibold mb-3">Six-Month Plan Calculations</h4>
+              <p className="mb-2">Client-side algorithm generates actionable monthly tasks:</p>
+              <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+                <code className="block whitespace-pre-wrap">
+{`// Emergency Fund Gap Filling
+const efGap = emergencyFundReq - liquidAssets;
+const monthlyEfContribution = efGap / 6;
+
+// Debt Payoff (Avalanche Method - Highest APR First)
+const highestAprDebt = debts.sort((a, b) => b.apr - a.apr)[0];
+const extraPayment = cashFlowMonthly * 0.3; // 30% of surplus
+
+// Expense Reduction Templates
+const expenseCuts = {
+  month1: { type: "subscriptions", estSave: 50-150 },
+  month2: { type: "utilities", estSave: 30-80 },
+  month3: { type: "groceries", estSave: 100-200 }
+};
+
+// Income Boost Templates
+const incomeBoosts = {
+  month3: { type: "freelance", estRange: [200, 800] },
+  month4: { type: "salary_negotiation", estRange: [0, 500] }
+};`}
+                </code>
+              </div>
+            </div>
+          </div>
+
+          <div className="mb-8">
+            <h3 className="text-2xl font-semibold mb-4">1.3.2 Fixed/Mock Data (Prototype Placeholders)</h3>
+            <p className="mb-4">
+              These components display hardcoded example data and are labeled with <span className="text-xs text-muted-foreground">(fixed examples)</span>:
+            </p>
+            <ul className="list-disc pl-6 mb-4 space-y-2">
+              <li><strong>Connection Status</strong>: Shows 3 mock connected accounts (Chase, Vanguard, Amex)</li>
+              <li><strong>Personalized Recommendations</strong>: 3 hardcoded quick wins with estimated savings</li>
+              <li><strong>Paper Trading Progress</strong>: Mock 40 trades with 95% adherence rate</li>
+              <li><strong>Action Plan (Goals)</strong>: Static list of 5 recommended actions</li>
+              <li><strong>Key Insights</strong>: Templated insight cards with placeholder metrics</li>
+            </ul>
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+              <p className="text-sm">
+                <strong>Note:</strong> These components require backend integration or AI processing in production. They are intentionally static for prototype demonstration.
+              </p>
+            </div>
+          </div>
+
+          <div className="mb-8">
+            <h3 className="text-2xl font-semibold mb-4">1.3.3 User-Editable Data (Persisted State)</h3>
+            <p className="mb-4">
+              These values are set by users and persist across sessions via localStorage:
+            </p>
+            <ul className="list-disc pl-6 mb-4 space-y-2">
+              <li><strong>Monthly Income</strong>: User-edited value in Unspent Income card (overrides calculated average)</li>
+              <li><strong>Strategy Assessment Answers</strong>: 4 questions about capital, risk, time, experience</li>
+              <li><strong>Selected Strategies</strong>: User-chosen trading strategies (multi-select enabled)</li>
+              <li><strong>Broker Setup Progress</strong>: Wizard step, chosen broker, account type, options level, completion flags</li>
+              <li><strong>Emergency Fund Months</strong>: Target months of expenses for emergency fund (default 6)</li>
+              <li><strong>Six-Month Plan</strong>: Generated plan data including tasks, KPIs, rollup summary</li>
+            </ul>
+            <div className="bg-muted p-4 rounded-lg mb-4">
+              <p className="text-sm">
+                <strong>Persistence Mechanism:</strong> All editable data is stored in FinancialDataContext and synced to localStorage. Changes persist across page refreshes and tab navigation.
+              </p>
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <h3 className="text-2xl font-semibold mb-4">Data Labeling System</h3>
+            <p className="mb-4">
+              Throughout the UI, data labels indicate the source of displayed values:
+            </p>
+            <ul className="list-disc pl-6 mb-4 space-y-2">
+              <li><code className="bg-muted px-2 py-1 rounded text-xs">(fixed examples)</code> - Mock/hardcoded data</li>
+              <li><code className="bg-muted px-2 py-1 rounded text-xs">(calculated from snapshot)</code> - Derived from holdings/liabilities</li>
+              <li><code className="bg-muted px-2 py-1 rounded text-xs">(calculated from transactions)</code> - Derived from transaction history</li>
+              <li><code className="bg-muted px-2 py-1 rounded text-xs">(calculated from your inputs)</code> - Based on user-entered values</li>
+              <li><code className="bg-muted px-2 py-1 rounded text-xs">(progress from wizard)</code> - Tracked via Broker Setup wizard</li>
+              <li><code className="bg-muted px-2 py-1 rounded text-xs">(strange calculation)</code> - Complex logic requiring refinement</li>
+            </ul>
+          </div>
+        </section>
+
         {/* 2. Command Center */}
         <section id="command-center" className="mb-12 page-break-before">
           <h2 className="text-3xl font-bold mb-6">2. Command Center - Data Ingestion</h2>
