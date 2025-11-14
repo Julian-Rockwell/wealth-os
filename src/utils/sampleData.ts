@@ -18,26 +18,26 @@ const toStagingTransaction = (t: Transaction): StagingTransaction => ({
 // Reynolds Family Transactions: Higher expenses, variable income patterns
 const generateReynoldsTransactions = (): Transaction[] => {
   return [
-    // August 2025
-    {id:"t_20250801_1",date:"2025-08-01",desc:"Payroll Deposit - Acme Corp W-2",amount:12150.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Acme Corp",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250802_1",date:"2025-08-02",desc:"Mortgage Payment - FirstHome Mortgage",amount:3650.00,sign:"debit",category:"need",subcategory:"Rent/Mortgage",merchant:"FirstHome Mortgage",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250802_2",date:"2025-08-02",desc:"Auto Loan Payment",amount:540.12,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Chase Auto",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250803_1",date:"2025-08-03",desc:"HEB Grocery",amount:187.43,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250803_2",date:"2025-08-03",desc:"Starbucks Coffee",amount:8.45,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Starbucks",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250804_1",date:"2025-08-04",desc:"Shell Gas Station",amount:68.20,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250805_1",date:"2025-08-05",desc:"Austin Energy",amount:245.80,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Austin Energy",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250806_1",date:"2025-08-06",desc:"HEB Grocery",amount:124.56,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250806_2",date:"2025-08-06",desc:"Starbucks Coffee",amount:11.20,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Starbucks",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250807_1",date:"2025-08-07",desc:"Austin Water Utility",amount:78.50,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Austin Water",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250808_1",date:"2025-08-08",desc:"Target",amount:93.25,sign:"debit",category:"want",subcategory:"Shopping",merchant:"Target",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250809_1",date:"2025-08-09",desc:"Chipotle Mexican Grill",amount:24.80,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Chipotle",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250810_1",date:"2025-08-10",desc:"HEB Grocery",amount:203.15,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250810_2",date:"2025-08-10",desc:"Starbucks Coffee",amount:9.75,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Starbucks",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250811_1",date:"2025-08-11",desc:"Shell Gas Station",amount:72.15,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250812_1",date:"2025-08-12",desc:"Netflix Subscription",amount:15.49,sign:"debit",category:"want",subcategory:"Subscriptions",merchant:"Netflix",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250813_1",date:"2025-08-13",desc:"Whole Foods Market",amount:87.34,sign:"debit",category:"need",subcategory:"Groceries",merchant:"Whole Foods",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250814_1",date:"2025-08-14",desc:"CVS Pharmacy",amount:34.99,sign:"debit",category:"need",subcategory:"Healthcare",merchant:"CVS",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250815_1",date:"2025-08-15",desc:"Payroll Deposit - Acme Corp W-2",amount:12150.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Acme Corp",accountId:"acc_chk_5724",confidence:0.99},
+    // September 2025
+    {id:"t_20250901_1",date:"2025-09-01",desc:"Payroll Deposit - Acme Corp W-2",amount:12150.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Acme Corp",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20250902_1",date:"2025-09-02",desc:"Mortgage Payment - FirstHome Mortgage",amount:3650.00,sign:"debit",category:"need",subcategory:"Rent/Mortgage",merchant:"FirstHome Mortgage",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20250902_2",date:"2025-09-02",desc:"Auto Loan Payment",amount:540.12,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Chase Auto",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20250903_1",date:"2025-09-03",desc:"HEB Grocery",amount:187.43,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20250903_2",date:"2025-09-03",desc:"Starbucks Coffee",amount:8.45,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Starbucks",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20250904_1",date:"2025-09-04",desc:"Shell Gas Station",amount:68.20,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20250905_1",date:"2025-09-05",desc:"Austin Energy",amount:245.80,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Austin Energy",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20250906_1",date:"2025-09-06",desc:"HEB Grocery",amount:124.56,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20250906_2",date:"2025-09-06",desc:"Starbucks Coffee",amount:11.20,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Starbucks",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20250907_1",date:"2025-09-07",desc:"Austin Water Utility",amount:78.50,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Austin Water",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20250908_1",date:"2025-09-08",desc:"Target",amount:93.25,sign:"debit",category:"want",subcategory:"Shopping",merchant:"Target",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20250909_1",date:"2025-09-09",desc:"Chipotle Mexican Grill",amount:24.80,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Chipotle",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20250910_1",date:"2025-09-10",desc:"HEB Grocery",amount:203.15,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20250910_2",date:"2025-09-10",desc:"Starbucks Coffee",amount:9.75,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Starbucks",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20250911_1",date:"2025-09-11",desc:"Shell Gas Station",amount:72.15,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20250912_1",date:"2025-09-12",desc:"Netflix Subscription",amount:15.49,sign:"debit",category:"want",subcategory:"Subscriptions",merchant:"Netflix",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20250913_1",date:"2025-09-13",desc:"Whole Foods Market",amount:87.34,sign:"debit",category:"need",subcategory:"Groceries",merchant:"Whole Foods",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20250914_1",date:"2025-09-14",desc:"CVS Pharmacy",amount:34.99,sign:"debit",category:"need",subcategory:"Healthcare",merchant:"CVS",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20250915_1",date:"2025-09-15",desc:"Payroll Deposit - Acme Corp W-2",amount:12150.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Acme Corp",accountId:"acc_chk_5724",confidence:0.99},
     {id:"t_20250815_2",date:"2025-08-15",desc:"Credit Card Payment",amount:250.00,sign:"debit",category:"saving",subcategory:"Extra Debt Payment",merchant:"Chase Credit Card",accountId:"acc_chk_5724",confidence:0.99},
     {id:"t_20250815_3",date:"2025-08-15",desc:"AT&T Wireless",amount:185.00,sign:"debit",category:"need",subcategory:"Utilities",merchant:"AT&T",accountId:"acc_chk_5724",confidence:0.99},
     {id:"t_20250816_1",date:"2025-08-16",desc:"HEB Grocery",amount:156.89,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
@@ -59,41 +59,42 @@ const generateReynoldsTransactions = (): Transaction[] => {
     {id:"t_20250819_2",date:"2025-08-19",desc:"Zelle Transfer - Sarah M.",amount:85.00,sign:"debit",category:"want",subcategory:"Shopping",merchant:"Zelle",accountId:"acc_chk_5724",confidence:0.72},
     {id:"t_20250826_2",date:"2025-08-26",desc:"SQ *Local Coffee",amount:15.80,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Square Merchant",accountId:"acc_chk_5724",confidence:0.75},
 
-    // September 2025
-    {id:"t_20250901_1",date:"2025-09-01",desc:"Payroll Deposit - Acme Corp W-2",amount:12150.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Acme Corp",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250902_1",date:"2025-09-02",desc:"Mortgage Payment - FirstHome Mortgage",amount:3650.00,sign:"debit",category:"need",subcategory:"Rent/Mortgage",merchant:"FirstHome Mortgage",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250902_2",date:"2025-09-02",desc:"Auto Loan Payment",amount:540.12,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Chase Auto",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250903_1",date:"2025-09-03",desc:"HEB Grocery",amount:195.67,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250903_2",date:"2025-09-03",desc:"Starbucks Coffee",amount:9.85,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Starbucks",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250904_1",date:"2025-09-04",desc:"Torchy's Tacos",amount:45.80,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Torchy's Tacos",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250905_1",date:"2025-09-05",desc:"Austin Energy",amount:312.45,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Austin Energy",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250906_1",date:"2025-09-06",desc:"Target",amount:156.23,sign:"debit",category:"want",subcategory:"Shopping",merchant:"Target",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250907_1",date:"2025-09-07",desc:"Austin Water Utility",amount:82.30,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Austin Water",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250907_2",date:"2025-09-07",desc:"Shell Gas Station",amount:71.20,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250908_1",date:"2025-09-08",desc:"HEB Grocery",amount:210.45,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250909_1",date:"2025-09-09",desc:"Starbucks Coffee",amount:11.50,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Starbucks",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250910_1",date:"2025-09-10",desc:"Walgreens",amount:45.67,sign:"debit",category:"need",subcategory:"Healthcare",merchant:"Walgreens",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250912_1",date:"2025-09-12",desc:"Netflix Subscription",amount:15.49,sign:"debit",category:"want",subcategory:"Subscriptions",merchant:"Netflix",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250912_2",date:"2025-09-12",desc:"Spotify Premium",amount:10.99,sign:"debit",category:"want",subcategory:"Subscriptions",merchant:"Spotify",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250913_1",date:"2025-09-13",desc:"HEB Grocery",amount:167.89,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250914_1",date:"2025-09-14",desc:"Shell Gas Station",amount:68.90,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250915_1",date:"2025-09-15",desc:"Payroll Deposit - Acme Corp W-2",amount:12150.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Acme Corp",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250915_2",date:"2025-09-15",desc:"Credit Card Payment",amount:250.00,sign:"debit",category:"saving",subcategory:"Extra Debt Payment",merchant:"Chase Credit Card",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250915_3",date:"2025-09-15",desc:"AT&T Wireless",amount:185.00,sign:"debit",category:"need",subcategory:"Utilities",merchant:"AT&T",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250916_1",date:"2025-09-16",desc:"Starbucks Coffee",amount:8.95,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Starbucks",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250917_1",date:"2025-09-17",desc:"Texas Gas Service",amount:38.75,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Texas Gas Service",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250917_2",date:"2025-09-17",desc:"HEB Grocery",amount:183.45,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250918_1",date:"2025-09-18",desc:"AMC Theaters",amount:56.00,sign:"debit",category:"want",subcategory:"Entertainment",merchant:"AMC",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250920_1",date:"2025-09-20",desc:"Costco",amount:287.92,sign:"debit",category:"need",subcategory:"Groceries",merchant:"Costco",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250921_1",date:"2025-09-21",desc:"Shell Gas Station",amount:73.15,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250922_1",date:"2025-09-22",desc:"Student Loan Payment",amount:180.00,sign:"debit",category:"saving",subcategory:"Extra Debt Payment",merchant:"Nelnet",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250923_1",date:"2025-09-23",desc:"HEB Grocery",amount:189.23,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250924_1",date:"2025-09-24",desc:"Starbucks Coffee",amount:12.40,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Starbucks",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250925_1",date:"2025-09-25",desc:"Amazon Purchase",amount:67.89,sign:"debit",category:"want",subcategory:"Shopping",merchant:"Amazon",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250926_1",date:"2025-09-26",desc:"State Farm Insurance",amount:275.00,sign:"debit",category:"need",subcategory:"Insurance",merchant:"State Farm",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250927_1",date:"2025-09-27",desc:"HEB Grocery",amount:201.56,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
-    {id:"t_20250928_1",date:"2025-09-28",desc:"Shell Gas Station",amount:69.25,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_5724",confidence:0.99},
-    {id:"t_20250930_1",date:"2025-09-30",desc:"Chili's Grill & Bar",amount:64.30,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Chili's",accountId:"acc_chk_5724",confidence:0.98},
+    // October 2025
+    {id:"t_20251001_1",date:"2025-10-01",desc:"Payroll Deposit - Acme Corp W-2",amount:12150.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Acme Corp",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251002_1",date:"2025-10-02",desc:"Mortgage Payment - FirstHome Mortgage",amount:3650.00,sign:"debit",category:"need",subcategory:"Rent/Mortgage",merchant:"FirstHome Mortgage",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251002_2",date:"2025-10-02",desc:"Auto Loan Payment",amount:540.12,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Chase Auto",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251003_1",date:"2025-10-03",desc:"HEB Grocery",amount:195.67,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20251003_2",date:"2025-10-03",desc:"Starbucks Coffee",amount:9.85,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Starbucks",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20251004_1",date:"2025-10-04",desc:"Torchy's Tacos",amount:45.80,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Torchy's Tacos",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20251005_1",date:"2025-10-05",desc:"Austin Energy",amount:312.45,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Austin Energy",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251006_1",date:"2025-10-06",desc:"Target",amount:156.23,sign:"debit",category:"want",subcategory:"Shopping",merchant:"Target",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20251007_1",date:"2025-10-07",desc:"Austin Water Utility",amount:82.30,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Austin Water",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251007_2",date:"2025-10-07",desc:"Shell Gas Station",amount:71.20,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251008_1",date:"2025-10-08",desc:"HEB Grocery",amount:210.45,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20251009_1",date:"2025-10-09",desc:"Starbucks Coffee",amount:11.50,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Starbucks",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20251010_1",date:"2025-10-10",desc:"Walgreens",amount:45.67,sign:"debit",category:"need",subcategory:"Healthcare",merchant:"Walgreens",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20251012_1",date:"2025-10-12",desc:"Netflix Subscription",amount:15.49,sign:"debit",category:"want",subcategory:"Subscriptions",merchant:"Netflix",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251012_2",date:"2025-10-12",desc:"Spotify Premium",amount:10.99,sign:"debit",category:"want",subcategory:"Subscriptions",merchant:"Spotify",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251013_1",date:"2025-10-13",desc:"HEB Grocery",amount:167.89,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20251014_1",date:"2025-10-14",desc:"Shell Gas Station",amount:68.90,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251015_1",date:"2025-10-15",desc:"Payroll Deposit - Acme Corp W-2",amount:12150.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Acme Corp",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251015_2",date:"2025-10-15",desc:"Credit Card Payment",amount:250.00,sign:"debit",category:"saving",subcategory:"Extra Debt Payment",merchant:"Chase Credit Card",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251015_3",date:"2025-10-15",desc:"AT&T Wireless",amount:185.00,sign:"debit",category:"need",subcategory:"Utilities",merchant:"AT&T",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251016_1",date:"2025-10-16",desc:"Starbucks Coffee",amount:8.95,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Starbucks",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20251017_1",date:"2025-10-17",desc:"Texas Gas Service",amount:38.75,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Texas Gas Service",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251017_2",date:"2025-10-17",desc:"HEB Grocery",amount:183.45,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20251018_1",date:"2025-10-18",desc:"Shell Gas Station",amount:67.90,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251019_1",date:"2025-10-19",desc:"Olive Garden",amount:73.50,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Olive Garden",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20251020_1",date:"2025-10-20",desc:"HEB Grocery",amount:192.80,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20251021_1",date:"2025-10-21",desc:"Amazon Purchase",amount:127.45,sign:"debit",category:"want",subcategory:"Shopping",merchant:"Amazon",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20251022_1",date:"2025-10-22",desc:"Student Loan Payment",amount:180.00,sign:"debit",category:"saving",subcategory:"Extra Debt Payment",merchant:"Nelnet",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251023_1",date:"2025-10-23",desc:"Costco",amount:298.70,sign:"debit",category:"need",subcategory:"Groceries",merchant:"Costco",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20251024_1",date:"2025-10-24",desc:"Shell Gas Station",amount:73.40,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251025_1",date:"2025-10-25",desc:"Starbucks Coffee",amount:10.75,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Starbucks",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20251026_1",date:"2025-10-26",desc:"State Farm Insurance",amount:275.00,sign:"debit",category:"need",subcategory:"Insurance",merchant:"State Farm",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251027_1",date:"2025-10-27",desc:"HEB Grocery",amount:167.45,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20251028_1",date:"2025-10-28",desc:"Shell Gas Station",amount:69.25,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251030_1",date:"2025-10-30",desc:"Chili's Grill & Bar",amount:64.30,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Chili's",accountId:"acc_chk_5724",confidence:0.98},
 
     // October 2025
     {id:"t_20251001_1",date:"2025-10-01",desc:"Payroll Deposit - Acme Corp W-2",amount:12150.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Acme Corp",accountId:"acc_chk_5724",confidence:0.99},
@@ -222,19 +223,19 @@ const reynoldsNetWorth = reynoldsTotalAssets - reynoldsTotalLiabilities;
 
 export const SAMPLE_REYNOLDS_DATA: FinancialSnapshot = {
   analyzedPeriod: {
-    startDate: "2025-08-01",
-    endDate: "2025-10-27",
+    startDate: "2025-09-01",
+    endDate: "2025-11-27",
     totalMonths: 3
   },
   accounts: [
-    {id:"acc_chk_5724",name:"Chase Private Client Checking •••5724",type:"checking",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"},
-    {id:"acc_svg_001",name:"Chase Savings — Emergency Fund",type:"savings",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"},
-    {id:"acc_brg_vaa",name:"Vanguard Brokerage (Taxable)",type:"brokerage",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"},
-    {id:"acc_401k_fid",name:"Fidelity 401(k) — James",type:"401k",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"},
-    {id:"acc_ira_roth",name:"Vanguard Roth IRA — Emily",type:"IRA",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"},
-    {id:"acc_real_home",name:"Primary Residence — Austin, TX",type:"real_estate",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"},
-    {id:"acc_vehicle_1",name:"2019 Toyota Highlander",type:"vehicle",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"},
-    {id:"acc_cc_chase",name:"Chase Credit Card",type:"credit_card",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"}
+    {id:"acc_chk_5724",name:"Chase Private Client Checking •••5724",type:"checking",providerStatus:"connected",lastSync:"2025-10-01T10:00:00Z"},
+    {id:"acc_svg_001",name:"Chase Savings — Emergency Fund",type:"savings",providerStatus:"connected",lastSync:"2025-10-01T10:00:00Z"},
+    {id:"acc_brg_vaa",name:"Vanguard Brokerage (Taxable)",type:"brokerage",providerStatus:"connected",lastSync:"2025-10-01T10:00:00Z"},
+    {id:"acc_401k_fid",name:"Fidelity 401(k) — James",type:"401k",providerStatus:"connected",lastSync:"2025-10-01T10:00:00Z"},
+    {id:"acc_ira_roth",name:"Vanguard Roth IRA — Emily",type:"IRA",providerStatus:"connected",lastSync:"2025-10-01T10:00:00Z"},
+    {id:"acc_real_home",name:"Primary Residence — Austin, TX",type:"real_estate",providerStatus:"connected",lastSync:"2025-10-01T10:00:00Z"},
+    {id:"acc_vehicle_1",name:"2019 Toyota Highlander",type:"vehicle",providerStatus:"connected",lastSync:"2025-10-01T10:00:00Z"},
+    {id:"acc_cc_chase",name:"Chase Credit Card",type:"credit_card",providerStatus:"connected",lastSync:"2025-10-01T10:00:00Z"}
   ],
   holdings: [
     {id:"h_chk",accountId:"acc_chk_5724",name:"Checking Balance",accountType:"checking",assetClass:"cash",liquidity:"liquid",balance:12500.00,currency:"USD",source:"mock"},
@@ -286,14 +287,14 @@ const johnsonNetWorth = johnsonTotalAssets - johnsonTotalLiabilities;
 
 export const SAMPLE_JOHNSON_DATA: FinancialSnapshot = {
   analyzedPeriod: {
-    startDate: "2025-08-01",
-    endDate: "2025-10-27",
+    startDate: "2025-09-01",
+    endDate: "2025-11-27",
     totalMonths: 3
   },
   accounts: [
-    {id:"acc_chk_j001",name:"Wells Fargo Checking •••4892",type:"checking",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"},
-    {id:"acc_svg_j002",name:"Ally Savings — Emergency Reserve",type:"savings",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"},
-    {id:"acc_brg_j003",name:"Schwab Brokerage",type:"brokerage",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"},
+    {id:"acc_chk_j001",name:"Wells Fargo Checking •••4892",type:"checking",providerStatus:"connected",lastSync:"2025-10-01T10:00:00Z"},
+    {id:"acc_svg_j002",name:"Ally Savings — Emergency Reserve",type:"savings",providerStatus:"connected",lastSync:"2025-10-01T10:00:00Z"},
+    {id:"acc_brg_j003",name:"Schwab Brokerage",type:"brokerage",providerStatus:"connected",lastSync:"2025-10-01T10:00:00Z"},
     {id:"acc_401k_j004",name:"Vanguard 401(k) — Sarah",type:"401k",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"},
     {id:"acc_ira_j005",name:"Fidelity Roth IRA — Michael",type:"IRA",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"},
     {id:"acc_real_j006",name:"Primary Residence — Denver, CO",type:"real_estate",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"},
@@ -343,8 +344,8 @@ export const SAMPLE_JOHNSON_DATA: FinancialSnapshot = {
 // Export Reynolds transactions as default DashboardData
 export const SAMPLE_DASHBOARD_DATA: DashboardData = {
   period: {
-    start: "2025-08-01",
-    end: "2025-10-27",
+    start: "2025-09-01",
+    end: "2025-11-27",
     months: 3
   },
   accounts: [],
@@ -362,8 +363,8 @@ export const SAMPLE_DASHBOARD_DATA: DashboardData = {
 // Export Johnson transactions as separate DashboardData
 export const SAMPLE_JOHNSON_DASHBOARD_DATA: DashboardData = {
   period: {
-    start: "2025-08-01",
-    end: "2025-10-27",
+    start: "2025-09-01",
+    end: "2025-11-27",
     months: 3
   },
   accounts: [],
@@ -510,16 +511,16 @@ const austinNetWorth = austinTotalAssets - austinTotalLiabilities;
 
 export const SAMPLE_AUSTIN_DATA: FinancialSnapshot = {
   analyzedPeriod: {
-    startDate: "2025-08-01",
-    endDate: "2025-10-29",
+    startDate: "2025-09-01",
+    endDate: "2025-11-29",
     totalMonths: 3
   },
   accounts: [
-    {id:"acc_chk_a001",name:"Chase Checking •••8923",type:"checking",providerStatus:"connected",lastSync:"2025-10-15T10:00:00Z"},
-    {id:"acc_brg_a002",name:"Vanguard Brokerage",type:"brokerage",providerStatus:"connected",lastSync:"2025-10-15T10:00:00Z"},
-    {id:"acc_401k_a003",name:"Fidelity 401(k)",type:"401k",providerStatus:"needs_attention",lastSync:"2025-09-20T10:00:00Z"},
-    {id:"acc_real_a004",name:"Primary Residence — Austin, TX",type:"real_estate",providerStatus:"connected",lastSync:"2025-10-15T10:00:00Z"},
-    {id:"acc_vehicle_a005",name:"2021 Honda Accord",type:"vehicle",providerStatus:"connected",lastSync:"2025-10-15T10:00:00Z"}
+    {id:"acc_chk_a001",name:"Chase Checking •••8923",type:"checking",providerStatus:"connected",lastSync:"2025-11-15T10:00:00Z"},
+    {id:"acc_brg_a002",name:"Vanguard Brokerage",type:"brokerage",providerStatus:"connected",lastSync:"2025-11-15T10:00:00Z"},
+    {id:"acc_401k_a003",name:"Fidelity 401(k)",type:"401k",providerStatus:"needs_attention",lastSync:"2025-10-20T10:00:00Z"},
+    {id:"acc_real_a004",name:"Primary Residence — Austin, TX",type:"real_estate",providerStatus:"connected",lastSync:"2025-11-15T10:00:00Z"},
+    {id:"acc_vehicle_a005",name:"2021 Honda Accord",type:"vehicle",providerStatus:"connected",lastSync:"2025-11-15T10:00:00Z"}
   ],
   holdings: [
     {id:"h_chk_a",accountId:"acc_chk_a001",name:"Checking Balance",accountType:"checking",assetClass:"cash",liquidity:"liquid",balance:40799.00,currency:"USD",source:"mock"},
@@ -560,8 +561,8 @@ export const SAMPLE_AUSTIN_DATA: FinancialSnapshot = {
 
 export const SAMPLE_AUSTIN_DASHBOARD_DATA: DashboardData = {
   period: {
-    start: "2025-08-01",
-    end: "2025-10-29",
+    start: "2025-09-01",
+    end: "2025-11-29",
     months: 3
   },
   accounts: [],
@@ -705,14 +706,14 @@ const phoenixNetWorth = phoenixTotalAssets - phoenixTotalLiabilities;
 
 export const SAMPLE_PHOENIX_DATA: FinancialSnapshot = {
   analyzedPeriod: {
-    startDate: "2025-08-01",
-    endDate: "2025-10-31",
+    startDate: "2025-09-01",
+    endDate: "2025-11-30",
     totalMonths: 3
   },
   accounts: [
-    {id:"acc_chk_p001",name:"Bank of America Checking •••2341",type:"checking",providerStatus:"connected",lastSync:"2025-10-20T10:00:00Z"},
-    {id:"acc_svg_p002",name:"Emergency Fund Savings",type:"savings",providerStatus:"needs_attention",lastSync:"2025-09-15T10:00:00Z"},
-    {id:"acc_ira_p003",name:"Fidelity IRA Account",type:"IRA",providerStatus:"connected",lastSync:"2025-10-20T10:00:00Z"},
+    {id:"acc_chk_p001",name:"Bank of America Checking •••2341",type:"checking",providerStatus:"connected",lastSync:"2025-11-20T10:00:00Z"},
+    {id:"acc_svg_p002",name:"Emergency Fund Savings",type:"savings",providerStatus:"needs_attention",lastSync:"2025-10-15T10:00:00Z"},
+    {id:"acc_ira_p003",name:"Fidelity IRA Account",type:"IRA",providerStatus:"connected",lastSync:"2025-11-20T10:00:00Z"},
     {id:"acc_vehicle_p004",name:"2017 Toyota Camry",type:"vehicle",providerStatus:"disconnected",lastSync:"2025-08-10T10:00:00Z"}
   ],
   holdings: [
@@ -753,8 +754,8 @@ export const SAMPLE_PHOENIX_DATA: FinancialSnapshot = {
 
 export const SAMPLE_PHOENIX_DASHBOARD_DATA: DashboardData = {
   period: {
-    start: "2025-08-01",
-    end: "2025-10-31",
+    start: "2025-09-01",
+    end: "2025-11-30",
     months: 3
   },
   accounts: [],
