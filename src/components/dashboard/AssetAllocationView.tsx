@@ -1,8 +1,6 @@
 import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import type { Holding } from "@/types/financial";
-import { InfoTooltip } from "@/components/ui/info-tooltip";
 
 interface AssetAllocationViewProps {
   holdings: Holding[];
@@ -42,16 +40,9 @@ export const AssetAllocationView = ({ holdings }: AssetAllocationViewProps) => {
   const assetClassData = formatDataForCharts(byAssetClass);
   const liquidityData = formatDataForCharts(byLiquidity);
 
-  const COLORS = [
-    "hsl(var(--primary))",
-    "hsl(var(--accent))",
-    "hsl(var(--success))",
-    "hsl(var(--warning))",
-    "hsl(var(--destructive))",
-    "hsl(213, 94%, 55%)",
-    "hsl(173, 80%, 50%)",
-    "hsl(142, 76%, 45%)",
-  ];
+  const ACCOUNT_TYPE_COLORS = ["#5BB6CE", "#48A0B8", "#3A8DA0", "#2C7A88", "#1E6770"];
+  const ASSET_CLASS_COLORS = ["#9B7FD8", "#8865D0", "#754BC8", "#6231C0", "#4F17B8"];
+  const LIQUIDITY_COLORS = ["#16A34A", "#F59E0B", "#DC2626"];
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -70,160 +61,73 @@ export const AssetAllocationView = ({ holdings }: AssetAllocationViewProps) => {
     return null;
   };
 
-  const renderPieChart = (data: any[]) => (
-    <ResponsiveContainer width="100%" height={300}>
-      <PieChart>
-        <Pie
-          data={data}
-          cx="50%"
-          cy="50%"
-          labelLine={false}
-          label={({ percentage }) => `${percentage}%`}
-          outerRadius={100}
-          fill="#8884d8"
-          dataKey="value"
-        >
-          {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-          ))}
-        </Pie>
-        <Tooltip content={<CustomTooltip />} />
-        <Legend />
-      </PieChart>
-    </ResponsiveContainer>
-  );
-
-  const renderBarChart = (data: any[]) => (
-    <ResponsiveContainer width="100%" height={300}>
-      <BarChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-        <XAxis 
-          dataKey="name" 
-          stroke="hsl(var(--muted-foreground))"
-          tick={{ fontSize: 12 }}
-        />
-        <YAxis 
-          stroke="hsl(var(--muted-foreground))"
-          tick={{ fontSize: 12 }}
-          tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-        />
-        <Tooltip content={<CustomTooltip />} />
-        <Bar dataKey="value" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]}>
-          {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-          ))}
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
+  const renderDonutChart = (data: any[], colors: string[], title: string) => (
+    <div>
+      <h4 className="text-sm font-medium mb-3 text-center">{title}</h4>
+      <ResponsiveContainer width="100%" height={200}>
+        <PieChart>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            innerRadius={60}
+            outerRadius={80}
+            fill="#8884d8"
+            dataKey="value"
+            labelLine={false}
+          >
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+            ))}
+          </Pie>
+          <Tooltip content={<CustomTooltip />} />
+        </PieChart>
+      </ResponsiveContainer>
+      {/* Legend */}
+      <div className="mt-3 space-y-1.5">
+        {data.map((item, idx) => (
+          <div key={idx} className="flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: colors[idx % colors.length] }} />
+              <span>{item.name}</span>
+            </div>
+            <span className="font-medium">{item.percentage}%</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 
   if (holdings.length === 0) {
     return (
-      <Card className="p-8 text-center shadow-soft">
-        <p className="text-muted-foreground">No holdings data available to visualize</p>
+      <Card className="p-6 shadow-sm">
+        <p className="text-sm text-muted-foreground text-center">
+          No holdings to visualize. Add assets in the Holdings tab above.
+        </p>
       </Card>
     );
   }
 
   return (
-    <Card className="p-6 shadow-soft">
-      <h3 className="font-semibold mb-4">Asset Allocation Visualization</h3>
+    <Card className="p-6 shadow-sm">
+      <h3 className="text-lg font-semibold mb-6">Asset Distribution</h3>
       
-      <Tabs defaultValue="account-type" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-6">
-          <TabsTrigger value="account-type">By Account Type</TabsTrigger>
-          <TabsTrigger value="asset-class">By Asset Class</TabsTrigger>
-          <TabsTrigger value="liquidity">
-            <div className="flex items-center gap-1">
-              By Liquidity
-              <InfoTooltip
-                content={
-                  <div className="space-y-2">
-                    <div className="font-semibold">Why these classifications?</div>
-                    <div className="text-xs space-y-1">
-                      <div>
-                        <strong>Vehicles:</strong> Considered illiquid due to typical 4+ week sale timeline, depreciation considerations, and market volatility.
-                      </div>
-                      <div>
-                        <strong>Retirement accounts:</strong> Illiquid due to tax penalties before age 59.5 and withdrawal restrictions.
-                      </div>
-                      <div>
-                        <strong>Real estate:</strong> Requires extensive time for listing, negotiation, and closing process.
-                      </div>
-                    </div>
-                  </div>
-                }
-              />
-            </div>
-          </TabsTrigger>
-          <TabsTrigger value="custom">Custom</TabsTrigger>
-        </TabsList>
+      {/* Three donuts side by side */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {renderDonutChart(accountTypeData, ACCOUNT_TYPE_COLORS, "By Account Type")}
+        {renderDonutChart(assetClassData, ASSET_CLASS_COLORS, "By Asset Class")}
+        {renderDonutChart(liquidityData, LIQUIDITY_COLORS, "By Liquidity")}
+      </div>
 
-        <TabsContent value="account-type">
-          <div className="space-y-6">
-            <div>
-              <h4 className="text-sm font-medium mb-4">Pie Chart View</h4>
-              {renderPieChart(accountTypeData)}
-            </div>
-            <div>
-              <h4 className="text-sm font-medium mb-4">Bar Chart View</h4>
-              {renderBarChart(accountTypeData)}
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="asset-class">
-          <div className="space-y-6">
-            <div>
-              <h4 className="text-sm font-medium mb-4">Pie Chart View</h4>
-              {renderPieChart(assetClassData)}
-            </div>
-            <div>
-              <h4 className="text-sm font-medium mb-4">Bar Chart View</h4>
-              {renderBarChart(assetClassData)}
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="liquidity">
-          <div className="space-y-6">
-            <div>
-              <h4 className="text-sm font-medium mb-4">Pie Chart View</h4>
-              {renderPieChart(liquidityData)}
-            </div>
-            <div>
-              <h4 className="text-sm font-medium mb-4">Bar Chart View</h4>
-              {renderBarChart(liquidityData)}
-            </div>
-            <div className="mt-6 p-4 rounded-lg bg-muted">
-              <h5 className="font-medium mb-2 text-sm">Liquidity Definitions:</h5>
-              <ul className="space-y-1 text-xs text-muted-foreground">
-                <li>• <strong>Liquid:</strong> &lt;1 week to access (cash, checking, savings)</li>
-                <li>• <strong>Semi-Liquid:</strong> 1-4 weeks (brokerage, some investments)</li>
-                <li>• <strong>Illiquid:</strong> &gt;4 weeks (real estate, retirement accounts)</li>
-              </ul>
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="custom">
-          <div className="text-center py-12">
-            <p className="text-muted-foreground mb-2">Custom Categories</p>
-            <p className="text-sm text-muted-foreground">
-              Phase 2: User-defined groupings and custom allocation views will be available here.
-            </p>
-          </div>
-        </TabsContent>
-      </Tabs>
-
-      <div className="mt-6 pt-6 border-t">
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-muted-foreground">Total Visualized Assets</span>
-          <span className="text-lg font-bold text-primary">
+      <div className="mt-6 pt-4 border-t flex justify-end">
+        <p className="text-sm text-muted-foreground">
+          Total Visualized Assets:{" "}
+          <span className="font-semibold text-foreground">
             ${totalAssets.toLocaleString('en-US', { minimumFractionDigits: 2 })}
           </span>
-        </div>
+        </p>
       </div>
     </Card>
   );
 };
+

@@ -1,6 +1,7 @@
 import { useFinancialData } from "@/contexts/FinancialDataContext";
-import { NetWorthKPI } from "@/components/dashboard/NetWorthKPI";
-import { ConnectionStatus } from "@/components/dashboard/ConnectionStatus";
+import { NetWorthKPICard } from "@/components/dashboard/NetWorthKPICard";
+import { AssetsKPICard } from "@/components/dashboard/AssetsKPICard";
+import { LiabilitiesKPICard } from "@/components/dashboard/LiabilitiesKPICard";
 import { LiquidAssetsPanel } from "@/components/dashboard/LiquidAssetsPanel";
 import { HoldingsTable } from "@/components/dashboard/HoldingsTable";
 import { LiabilitiesTable } from "@/components/dashboard/LiabilitiesTable";
@@ -87,90 +88,94 @@ export default function NetWorthDashboard() {
           </div>
         )}
 
-        <div className="grid lg:grid-cols-[360px,1fr] gap-6">
-          {/* Left Column - KPIs & Status */}
-          <div className="space-y-6">
-            <NetWorthKPI snapshot={snapshot} />
-            <ConnectionStatus accounts={snapshot.accounts} />
-            <LiquidAssetsPanel holdings={snapshot.holdings} />
+        {/* Main Layout - Vertical Stack */}
+        <div className="space-y-6">
+          {/* Top KPIs - 3 cards horizontal */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <NetWorthKPICard snapshot={snapshot} />
+            <AssetsKPICard totalAssets={snapshot.netWorth.assets} />
+            <LiabilitiesKPICard 
+              totalLiabilities={snapshot.netWorth.liabilities} 
+              liabilities={snapshot.liabilities}
+            />
           </div>
 
-          {/* Right Column - Data Tables */}
-          <div className="space-y-6">
-            {/* Holdings & Liabilities Tables */}
-            <Card className="p-6 shadow-soft">
-              <h3 className="text-lg font-semibold mb-6">Financial Data</h3>
-              
-              <Tabs defaultValue="holdings" className="w-full">
+          {/* Asset Distribution - 3 donuts side by side */}
+          <AssetAllocationView holdings={snapshot.holdings} />
+
+          {/* Liquid Assets - Horizontal layout */}
+          <LiquidAssetsPanel holdings={snapshot.holdings} />
+
+          {/* Financial Data Tables */}
+          <Card className="shadow-sm">
+            <Tabs defaultValue="holdings" className="w-full">
+              <div className="p-6 pb-0">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="holdings">Holdings & Assets</TabsTrigger>
                   <TabsTrigger value="liabilities">Liabilities</TabsTrigger>
                 </TabsList>
+              </div>
 
-                <TabsContent value="holdings" className="mt-6">
-                  <HoldingsTable 
-                    holdings={snapshot.holdings}
-                    onUpdate={(id, updates) => {
-                      const updated = snapshot.holdings.map(h => 
-                        h.id === id ? { ...h, ...updates } : h
-                      );
-                      setSnapshot(updateSnapshotHoldings(snapshot, updated));
-                    }}
-                    onDelete={(id) => {
-                      const updated = snapshot.holdings.filter(h => h.id !== id);
-                      setSnapshot(updateSnapshotHoldings(snapshot, updated));
-                    }}
-                    onAdd={() => {
-                      const newHolding: Holding = {
-                        id: `holding-${Date.now()}`,
-                        accountId: "manual-1",
-                        name: "New Asset",
-                        accountType: "other",
-                        assetClass: "other",
-                        liquidity: "liquid",
-                        balance: 0,
-                        currency: "USD",
-                        source: "manual",
-                      };
-                      setSnapshot(updateSnapshotHoldings(snapshot, [...snapshot.holdings, newHolding]));
-                    }}
-                  />
-                </TabsContent>
+              <TabsContent value="holdings" className="p-6 pt-4">
+                <HoldingsTable
+                  holdings={snapshot.holdings}
+                  onUpdate={(id, updates) => {
+                    const updated = snapshot.holdings.map(h => 
+                      h.id === id ? { ...h, ...updates } : h
+                    );
+                    setSnapshot(updateSnapshotHoldings(snapshot, updated));
+                  }}
+                  onDelete={(id) => {
+                    const updated = snapshot.holdings.filter(h => h.id !== id);
+                    setSnapshot(updateSnapshotHoldings(snapshot, updated));
+                  }}
+                  onAdd={() => {
+                    const newHolding: Holding = {
+                      id: `holding-${Date.now()}`,
+                      accountId: "manual-1",
+                      name: "New Asset",
+                      accountType: "other",
+                      assetClass: "other",
+                      liquidity: "liquid",
+                      balance: 0,
+                      currency: "USD",
+                      source: "manual",
+                    };
+                    setSnapshot(updateSnapshotHoldings(snapshot, [...snapshot.holdings, newHolding]));
+                  }}
+                />
+              </TabsContent>
 
-                <TabsContent value="liabilities" className="mt-6">
-                  <LiabilitiesTable 
-                    liabilities={snapshot.liabilities}
-                    onUpdate={(id, updates) => {
-                      const updated = snapshot.liabilities.map(l => 
-                        l.id === id ? { ...l, ...updates } : l
-                      );
-                      setSnapshot(updateSnapshotLiabilities(snapshot, updated));
-                    }}
-                    onDelete={(id) => {
-                      const updated = snapshot.liabilities.filter(l => l.id !== id);
-                      setSnapshot(updateSnapshotLiabilities(snapshot, updated));
-                    }}
-                    onAdd={() => {
-                      const newLiability: Liability = {
-                        id: `liability-${Date.now()}`,
-                        accountId: "manual-1",
-                        name: "New Liability",
-                        type: "other",
-                        apr: 0,
-                        balance: 0,
-                        monthlyPayment: 0,
-                        remainingTermMonths: 0,
-                      };
-                      setSnapshot(updateSnapshotLiabilities(snapshot, [...snapshot.liabilities, newLiability]));
-                    }}
-                  />
-                </TabsContent>
-              </Tabs>
-            </Card>
-
-            {/* Asset Allocation */}
-            <AssetAllocationView holdings={snapshot.holdings} />
-          </div>
+              <TabsContent value="liabilities" className="p-6 pt-4">
+                <LiabilitiesTable
+                  liabilities={snapshot.liabilities}
+                  onUpdate={(id, updates) => {
+                    const updated = snapshot.liabilities.map(l => 
+                      l.id === id ? { ...l, ...updates } : l
+                    );
+                    setSnapshot(updateSnapshotLiabilities(snapshot, updated));
+                  }}
+                  onDelete={(id) => {
+                    const updated = snapshot.liabilities.filter(l => l.id !== id);
+                    setSnapshot(updateSnapshotLiabilities(snapshot, updated));
+                  }}
+                  onAdd={() => {
+                    const newLiability: Liability = {
+                      id: `liability-${Date.now()}`,
+                      accountId: "manual-1",
+                      name: "New Liability",
+                      type: "other",
+                      apr: 0,
+                      balance: 0,
+                      monthlyPayment: 0,
+                      remainingTermMonths: 0,
+                    };
+                    setSnapshot(updateSnapshotLiabilities(snapshot, [...snapshot.liabilities, newLiability]));
+                  }}
+                />
+              </TabsContent>
+            </Tabs>
+          </Card>
         </div>
       </div>
     </div>
