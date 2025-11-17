@@ -100,14 +100,22 @@ export default function NetWorthDashboard() {
             />
           </div>
 
-          {/* Asset Distribution - 3 donuts side by side */}
-          <AssetAllocationView holdings={snapshot.holdings} />
-
-          {/* Liquid Assets - Horizontal layout */}
-          <LiquidAssetsPanel holdings={snapshot.holdings} />
-
-          {/* Financial Data Tables */}
-          <Card className="shadow-sm">
+          {/* Consolidated Card */}
+          <Card className="p-6 shadow-sm">
+            <div><h3 className="text-lg font-semibold mb-6">Asset Distribution</h3><AssetAllocationView holdings={snapshot.holdings} /></div>
+            <div className="my-8 border-t" />
+            <div><h3 className="text-lg font-semibold mb-6">Liquid Assets</h3><LiquidAssetsPanel holdings={snapshot.holdings} /></div>
+            <div className="my-8 border-t" />
+            <div><h3 className="text-lg font-semibold mb-6">Financial Data</h3>
+            <Tabs defaultValue="holdings" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="holdings">Holdings & Assets</TabsTrigger>
+                <TabsTrigger value="liabilities">Liabilities</TabsTrigger>
+              </TabsList>
+              <TabsContent value="holdings" className="mt-4"><HoldingsTable holdings={snapshot.holdings} onUpdate={(id, updates) => setSnapshot(updateSnapshotHoldings(snapshot, snapshot.holdings.map(h => h.id === id ? { ...h, ...updates } : h)))} onDelete={(id) => setSnapshot(updateSnapshotHoldings(snapshot, snapshot.holdings.filter(h => h.id !== id)))} onAdd={() => setSnapshot(updateSnapshotHoldings(snapshot, [...snapshot.holdings, { id: `holding-${Date.now()}`, accountId: "manual-1", name: "New Asset", accountType: "other", assetClass: "other", liquidity: "liquid", balance: 0, currency: "USD", source: "manual" }]))} /></TabsContent>
+              <TabsContent value="liabilities" className="mt-4"><LiabilitiesTable liabilities={snapshot.liabilities} onUpdate={(id, updates) => setSnapshot(updateSnapshotLiabilities(snapshot, snapshot.liabilities.map(l => l.id === id ? { ...l, ...updates } : l)))} onDelete={(id) => setSnapshot(updateSnapshotLiabilities(snapshot, snapshot.liabilities.filter(l => l.id !== id)))} onAdd={() => setSnapshot(updateSnapshotLiabilities(snapshot, [...snapshot.liabilities, { id: `liability-${Date.now()}`, accountId: "manual-1", name: "New Liability", type: "other", apr: 0, balance: 0, monthlyPayment: 0, termMonths: 12, currency: "USD", source: "manual" }]))} /></TabsContent>
+            </Tabs></div>
+          </Card>
             <Tabs defaultValue="holdings" className="w-full">
               <div className="p-6 pb-0">
                 <TabsList className="grid w-full grid-cols-2">

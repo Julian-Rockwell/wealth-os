@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import type { Holding } from "@/types/financial";
 
@@ -61,65 +60,78 @@ export const AssetAllocationView = ({ holdings }: AssetAllocationViewProps) => {
     return null;
   };
 
-  const renderDonutChart = (data: any[], colors: string[], title: string) => (
-    <div>
-      <h4 className="text-sm font-medium mb-3 text-center">{title}</h4>
-      <ResponsiveContainer width="100%" height={200}>
-        <PieChart>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            innerRadius={60}
-            outerRadius={80}
-            fill="#8884d8"
-            dataKey="value"
-            labelLine={false}
-          >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
-            ))}
-          </Pie>
-          <Tooltip content={<CustomTooltip />} />
-        </PieChart>
-      </ResponsiveContainer>
-      {/* Legend */}
-      <div className="mt-3 space-y-1.5">
-        {data.map((item, idx) => (
-          <div key={idx} className="flex items-center justify-between text-xs">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: colors[idx % colors.length] }} />
-              <span>{item.name}</span>
+  const renderDistributionCard = (
+    data: any[], 
+    colors: string[], 
+    title: string
+  ) => (
+    <div className="border rounded-lg p-4 bg-muted/20">
+      <h4 className="text-sm font-semibold mb-4">{title}</h4>
+      
+      <div className="grid grid-cols-1 md:grid-cols-[200px,1fr] gap-6 items-center">
+        {/* Donut a la izquierda */}
+        <div>
+          <ResponsiveContainer width="100%" height={180}>
+            <PieChart>
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                innerRadius={50}
+                outerRadius={70}
+                dataKey="value"
+              >
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                ))}
+              </Pie>
+              <Tooltip content={<CustomTooltip />} />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Listado a la derecha */}
+        <div className="space-y-2">
+          {data.map((item, idx) => (
+            <div key={idx} className="flex items-center justify-between py-2 px-3 rounded hover:bg-muted/30 transition-colors">
+              <div className="flex items-center gap-3">
+                <div 
+                  className="w-4 h-4 rounded-full flex-shrink-0" 
+                  style={{ backgroundColor: colors[idx % colors.length] }} 
+                />
+                <span className="text-sm font-medium">{item.name}</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-muted-foreground">
+                  ${item.value.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                </span>
+                <span className="text-sm font-semibold min-w-[45px] text-right">
+                  {item.percentage}%
+                </span>
+              </div>
             </div>
-            <span className="font-medium">{item.percentage}%</span>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
 
   if (holdings.length === 0) {
     return (
-      <Card className="p-6 shadow-sm">
-        <p className="text-sm text-muted-foreground text-center">
-          No holdings to visualize. Add assets in the Holdings tab above.
-        </p>
-      </Card>
+      <p className="text-sm text-muted-foreground text-center py-8">
+        No holdings to visualize. Add assets in the Holdings tab below.
+      </p>
     );
   }
 
   return (
-    <Card className="p-6 shadow-sm">
-      <h3 className="text-lg font-semibold mb-6">Asset Distribution</h3>
+    <div className="space-y-4">
+      {renderDistributionCard(accountTypeData, ACCOUNT_TYPE_COLORS, "By Account Type")}
+      {renderDistributionCard(assetClassData, ASSET_CLASS_COLORS, "By Asset Class")}
+      {renderDistributionCard(liquidityData, LIQUIDITY_COLORS, "By Liquidity")}
       
-      {/* Three donuts side by side */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {renderDonutChart(accountTypeData, ACCOUNT_TYPE_COLORS, "By Account Type")}
-        {renderDonutChart(assetClassData, ASSET_CLASS_COLORS, "By Asset Class")}
-        {renderDonutChart(liquidityData, LIQUIDITY_COLORS, "By Liquidity")}
-      </div>
-
-      <div className="mt-6 pt-4 border-t flex justify-end">
+      {/* Footer con total */}
+      <div className="flex justify-end pt-4 border-t">
         <p className="text-sm text-muted-foreground">
           Total Visualized Assets:{" "}
           <span className="font-semibold text-foreground">
@@ -127,7 +139,6 @@ export const AssetAllocationView = ({ holdings }: AssetAllocationViewProps) => {
           </span>
         </p>
       </div>
-    </Card>
+    </div>
   );
 };
-
