@@ -76,7 +76,7 @@ export default function UnifiedPanel() {
               disabled={!snapshot}
             >
               <LayoutDashboard className="w-4 h-4" />
-              Dashboard
+              Net Worth
             </TabsTrigger>
             <TabsTrigger 
               value="command" 
