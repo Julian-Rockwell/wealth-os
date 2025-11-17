@@ -109,6 +109,33 @@ export default function NetWorthDashboard() {
         <div>
           <h3 className="text-lg font-semibold mb-6">Financial Data</h3>
           
+          {/* Debt KPIs */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <Card className="p-4">
+              <div className="text-sm text-muted-foreground mb-1">Total Debt</div>
+              <div className="text-2xl font-bold text-destructive">
+                ${snapshot.liabilities.reduce((sum, l) => sum + l.balance, 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+              </div>
+            </Card>
+            <Card className="p-4">
+              <div className="text-sm text-muted-foreground mb-1">Monthly Payment</div>
+              <div className="text-2xl font-bold">
+                ${snapshot.liabilities.reduce((sum, l) => sum + l.monthlyPayment, 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+              </div>
+            </Card>
+            <Card className="p-4">
+              <div className="text-sm text-muted-foreground mb-1">Weighted Avg APR</div>
+              <div className="text-2xl font-bold">
+                {(() => {
+                  const totalDebt = snapshot.liabilities.reduce((sum, l) => sum + l.balance, 0);
+                  return totalDebt > 0
+                    ? (snapshot.liabilities.reduce((sum, l) => sum + (l.apr * l.balance), 0) / totalDebt).toFixed(2)
+                    : '0.00';
+                })()}%
+              </div>
+            </Card>
+          </div>
+          
           <Tabs defaultValue="holdings" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="holdings">Holdings & Assets</TabsTrigger>
