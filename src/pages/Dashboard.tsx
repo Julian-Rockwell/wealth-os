@@ -1,16 +1,13 @@
 import { useState } from "react";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
 
-import { ViewToggle } from "@/components/dashboard/ViewToggle";
 import { FiltersCard } from "@/components/dashboard/FiltersCard";
-import { BudgetDonut } from "@/components/dashboard/BudgetDonut";
 import { Card } from "@/components/ui/card";
-import { MonthlyStackedBars } from "@/components/dashboard/MonthlyStackedBars";
 import { TransactionsList } from "@/components/dashboard/TransactionsList";
-import { KeyInsights } from "@/components/dashboard/KeyInsights";
 import { PersonalizedRecommendations } from "@/components/dashboard/PersonalizedRecommendations";
-import { IncomeExpensesKPI } from "@/components/dashboard/IncomeExpensesKPI";
 import { UnspentIncomeCard } from "@/components/dashboard/UnspentIncomeCard";
+import { SpendingVisualization } from "@/components/dashboard/SpendingVisualization";
+import { KeyInsightsContainer } from "@/components/dashboard/KeyInsightsContainer";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Database, BarChart3 } from "lucide-react";
@@ -93,26 +90,7 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
               </div>
             </Card>
 
-            <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
-            
-            <div className="grid md:grid-cols-2 gap-6">
-              <BudgetDonut data={data} viewMode={viewMode} period={period} />
-              <MonthlyStackedBars data={data} />
-            </div>
-
-            <FiltersCard data={data} filters={filters} setFilters={setFilters} />
-
-            <TransactionsList 
-              key={data.txns[0]?.id || 'no-data'}
-              transactions={data.txns} 
-              onUpdate={updateTransaction}
-              onDelete={deleteTransaction}
-              filters={filters}
-            />
-
-            <KeyInsights data={data} />
-
-            <PersonalizedRecommendations data={data} />
+            {/* Placeholder for sample data loading */}
           </div>
         </div>
       </div>
@@ -177,54 +155,37 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
             </div>
           </Card>
 
-          {/* Income, Expenses & Unspent Income - 2 Column Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column: Income and Expenses stacked - 1/3 width */}
-            <div className="lg:col-span-1 space-y-6">
-              <IncomeExpensesKPI data={data} period={period} />
-            </div>
-            
-            {/* Right Column: Unspent Income - 2/3 width */}
-            <div className="lg:col-span-2">
-              <UnspentIncomeCard 
-                data={data} 
-                period={period}
-                onUpdateIncome={updateIncome}
-              />
-            </div>
-          </div>
+          {/* Income/Expenses/Unspent Income - Full Width */}
+          <UnspentIncomeCard 
+            data={data} 
+            period={period}
+            onUpdateIncome={updateIncome}
+          />
 
-          {/* View Toggle */}
-          <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
-          
-          {/* Two Column Layout: Budget Visualizations + Filters & Transactions */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column: 1/3 width */}
-            <div className="lg:col-span-1 space-y-6 flex flex-col">
-              <BudgetDonut data={data} viewMode={viewMode} period={period} />
-              <MonthlyStackedBars data={data} />
-              
-              {/* Key Insights - 3 Cards */}
-              <KeyInsights data={data} />
-            </div>
+          {/* Spending Visualization with ViewToggle - Full Width */}
+          <SpendingVisualization 
+            data={data} 
+            viewMode={viewMode} 
+            setViewMode={setViewMode}
+            period={period}
+          />
 
-            {/* Right Column: 2/3 width */}
-            <div className="lg:col-span-2 space-y-6 flex flex-col">
-              <FiltersCard data={data} filters={filters} setFilters={setFilters} />
-              
-              <div className="flex-1">
-                <TransactionsList 
-                  key={data.txns[0]?.id || 'no-data'}
-                  transactions={data.txns} 
-                  onUpdate={updateTransaction}
-                  onDelete={deleteTransaction}
-                  filters={filters}
-                />
-              </div>
-            </div>
-          </div>
+          {/* Key Insights Container - Full Width */}
+          <KeyInsightsContainer data={data} />
 
-          {/* Personalized Recommendations */}
+          {/* Filters - Full Width */}
+          <FiltersCard data={data} filters={filters} setFilters={setFilters} />
+
+          {/* Transactions List - Full Width */}
+          <TransactionsList 
+            key={data.txns[0]?.id || 'no-data'}
+            transactions={data.txns} 
+            onUpdate={updateTransaction}
+            onDelete={deleteTransaction}
+            filters={filters}
+          />
+
+          {/* Personalized Recommendations - Full Width */}
           <PersonalizedRecommendations data={data} />
         </div>
       </div>
