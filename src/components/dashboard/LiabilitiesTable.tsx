@@ -3,8 +3,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertCircle, AlertTriangle, CheckCircle, Edit3, Trash2, Check, X, Plus } from "lucide-react";
-import type { Liability, LiabilityType } from "@/types/financial";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { AlertCircle, AlertTriangle, CheckCircle, Edit3, Trash2, Plus } from "lucide-react";
+import type { Liability } from "@/types/financial";
 import { toast } from "sonner";
 
 interface LiabilitiesTableProps {
@@ -21,304 +22,30 @@ const getPriorityLevel = (apr: number) => {
 };
 
 export const LiabilitiesTable = ({ liabilities, onUpdate, onDelete, onAdd }: LiabilitiesTableProps) => {
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState<Partial<Liability>>({});
+  const [editingCell, setEditingCell] = useState<{ id: string; field: keyof Liability } | null>(null);
+  const [cellValue, setCellValue] = useState<any>("");
 
-  const startEdit = (liability: Liability) => {
-    setEditingId(liability.id);
-    setEditForm(liability);
-  };
+  const isEditing = (id: string, field: keyof Liability) => editingCell?.id === id && editingCell?.field === field;
 
-  const cancelEdit = () => {
-    setEditingId(null);
-    setEditForm({});
-  };
-
-  const saveEdit = () => {
-    if (editingId && onUpdate) {
-      onUpdate(editingId, editForm);
-      toast.success("Liability updated successfully");
-      cancelEdit();
+  const renderEditableCell = (liability: Liability, field: keyof Liability, displayValue: any, inputType: 'text' | 'number' | 'select' = 'text', selectOptions?: { value: string; label: string }[]) => {
+    if (isEditing(liability.id, field)) {
+      if (inputType === 'select') return <Select value={cellValue} onValueChange={(val) => { setCellValue(val); setTimeout(() => { onUpdate?.(liability.id, { [field]: val }); toast.success("Updated"); setEditingCell(null); }, 100); }}><SelectTrigger className="h-8"><SelectValue /></SelectTrigger><SelectContent>{selectOptions?.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent></Select>;
+      return <Input type={inputType} value={cellValue} onChange={(e) => setCellValue(inputType === 'number' ? parseFloat(e.target.value) || 0 : e.target.value)} onBlur={() => { if (editingCell && onUpdate) { onUpdate(editingCell.id, { [editingCell.field]: cellValue }); toast.success("Updated"); } setEditingCell(null); }} onKeyDown={(e) => { if (e.key === 'Enter') { onUpdate?.(liability.id, { [field]: cellValue }); setEditingCell(null); } }} autoFocus className="h-8" />;
     }
+    return <div onClick={() => { setEditingCell({ id: liability.id, field }); setCellValue(liability[field]); }} className="cursor-pointer hover:bg-muted/50 px-2 py-1 rounded group flex items-center gap-2"><span>{displayValue}</span><Edit3 className="w-3 h-3 opacity-0 group-hover:opacity-50" /></div>;
   };
 
-  const handleDelete = (id: string, name: string) => {
-    if (confirm(`Delete ${name}?`)) {
-      onDelete?.(id);
-      toast.success("Liability deleted successfully");
-    }
-  };
+  if (!liabilities?.length) return <div className="space-y-4"><div className="flex justify-between items-center"><h4 className="text-sm font-medium text-muted-foreground">0 Liabilities</h4>{onAdd && <Button onClick={onAdd} variant="outline" size="sm"><Plus className="w-4 h-4 mr-2" />Add Liability</Button>}</div><div className="text-center py-8 text-muted-foreground">No liabilities data.</div></div>;
 
-  if (!liabilities || liabilities.length === 0) {
-    return (
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h4 className="text-sm font-medium text-muted-foreground">0 Liabilities</h4>
-          {onAdd && (
-            <Button onClick={onAdd} variant="outline" size="sm">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Liability
-            </Button>
-          )}
-        </div>
-        <div className="text-center py-8 text-muted-foreground">
-          No liabilities data available. Click "Add Liability" to add your first liability.
-        </div>
-      </div>
-    );
-  }
-
-  const totalLiabilities = liabilities.reduce((sum, l) => sum + l.balance, 0);
-  const totalMonthlyPayment = liabilities.reduce((sum, l) => sum + l.monthlyPayment, 0);
-  
-  // Calculate weighted average APR
-  const weightedAPR = liabilities.reduce((sum, l) => sum + (l.apr * l.balance), 0) / totalLiabilities;
-
-  // Group by type
-  const byType = liabilities.reduce((acc, l) => {
-    if (!acc[l.type]) {
-      acc[l.type] = { balance: 0, count: 0 };
-    }
-    acc[l.type].balance += l.balance;
-    acc[l.type].count += 1;
-    return acc;
-  }, {} as Record<string, { balance: number; count: number }>);
+  const total = liabilities.reduce((sum, l) => sum + l.balance, 0);
+  const totalPayment = liabilities.reduce((sum, l) => sum + l.monthlyPayment, 0);
+  const weightedAPR = liabilities.reduce((sum, l) => sum + (l.apr * l.balance), 0) / total;
 
   return (
     <div className="space-y-6">
-      {/* Header with Add Button */}
-      <div className="flex justify-between items-center">
-        <h4 className="text-sm font-medium text-muted-foreground">
-          {liabilities.length} {liabilities.length === 1 ? 'Liability' : 'Liabilities'} <span className="text-xs font-normal">(from snapshot data)</span>
-        </h4>
-        {onAdd && (
-          <Button onClick={onAdd} variant="outline" size="sm">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Liability
-          </Button>
-        )}
-      </div>
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="p-4 rounded-lg border bg-card">
-          <p className="text-xs text-muted-foreground mb-1">Total Debt</p>
-          <p className="text-lg font-bold text-destructive">
-            ${totalLiabilities.toLocaleString('en-US', { minimumFractionDigits: 0 })}
-          </p>
-        </div>
-        <div className="p-4 rounded-lg border bg-card">
-          <p className="text-xs text-muted-foreground mb-1">Monthly Payment</p>
-          <p className="text-lg font-bold">
-            ${totalMonthlyPayment.toLocaleString('en-US', { minimumFractionDigits: 0 })}
-          </p>
-        </div>
-        <div className="p-4 rounded-lg border bg-card">
-          <p className="text-xs text-muted-foreground mb-1">Weighted Avg APR</p>
-          <p className="text-lg font-bold">
-            {weightedAPR.toFixed(2)}%
-          </p>
-        </div>
-      </div>
-
-      {/* Liabilities Table */}
-      <div className="rounded-md border">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/50">
-              <tr>
-                <th className="text-left p-3 font-medium">Priority</th>
-                <th className="text-left p-3 font-medium">Name</th>
-                <th className="text-left p-3 font-medium">Type</th>
-                <th className="text-right p-3 font-medium">APR</th>
-                <th className="text-right p-3 font-medium">Balance</th>
-                <th className="text-right p-3 font-medium">Monthly Payment</th>
-                <th className="text-right p-3 font-medium">Term (mo)</th>
-                <th className="text-right p-3 font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {liabilities
-                .sort((a, b) => b.apr - a.apr)
-                .map((liability) => {
-                  const priority = getPriorityLevel(liability.apr);
-                  const PriorityIcon = priority.icon;
-                  
-                  return (
-                    <tr key={liability.id} className="hover:bg-muted/30 transition-colors">
-                      {editingId === liability.id ? (
-                        <>
-                          <td className="p-3">
-                            <Badge variant={getPriorityLevel(editForm.apr || 0).color as any} className="gap-1">
-                              <PriorityIcon className="w-3 h-3" />
-                              {getPriorityLevel(editForm.apr || 0).label}
-                            </Badge>
-                          </td>
-                          <td className="p-3">
-                            <Input
-                              value={editForm.name || ""}
-                              onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                              className="h-8"
-                            />
-                          </td>
-                          <td className="p-3">
-                            <Select
-                              value={editForm.type}
-                              onValueChange={(value) => setEditForm({ ...editForm, type: value as LiabilityType })}
-                            >
-                              <SelectTrigger className="h-8">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="mortgage">Mortgage</SelectItem>
-                                <SelectItem value="auto">Auto Loan</SelectItem>
-                                <SelectItem value="student">Student Loan</SelectItem>
-                                <SelectItem value="credit_card">Credit Card</SelectItem>
-                                <SelectItem value="personal">Personal Loan</SelectItem>
-                                <SelectItem value="other">Other</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </td>
-                          <td className="p-3">
-                            <Input
-                              type="number"
-                              step="0.01"
-                              value={editForm.apr || 0}
-                              onChange={(e) => setEditForm({ ...editForm, apr: parseFloat(e.target.value) || 0 })}
-                              className="h-8 text-right"
-                            />
-                          </td>
-                          <td className="p-3">
-                            <Input
-                              type="number"
-                              value={editForm.balance || 0}
-                              onChange={(e) => setEditForm({ ...editForm, balance: parseFloat(e.target.value) || 0 })}
-                              className="h-8 text-right"
-                            />
-                          </td>
-                          <td className="p-3">
-                            <Input
-                              type="number"
-                              value={editForm.monthlyPayment || 0}
-                              onChange={(e) => setEditForm({ ...editForm, monthlyPayment: parseFloat(e.target.value) || 0 })}
-                              className="h-8 text-right"
-                            />
-                          </td>
-                          <td className="p-3">
-                            <Input
-                              type="number"
-                              value={editForm.remainingTermMonths || 0}
-                              onChange={(e) => setEditForm({ ...editForm, remainingTermMonths: parseInt(e.target.value) || 0 })}
-                              className="h-8 text-right"
-                            />
-                          </td>
-                          <td className="p-3">
-                            <div className="flex gap-1 justify-end">
-                              <Button variant="ghost" size="icon" onClick={saveEdit} className="h-8 w-8">
-                                <Check className="w-4 h-4 text-success" />
-                              </Button>
-                              <Button variant="ghost" size="icon" onClick={cancelEdit} className="h-8 w-8">
-                                <X className="w-4 h-4 text-destructive" />
-                              </Button>
-                            </div>
-                          </td>
-                        </>
-                      ) : (
-                        <>
-                          <td className="p-3">
-                            <Badge variant={priority.color as any} className="gap-1">
-                              <PriorityIcon className="w-3 h-3" />
-                              {priority.label}
-                            </Badge>
-                          </td>
-                          <td className="p-3 font-medium">{liability.name}</td>
-                          <td className="p-3 capitalize">{liability.type.replace("_", " ")}</td>
-                          <td className="p-3 text-right">
-                            <span className="font-semibold">
-                              {liability.apr.toFixed(2)}%
-                            </span>
-                          </td>
-                          <td className="p-3 text-right font-medium">
-                            ${liability.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                          </td>
-                          <td className="p-3 text-right">
-                            ${liability.monthlyPayment.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                          </td>
-                          <td className="p-3 text-right">
-                            {liability.remainingTermMonths}
-                          </td>
-                          <td className="p-3">
-                            <div className="flex gap-1 justify-end">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => startEdit(liability)}
-                                className="h-8 w-8"
-                              >
-                                <Edit3 className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleDelete(liability.id, liability.name)}
-                                className="h-8 w-8"
-                              >
-                                <Trash2 className="w-4 h-4 text-destructive" />
-                              </Button>
-                            </div>
-                          </td>
-                        </>
-                      )}
-                    </tr>
-                  );
-                })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Breakdown by Type */}
-      <div className="p-4 rounded-lg border bg-muted/30">
-        <h4 className="text-sm font-medium mb-3">Breakdown by Type</h4>
-        <div className="space-y-2">
-          {Object.entries(byType).map(([type, data]) => (
-            <div key={type} className="flex justify-between items-center text-sm">
-              <span className="capitalize">{type.replace("_", " ")} ({data.count})</span>
-              <span className="font-semibold">
-                ${data.balance.toLocaleString('en-US', { minimumFractionDigits: 0 })}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Priority Legend */}
-      <div className="p-4 rounded-lg border bg-card">
-        <h4 className="text-xs font-medium text-muted-foreground mb-3">Priority Levels</h4>
-        <div className="grid grid-cols-3 gap-3 text-xs">
-          <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-destructive" />
-            <div>
-              <p className="font-semibold">URGENT</p>
-              <p className="text-muted-foreground">&gt;18% APR</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-warning" />
-            <div>
-              <p className="font-semibold">Consider</p>
-              <p className="text-muted-foreground">8-18% APR</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-success" />
-            <div>
-              <p className="font-semibold">Maintain</p>
-              <p className="text-muted-foreground">&lt;8% APR</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div className="flex justify-between items-center"><h4 className="text-sm font-medium text-muted-foreground">{liabilities.length} Liabilities <span className="text-xs font-normal">(from snapshot data)</span></h4>{onAdd && <Button onClick={onAdd} variant="outline" size="sm"><Plus className="w-4 h-4 mr-2" />Add Liability</Button>}</div>
+      <div className="grid grid-cols-3 gap-4"><div className="p-4 rounded-lg border bg-card"><p className="text-xs text-muted-foreground mb-1">Total Debt</p><p className="text-lg font-bold text-destructive">${total.toLocaleString()}</p></div><div className="p-4 rounded-lg border bg-card"><p className="text-xs text-muted-foreground mb-1">Monthly Payment</p><p className="text-lg font-bold">${totalPayment.toLocaleString()}</p></div><div className="p-4 rounded-lg border bg-card"><p className="text-xs text-muted-foreground mb-1">Weighted Avg APR</p><p className="text-lg font-bold">{weightedAPR.toFixed(2)}%</p></div></div>
+      <Table><TableHeader><TableRow><TableHead>Priority</TableHead><TableHead>Name</TableHead><TableHead>Type</TableHead><TableHead className="text-right">APR</TableHead><TableHead className="text-right">Balance</TableHead><TableHead className="text-right">Monthly</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader><TableBody>{liabilities.map((l) => { const p = getPriorityLevel(l.apr); const Icon = p.icon; return <TableRow key={l.id}><TableCell><Badge variant={p.color as any}><Icon className="w-3 h-3" />{p.label}</Badge></TableCell><TableCell>{renderEditableCell(l, 'name', l.name, 'text')}</TableCell><TableCell>{renderEditableCell(l, 'type', l.type.replace('_', ' '), 'select', [{ value: 'mortgage', label: 'Mortgage' }, { value: 'auto_loan', label: 'Auto Loan' }, { value: 'credit_card', label: 'Credit Card' }, { value: 'other', label: 'Other' }])}</TableCell><TableCell className="text-right">{renderEditableCell(l, 'apr', `${l.apr.toFixed(2)}%`, 'number')}</TableCell><TableCell className="text-right">{renderEditableCell(l, 'balance', `$${l.balance.toLocaleString()}`, 'number')}</TableCell><TableCell className="text-right">{renderEditableCell(l, 'monthlyPayment', `$${l.monthlyPayment.toLocaleString()}`, 'number')}</TableCell><TableCell className="text-right"><Button variant="ghost" size="sm" onClick={() => { if (confirm(`Delete ${l.name}?`)) { onDelete?.(l.id); toast.success("Deleted"); } }}><Trash2 className="w-4 h-4 text-destructive" /></Button></TableCell></TableRow>; })}</TableBody></Table>
     </div>
   );
 };

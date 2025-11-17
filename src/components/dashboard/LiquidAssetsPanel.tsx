@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
@@ -33,7 +32,7 @@ export const LiquidAssetsPanel = ({ holdings }: LiquidAssetsPanelProps) => {
   }, [totalAvailable, setAvailableCapital]);
 
   return (
-    <Card className="p-6 shadow-sm">
+    <>
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold">Liquid Assets</h3>
         <InfoTooltip
@@ -111,7 +110,7 @@ export const LiquidAssetsPanel = ({ holdings }: LiquidAssetsPanelProps) => {
           </span>
         </div>
       )}
-    </Card>
+    </>
   );
 };
 
