@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Pencil, DollarSign, TrendingUp } from "lucide-react";
+import { Pencil, DollarSign, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import type { DashboardData } from "@/types/dashboard";
 import { classifyTransactions } from "@/utils/transactionClassifier";
 
@@ -18,23 +18,67 @@ export const UnspentIncomeCard = ({ data, period, onUpdateIncome }: UnspentIncom
   const [isEditing, setIsEditing] = useState(false);
   const [editedIncome, setEditedIncome] = useState(String(data.income.avgMonthly));
 
-  // Calculate date range for the period
-  const endDate = new Date();
-  const startDate = new Date();
-  startDate.setDate(endDate.getDate() - period);
+  // Calculate date ranges for current and previous periods
+  const now = new Date();
+  const periodDaysAgo = new Date(now.getTime() - period * 24 * 60 * 60 * 1000);
+  const doublePeriodDaysAgo = new Date(now.getTime() - (period * 2) * 24 * 60 * 60 * 1000);
 
-  // Filter transactions for the current period
-  const periodTransactions = data.txns.filter(txn => {
-    const txnDate = new Date(txn.date);
-    return txnDate >= startDate && txnDate <= endDate;
+  // Filter transactions for current period
+  const currentPeriodTxns = data.txns.filter(t => {
+    const date = new Date(t.date);
+    return date >= periodDaysAgo && date <= now;
   });
 
-  // Classify transactions to get real income and expenses for the period
-  const classified = classifyTransactions(periodTransactions);
+  // Filter transactions for previous period
+  const previousPeriodTxns = data.txns.filter(t => {
+    const date = new Date(t.date);
+    return date >= doublePeriodDaysAgo && date < periodDaysAgo;
+  });
+
+  // Classify transactions for both periods
+  const currentClassification = classifyTransactions(currentPeriodTxns);
+  const previousClassification = classifyTransactions(previousPeriodTxns);
   
-  const totalIncomeForPeriod = classified.totals.income;
-  const totalExpenses = classified.totals.expenses;
-  const unspentIncome = totalIncomeForPeriod - totalExpenses;
+  const totalIncome = currentClassification.totals.income;
+  const totalExpenses = currentClassification.totals.expenses;
+  const unspentIncome = totalIncome - totalExpenses;
+
+  const previousIncome = previousClassification.totals.income;
+  const previousExpenses = previousClassification.totals.expenses;
+
+  // Calculate percentage changes
+  const incomeChange = previousIncome > 0 
+    ? ((totalIncome - previousIncome) / previousIncome) * 100
+    : 0;
+
+  const expensesChange = previousExpenses > 0
+    ? ((totalExpenses - previousExpenses) / previousExpenses) * 100
+    : 0;
+
+  const getTrendIcon = (value: number) => {
+    if (value > 0) return <TrendingUp className="w-4 h-4 text-success" />;
+    if (value < 0) return <TrendingDown className="w-4 h-4 text-destructive" />;
+    return <Minus className="w-4 h-4 text-warning" />;
+  };
+
+  const getTrendColor = (value: number) => {
+    if (value > 0) return "text-success";
+    if (value < 0) return "text-destructive";
+    return "text-warning";
+  };
+
+  // For expenses, the color logic is inverted
+  const getExpenseTrendColor = (value: number) => {
+    if (value > 0) return "text-destructive";
+    if (value < 0) return "text-success";
+    return "text-warning";
+  };
+
+  const getExpenseTrendIcon = (value: number) => {
+    if (value > 0) return <TrendingUp className="w-4 h-4 text-destructive" />;
+    if (value < 0) return <TrendingDown className="w-4 h-4 text-success" />;
+    return <Minus className="w-4 h-4 text-warning" />;
+  };
 
   const handleSave = () => {
     const newIncome = parseFloat(editedIncome);
@@ -46,20 +90,10 @@ export const UnspentIncomeCard = ({ data, period, onUpdateIncome }: UnspentIncom
 
   return (
     <>
-      <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
+      <Card className="shadow-soft">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <TrendingUp className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <CardTitle>Unspent Income <span className="text-xs text-muted-foreground font-normal ml-2">(strange calculation)</span></CardTitle>
-                <CardDescription>
-                  Income not allocated to expenses in this {period}-day period
-                </CardDescription>
-              </div>
-            </div>
+            <CardTitle>Income & Expenses Overview <span className="text-xs text-muted-foreground font-normal ml-2">(calculated from txns)</span></CardTitle>
             <Button
               variant="ghost"
               size="icon"
@@ -67,69 +101,72 @@ export const UnspentIncomeCard = ({ data, period, onUpdateIncome }: UnspentIncom
                 setEditedIncome(String(data.income.avgMonthly));
                 setIsEditing(true);
               }}
-              aria-label="Edit income"
+              aria-label="Edit monthly income"
             >
               <Pencil className="w-4 h-4" />
             </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Income and Expenses stacked on the left */}
-            <div className="space-y-3 md:col-span-2">
-              <div className="flex items-center justify-between p-3 rounded bg-background/30">
-                <div className="flex items-center gap-2">
-                  <DollarSign className="w-4 h-4 text-success" />
-                  <span className="text-muted-foreground">Total Income ({period} days)</span>
-                </div>
-                <span className="font-semibold">
-                  ${totalIncomeForPeriod.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Column 1: Total Income */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 mb-1">
+                <DollarSign className="w-4 h-4 text-success" />
+                <span className="text-sm font-medium text-muted-foreground">Total Income</span>
               </div>
-
-              <div className="flex items-center justify-between p-3 rounded bg-background/30">
-                <span className="text-muted-foreground">Total Expenses ({period} days)</span>
-                <span className="font-semibold text-destructive">
-                  -${totalExpenses.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              <p className="text-3xl font-bold text-success">
+                ${totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              </p>
+              <div className="flex items-center gap-1 text-sm">
+                {getTrendIcon(incomeChange)}
+                <span className={getTrendColor(incomeChange)}>
+                  {incomeChange > 0 ? '+' : ''}{incomeChange.toFixed(1)}%
                 </span>
-              </div>
-
-              <div className="flex items-center justify-between p-3 rounded bg-background/30 border-t pt-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">Avg Monthly Income</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-muted-foreground">
-                    ${data.income.avgMonthly.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0"
-                    onClick={() => {
-                      setEditedIncome(String(data.income.avgMonthly));
-                      setIsEditing(true);
-                    }}
-                  >
-                    <Pencil className="w-3 h-3" />
-                  </Button>
-                </div>
+                <span className="text-muted-foreground text-xs">vs prev {period}d</span>
               </div>
             </div>
 
-            {/* Unspent Income on the right */}
-            <div className="flex items-center justify-center p-4 rounded bg-background/30 border-2 border-primary/20">
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground mb-2">Unspent Income</p>
-                <p className={`text-2xl font-bold ${unspentIncome >= 0 ? 'text-success' : 'text-destructive'}`}>
-                  ${Math.abs(unspentIncome).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </p>
-                {unspentIncome < 0 && (
-                  <p className="text-xs text-destructive mt-2">
-                    Overspent
-                  </p>
-                )}
+            {/* Column 2: Total Expenses */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 mb-1">
+                <DollarSign className="w-4 h-4 text-destructive" />
+                <span className="text-sm font-medium text-muted-foreground">Total Expenses</span>
               </div>
+              <p className="text-3xl font-bold text-destructive">
+                ${totalExpenses.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              </p>
+              <div className="flex items-center gap-1 text-sm">
+                {getExpenseTrendIcon(expensesChange)}
+                <span className={getExpenseTrendColor(expensesChange)}>
+                  {expensesChange > 0 ? '+' : ''}{expensesChange.toFixed(1)}%
+                </span>
+                <span className="text-muted-foreground text-xs">vs prev {period}d</span>
+              </div>
+            </div>
+
+            {/* Column 3: Unspent Income */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 mb-1">
+                <TrendingUp className="w-4 h-4 text-primary" />
+                <span className="text-sm font-medium text-muted-foreground">Unspent Income</span>
+              </div>
+              <p className="text-3xl font-bold text-primary">
+                ${unspentIncome.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              </p>
+              <div className="text-xs text-muted-foreground">
+                Available for savings or investment
+              </div>
+            </div>
+          </div>
+
+          {/* Average Monthly Income Row */}
+          <div className="mt-6 pt-6 border-t">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Average Monthly Income</span>
+              <span className="text-lg font-semibold">
+                ${data.income.avgMonthly.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
             </div>
           </div>
         </CardContent>
@@ -139,27 +176,19 @@ export const UnspentIncomeCard = ({ data, period, onUpdateIncome }: UnspentIncom
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Monthly Income</DialogTitle>
+            <DialogTitle>Edit Average Monthly Income</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="monthly-income">Average Monthly Income</Label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                <Input
-                  id="monthly-income"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={editedIncome}
-                  onChange={(e) => setEditedIncome(e.target.value)}
-                  className="pl-7"
-                  placeholder="0.00"
-                />
-              </div>
-              <p className="text-xs text-muted-foreground">
-                This will update your average monthly income used for calculations
-              </p>
+              <Label htmlFor="income">Monthly Income</Label>
+              <Input
+                id="income"
+                type="number"
+                step="0.01"
+                value={editedIncome}
+                onChange={(e) => setEditedIncome(e.target.value)}
+                placeholder="Enter monthly income"
+              />
             </div>
           </div>
           <DialogFooter>

@@ -153,7 +153,7 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
   // Handle insufficient income warning for category view
   if (viewMode === "category" && (viewData as any).insufficientIncome) {
     return (
-      <Card className="p-6 shadow-soft">
+      <div className="space-y-4">
         <div className="flex items-center gap-2 mb-4">
           <h3 className="font-semibold">{viewData.title}</h3>
         </div>
@@ -163,7 +163,7 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
             No se puede calcular la distribución 50/30/20. Ingreso neto insuficiente o no detectado en el período seleccionado (${((viewData as any).totalIncome || 0).toFixed(0)}).
           </AlertDescription>
         </Alert>
-      </Card>
+      </div>
     );
   }
 
@@ -191,7 +191,7 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
   const conicGradient = `conic-gradient(${gradientStops})`;
 
   return (
-    <Card className="p-6 shadow-soft">
+    <div className="space-y-4">
       <div className="flex items-center gap-2 mb-4">
         <h3 className="font-semibold">{viewData.title} <span className="text-xs text-muted-foreground font-normal ml-2">(calculated from classified transactions)</span></h3>
         {viewMode === "category" && (
@@ -282,6 +282,6 @@ export const BudgetDonut = ({ data, viewMode, period }: BudgetDonutProps) => {
           ))}
         </div>
       )}
-    </Card>
+    </div>
   );
 };

@@ -23,7 +23,7 @@ export const MonthlyStackedBars = ({ data }: MonthlyStackedBarsProps) => {
   const maxTotal = Math.max(...months.map(m => monthlyData[m].needs + monthlyData[m].wants + monthlyData[m].savings));
 
   return (
-    <Card className="p-6 shadow-soft">
+    <div className="space-y-4">{/* No Card wrapper - will be inside SpendingVisualization */}
       <div className="flex items-center gap-2 mb-4">
         <h3 className="font-semibold">Monthly Breakdown <span className="text-xs text-muted-foreground font-normal ml-2">(calculated from transaction history)</span></h3>
         <InfoTooltip content={
@@ -80,6 +80,6 @@ export const MonthlyStackedBars = ({ data }: MonthlyStackedBarsProps) => {
           );
         })}
       </div>
-    </Card>
+    </div>
   );
 };
