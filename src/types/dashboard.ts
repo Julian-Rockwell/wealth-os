@@ -11,6 +11,7 @@ export interface Transaction {
   merchant: string;
   accountId: string;
   confidence: number;
+  liquidity?: "discretionary" | "committed" | "fixed";
 }
 
 export interface Account {

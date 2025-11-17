@@ -6,6 +6,7 @@ import { FiltersCard } from "@/components/dashboard/FiltersCard";
 import { BudgetDonut } from "@/components/dashboard/BudgetDonut";
 import { Card } from "@/components/ui/card";
 import { MonthlyStackedBars } from "@/components/dashboard/MonthlyStackedBars";
+import { SpendingLiquidityDonut } from "@/components/dashboard/SpendingLiquidityDonut";
 import { TransactionsList } from "@/components/dashboard/TransactionsList";
 import { KeyInsights } from "@/components/dashboard/KeyInsights";
 import { PersonalizedRecommendations } from "@/components/dashboard/PersonalizedRecommendations";
@@ -194,38 +195,33 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
             </div>
           </div>
 
+          {/* ROW 2: Charts - Spending Liquidity Donut + Monthly Breakdown */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <SpendingLiquidityDonut data={data} period={period} />
+            <MonthlyStackedBars data={data} />
+          </div>
+
+          {/* ROW 3: Key Insights - 3 Cards */}
+          <KeyInsights data={data} />
+
+          {/* ROW 4: Personalized Recommendations */}
+          <PersonalizedRecommendations data={data} />
+
           {/* View Toggle */}
           <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
           
-          {/* Two Column Layout: Budget Visualizations + Filters & Transactions */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column: 1/3 width */}
-            <div className="lg:col-span-1 space-y-6 flex flex-col">
-              <BudgetDonut data={data} viewMode={viewMode} period={period} />
-              <MonthlyStackedBars data={data} />
-              
-              {/* Key Insights - 3 Cards */}
-              <KeyInsights data={data} />
-            </div>
-
-            {/* Right Column: 2/3 width */}
-            <div className="lg:col-span-2 space-y-6 flex flex-col">
-              <FiltersCard data={data} filters={filters} setFilters={setFilters} />
-              
-              <div className="flex-1">
-                <TransactionsList 
-                  key={data.txns[0]?.id || 'no-data'}
-                  transactions={data.txns} 
-                  onUpdate={updateTransaction}
-                  onDelete={deleteTransaction}
-                  filters={filters}
-                />
-              </div>
-            </div>
+          {/* Filters & Transactions */}
+          <div className="space-y-6">
+            <FiltersCard data={data} filters={filters} setFilters={setFilters} />
+            
+            <TransactionsList 
+              key={data.txns[0]?.id || 'no-data'}
+              transactions={data.txns} 
+              onUpdate={updateTransaction}
+              onDelete={deleteTransaction}
+              filters={filters}
+            />
           </div>
-
-          {/* Personalized Recommendations */}
-          <PersonalizedRecommendations data={data} />
         </div>
       </div>
     </div>
