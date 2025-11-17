@@ -71,14 +71,14 @@ export const AssetAllocationView = ({ holdings }: AssetAllocationViewProps) => {
       <div className="grid grid-cols-1 md:grid-cols-[200px,1fr] gap-6 items-center">
         {/* Donut a la izquierda */}
         <div>
-          <ResponsiveContainer width="100%" height={180}>
+          <ResponsiveContainer width="100%" height={150}>
             <PieChart>
               <Pie
                 data={data}
                 cx="50%"
                 cy="50%"
-                innerRadius={50}
-                outerRadius={70}
+                innerRadius={40}
+                outerRadius={58}
                 dataKey="value"
               >
                 {data.map((entry, index) => (
@@ -91,17 +91,17 @@ export const AssetAllocationView = ({ holdings }: AssetAllocationViewProps) => {
         </div>
 
         {/* Listado a la derecha */}
-        <div className="space-y-2">
+        <div className="space-y-1">
           {data.map((item, idx) => (
-            <div key={idx} className="flex items-center justify-between py-2 px-3 rounded hover:bg-muted/30 transition-colors">
+            <div key={idx} className="flex items-center justify-between py-1 px-3 rounded hover:bg-muted/30 transition-colors">
             <div className="flex items-center gap-3">
               <div 
                 className="w-4 h-4 rounded-full flex-shrink-0" 
                 style={{ backgroundColor: colors[idx % colors.length] }} 
               />
-              <span className="text-sm font-medium">{item.name}</span>
+              <span className="text-xs font-medium">{item.name}</span>
             </div>
-            <span className="text-sm font-semibold min-w-[45px] text-right">
+            <span className="text-xs font-semibold min-w-[45px] text-right">
               {item.percentage}%
             </span>
             </div>
