@@ -46,19 +46,17 @@ export const UnspentIncomeCard = ({ data, period, onUpdateIncome }: UnspentIncom
 
   return (
     <>
-      <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <TrendingUp className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <CardTitle>Unspent Income <span className="text-xs text-muted-foreground font-normal ml-2">(strange calculation)</span></CardTitle>
-                <CardDescription>
-                  Income not allocated to expenses in this {period}-day period
-                </CardDescription>
-              </div>
+      <Card className="rounded-xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 shadow-sm">
+        <div className="p-6">
+          {/* Header with title and edit button */}
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-lg font-semibold text-foreground">
+                Unspent Income <span className="text-xs text-muted-foreground font-normal ml-2">(strange calculation)</span>
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Income not allocated to expenses in this {period}-day period
+              </p>
             </div>
             <Button
               variant="ghost"
@@ -67,72 +65,51 @@ export const UnspentIncomeCard = ({ data, period, onUpdateIncome }: UnspentIncom
                 setEditedIncome(String(data.income.avgMonthly));
                 setIsEditing(true);
               }}
+              className="h-8 w-8"
               aria-label="Edit income"
             >
-              <Pencil className="w-4 h-4" />
+              <Pencil className="w-4 h-4 text-muted-foreground hover:text-foreground" />
             </Button>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Income and Expenses stacked on the left */}
+
+          {/* Two-column layout */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Left column: Income, Expenses, Avg Monthly Income */}
             <div className="space-y-3 md:col-span-2">
-              <div className="flex items-center justify-between p-3 rounded bg-background/30">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-border/50">
                 <div className="flex items-center gap-2">
                   <DollarSign className="w-4 h-4 text-success" />
-                  <span className="text-muted-foreground">Total Income ({period} days)</span>
+                  <span className="text-sm text-muted-foreground">Total Income ({period} days)</span>
                 </div>
-                <span className="font-semibold">
+                <span className="font-semibold text-success">
                   ${totalIncomeForPeriod.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded bg-background/30">
-                <span className="text-muted-foreground">Total Expenses ({period} days)</span>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-border/50">
+                <span className="text-sm text-muted-foreground">Total Expenses ({period} days)</span>
                 <span className="font-semibold text-destructive">
                   -${totalExpenses.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded bg-background/30 border-t pt-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">Avg Monthly Income</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-muted-foreground">
-                    ${data.income.avgMonthly.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0"
-                    onClick={() => {
-                      setEditedIncome(String(data.income.avgMonthly));
-                      setIsEditing(true);
-                    }}
-                  >
-                    <Pencil className="w-3 h-3" />
-                  </Button>
-                </div>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-border/50">
+                <span className="text-sm text-muted-foreground">Avg Monthly Income</span>
+                <span className="font-semibold">
+                  ${data.income.avgMonthly.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
               </div>
             </div>
 
-            {/* Unspent Income on the right */}
-            <div className="flex items-center justify-center p-4 rounded bg-background/30 border-2 border-primary/20">
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground mb-2">Unspent Income</p>
-                <p className={`text-2xl font-bold ${unspentIncome >= 0 ? 'text-success' : 'text-destructive'}`}>
-                  ${Math.abs(unspentIncome).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </p>
-                {unspentIncome < 0 && (
-                  <p className="text-xs text-destructive mt-2">
-                    Overspent
-                  </p>
-                )}
-              </div>
+            {/* Right column: Large Unspent Income */}
+            <div className="flex flex-col items-center justify-center p-6 rounded-lg bg-gradient-to-br from-success/10 to-success/20 border-2 border-success/30">
+              <span className="text-sm text-muted-foreground mb-2">Unspent</span>
+              <p className="text-4xl font-bold tracking-tight text-success">
+                ${unspentIncome.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+              </p>
             </div>
           </div>
-        </CardContent>
+        </div>
       </Card>
 
       {/* Edit Income Dialog */}

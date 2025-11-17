@@ -122,44 +122,62 @@ export const PersonalizedRecommendations = ({ data }: PersonalizedRecommendation
   const recommendations = generateRecommendations();
 
   return (
-    <Card className="p-6 shadow-soft">
+    <Card className="p-6 rounded-xl border border-border bg-card shadow-sm">
       <div className="flex items-center gap-2 mb-6">
-        <Bot className="w-6 h-6 text-primary" />
-        <h3 className="text-lg font-semibold">Personalized Recommendations <span className="text-xs text-muted-foreground font-normal ml-2">(strange calculation - Rocky's help here)</span></h3>
+        <div className="p-2 rounded-lg bg-primary/10">
+          <Bot className="w-5 h-5 text-primary" />
+        </div>
+        <h3 className="text-lg font-semibold">
+          Personalized Recommendations <span className="text-xs text-muted-foreground font-normal ml-2">(strange calculation - Rocky's help here)</span>
+        </h3>
       </div>
 
       <Tabs defaultValue="quick-wins" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="quick-wins">🎯 Quick Wins</TabsTrigger>
-          <TabsTrigger value="this-week">📋 This Week</TabsTrigger>
-          <TabsTrigger value="budget-plan">🏗️ Budget Plan</TabsTrigger>
+        <TabsList className="inline-flex rounded-lg border p-0.5 bg-muted/50">
+          <TabsTrigger 
+            value="quick-wins" 
+            className="px-3 py-1.5 rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm"
+          >
+            🎯 Quick Wins
+          </TabsTrigger>
+          <TabsTrigger 
+            value="this-week"
+            className="px-3 py-1.5 rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm"
+          >
+            📋 This Week
+          </TabsTrigger>
+          <TabsTrigger 
+            value="budget-plan"
+            className="px-3 py-1.5 rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm"
+          >
+            🏗️ Budget Plan
+          </TabsTrigger>
         </TabsList>
 
         {/* Quick Wins Tab */}
-        <TabsContent value="quick-wins" className="space-y-4 mt-6">
+        <TabsContent value="quick-wins" className="space-y-3 mt-6">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="font-semibold text-sm">Save ${recommendations.totalSavings}/month</h4>
+            <h4 className="font-semibold text-sm text-muted-foreground">Save ${recommendations.totalSavings}/month</h4>
           </div>
           
-          <div className="space-y-3">
+          <div className="space-y-2">
             {recommendations.quickWins.map((rec, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-4 rounded-lg border bg-card hover:shadow-soft transition-shadow"
+                className="flex items-center justify-between p-3 rounded-lg border border-border bg-card hover:border-primary/50 transition-colors"
               >
                 <div className="flex-1">
                   <p className="font-medium text-sm mb-1">{rec.title}</p>
                   <p className="text-xs text-muted-foreground">
-                    Potential savings: <span className="font-semibold text-success">${rec.estMonthlySave}/month</span>
+                    Potential savings: <span className="font-semibold text-success">${rec.estMonthlySave}/mo</span>
                   </p>
                 </div>
                 <Button
                   size="sm"
-                  variant="outline"
+                  variant="ghost"
                   onClick={() => handleApply(rec.title)}
-                  className="ml-4"
+                  className="ml-4 h-8"
                 >
-                  <Tag className="w-3 h-3 mr-2" />
                   Apply
                 </Button>
               </div>
@@ -168,22 +186,22 @@ export const PersonalizedRecommendations = ({ data }: PersonalizedRecommendation
         </TabsContent>
 
         {/* This Week Tab */}
-        <TabsContent value="this-week" className="space-y-4 mt-6">
-          <ul className="space-y-3">
+        <TabsContent value="this-week" className="space-y-3 mt-6">
+          <ul className="space-y-2">
             {recommendations.thisWeek.map((task, index) => (
-              <li key={index} className="flex items-start gap-3 p-3 rounded-lg border bg-card">
+              <li key={index} className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card">
                 <Calendar className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                <span className="text-sm">{task}</span>
+                <span className="text-sm text-foreground">{task}</span>
               </li>
             ))}
           </ul>
         </TabsContent>
 
         {/* Budget Restructuring Plan Tab */}
-        <TabsContent value="budget-plan" className="space-y-4 mt-6">
-          <div className="space-y-4">
+        <TabsContent value="budget-plan" className="space-y-3 mt-6">
+          <div className="space-y-2">
             {recommendations.restructuringPlan.map((phase, index) => (
-              <div key={index} className="flex items-start gap-3 p-4 rounded-lg border bg-card">
+              <div key={index} className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card">
                 <div className="p-2 rounded-lg bg-primary/10 flex-shrink-0">
                   <TrendingUp className="w-4 h-4 text-primary" />
                 </div>
@@ -191,7 +209,7 @@ export const PersonalizedRecommendations = ({ data }: PersonalizedRecommendation
                   <p className="text-xs font-semibold text-primary mb-1">
                     {phase.phase}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-foreground">
                     {phase.action}
                   </p>
                 </div>

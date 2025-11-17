@@ -177,15 +177,15 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
             </div>
           </Card>
 
-          {/* Income, Expenses & Unspent Income - 2 Column Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column: Income and Expenses stacked - 1/3 width */}
-            <div className="lg:col-span-1 space-y-6">
+          {/* ROW 1: KPI Cards + Unspent Income Hero */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            {/* Left: 2 mini KPI cards (Income and Expenses) - 2/5 width */}
+            <div className="lg:col-span-2">
               <IncomeExpensesKPI data={data} period={period} />
             </div>
             
-            {/* Right Column: Unspent Income - 2/3 width */}
-            <div className="lg:col-span-2">
+            {/* Right: Unspent Income hero card - 3/5 width */}
+            <div className="lg:col-span-3">
               <UnspentIncomeCard 
                 data={data} 
                 period={period}
