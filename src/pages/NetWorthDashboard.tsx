@@ -113,76 +113,8 @@ export default function NetWorthDashboard() {
                 <TabsTrigger value="liabilities">Liabilities</TabsTrigger>
               </TabsList>
               <TabsContent value="holdings" className="mt-4"><HoldingsTable holdings={snapshot.holdings} onUpdate={(id, updates) => setSnapshot(updateSnapshotHoldings(snapshot, snapshot.holdings.map(h => h.id === id ? { ...h, ...updates } : h)))} onDelete={(id) => setSnapshot(updateSnapshotHoldings(snapshot, snapshot.holdings.filter(h => h.id !== id)))} onAdd={() => setSnapshot(updateSnapshotHoldings(snapshot, [...snapshot.holdings, { id: `holding-${Date.now()}`, accountId: "manual-1", name: "New Asset", accountType: "other", assetClass: "other", liquidity: "liquid", balance: 0, currency: "USD", source: "manual" }]))} /></TabsContent>
-              <TabsContent value="liabilities" className="mt-4"><LiabilitiesTable liabilities={snapshot.liabilities} onUpdate={(id, updates) => setSnapshot(updateSnapshotLiabilities(snapshot, snapshot.liabilities.map(l => l.id === id ? { ...l, ...updates } : l)))} onDelete={(id) => setSnapshot(updateSnapshotLiabilities(snapshot, snapshot.liabilities.filter(l => l.id !== id)))} onAdd={() => setSnapshot(updateSnapshotLiabilities(snapshot, [...snapshot.liabilities, { id: `liability-${Date.now()}`, accountId: "manual-1", name: "New Liability", type: "other", apr: 0, balance: 0, monthlyPayment: 0, termMonths: 12, currency: "USD", source: "manual" }]))} /></TabsContent>
+              <TabsContent value="liabilities" className="mt-4"><LiabilitiesTable liabilities={snapshot.liabilities} onUpdate={(id, updates) => setSnapshot(updateSnapshotLiabilities(snapshot, snapshot.liabilities.map(l => l.id === id ? { ...l, ...updates } : l)))} onDelete={(id) => setSnapshot(updateSnapshotLiabilities(snapshot, snapshot.liabilities.filter(l => l.id !== id)))} onAdd={() => setSnapshot(updateSnapshotLiabilities(snapshot, [...snapshot.liabilities, { id: `liability-${Date.now()}`, accountId: "manual-1", name: "New Liability", type: "other", apr: 0, balance: 0, monthlyPayment: 0, remainingTermMonths: 0 }]))} /></TabsContent>
             </Tabs></div>
-          </Card>
-            <Tabs defaultValue="holdings" className="w-full">
-              <div className="p-6 pb-0">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="holdings">Holdings & Assets</TabsTrigger>
-                  <TabsTrigger value="liabilities">Liabilities</TabsTrigger>
-                </TabsList>
-              </div>
-
-              <TabsContent value="holdings" className="p-6 pt-4">
-                <HoldingsTable
-                  holdings={snapshot.holdings}
-                  onUpdate={(id, updates) => {
-                    const updated = snapshot.holdings.map(h => 
-                      h.id === id ? { ...h, ...updates } : h
-                    );
-                    setSnapshot(updateSnapshotHoldings(snapshot, updated));
-                  }}
-                  onDelete={(id) => {
-                    const updated = snapshot.holdings.filter(h => h.id !== id);
-                    setSnapshot(updateSnapshotHoldings(snapshot, updated));
-                  }}
-                  onAdd={() => {
-                    const newHolding: Holding = {
-                      id: `holding-${Date.now()}`,
-                      accountId: "manual-1",
-                      name: "New Asset",
-                      accountType: "other",
-                      assetClass: "other",
-                      liquidity: "liquid",
-                      balance: 0,
-                      currency: "USD",
-                      source: "manual",
-                    };
-                    setSnapshot(updateSnapshotHoldings(snapshot, [...snapshot.holdings, newHolding]));
-                  }}
-                />
-              </TabsContent>
-
-              <TabsContent value="liabilities" className="p-6 pt-4">
-                <LiabilitiesTable
-                  liabilities={snapshot.liabilities}
-                  onUpdate={(id, updates) => {
-                    const updated = snapshot.liabilities.map(l => 
-                      l.id === id ? { ...l, ...updates } : l
-                    );
-                    setSnapshot(updateSnapshotLiabilities(snapshot, updated));
-                  }}
-                  onDelete={(id) => {
-                    const updated = snapshot.liabilities.filter(l => l.id !== id);
-                    setSnapshot(updateSnapshotLiabilities(snapshot, updated));
-                  }}
-                  onAdd={() => {
-                    const newLiability: Liability = {
-                      id: `liability-${Date.now()}`,
-                      accountId: "manual-1",
-                      name: "New Liability",
-                      type: "other",
-                      apr: 0,
-                      balance: 0,
-                      monthlyPayment: 0,
-                      remainingTermMonths: 0,
-                    };
-                    setSnapshot(updateSnapshotLiabilities(snapshot, [...snapshot.liabilities, newLiability]));
-                  }}
-                />
-              </TabsContent>
-            </Tabs>
           </Card>
         </div>
       </div>
