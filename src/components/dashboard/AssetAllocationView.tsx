@@ -94,21 +94,16 @@ export const AssetAllocationView = ({ holdings }: AssetAllocationViewProps) => {
         <div className="space-y-2">
           {data.map((item, idx) => (
             <div key={idx} className="flex items-center justify-between py-2 px-3 rounded hover:bg-muted/30 transition-colors">
-              <div className="flex items-center gap-3">
-                <div 
-                  className="w-4 h-4 rounded-full flex-shrink-0" 
-                  style={{ backgroundColor: colors[idx % colors.length] }} 
-                />
-                <span className="text-sm font-medium">{item.name}</span>
-              </div>
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-muted-foreground">
-                  ${item.value.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                </span>
-                <span className="text-sm font-semibold min-w-[45px] text-right">
-                  {item.percentage}%
-                </span>
-              </div>
+            <div className="flex items-center gap-3">
+              <div 
+                className="w-4 h-4 rounded-full flex-shrink-0" 
+                style={{ backgroundColor: colors[idx % colors.length] }} 
+              />
+              <span className="text-sm font-medium">{item.name}</span>
+            </div>
+            <span className="text-sm font-semibold min-w-[45px] text-right">
+              {item.percentage}%
+            </span>
             </div>
           ))}
         </div>
@@ -126,9 +121,11 @@ export const AssetAllocationView = ({ holdings }: AssetAllocationViewProps) => {
 
   return (
     <div className="space-y-4">
-      {renderDistributionCard(accountTypeData, ACCOUNT_TYPE_COLORS, "By Account Type")}
-      {renderDistributionCard(assetClassData, ASSET_CLASS_COLORS, "By Asset Class")}
-      {renderDistributionCard(liquidityData, LIQUIDITY_COLORS, "By Liquidity")}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {renderDistributionCard(accountTypeData, ACCOUNT_TYPE_COLORS, "By Account Type")}
+        {renderDistributionCard(assetClassData, ASSET_CLASS_COLORS, "By Asset Class")}
+        {renderDistributionCard(liquidityData, LIQUIDITY_COLORS, "By Liquidity")}
+      </div>
       
       {/* Footer con total */}
       <div className="flex justify-end pt-4 border-t">

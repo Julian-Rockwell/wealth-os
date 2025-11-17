@@ -8,7 +8,7 @@ import { LiabilitiesTable } from "@/components/dashboard/LiabilitiesTable";
 import { AssetAllocationView } from "@/components/dashboard/AssetAllocationView";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, Database, LayoutDashboard } from "lucide-react";
+import { AlertCircle, Database, LayoutDashboard, AlertTriangle } from "lucide-react";
 import type { Holding, Liability } from "@/types/financial";
 import { updateSnapshotHoldings, updateSnapshotLiabilities } from "@/utils/snapshotHelpers";
 
@@ -106,8 +106,59 @@ export default function NetWorthDashboard() {
             <div className="my-8 border-t" />
             <div><h3 className="text-lg font-semibold mb-6">Liquid Assets</h3><LiquidAssetsPanel holdings={snapshot.holdings} /></div>
             <div className="my-8 border-t" />
-            <div><h3 className="text-lg font-semibold mb-6">Financial Data</h3>
-            <Tabs defaultValue="holdings" className="w-full">
+            <div>
+              <h3 className="text-lg font-semibold mb-6">Financial Data</h3>
+              
+              {/* KPIs de Liabilities - Siempre visibles */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 bg-muted/30 rounded-lg border">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Total Debt</p>
+                  <p className="text-2xl font-bold text-destructive">
+                    ${snapshot.netWorth.liabilities.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Monthly Payment</p>
+                  <p className="text-2xl font-bold">
+                    ${snapshot.liabilities.reduce((sum, l) => sum + l.monthlyPayment, 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Weighted Avg APR</p>
+                  <p className="text-2xl font-bold">
+                    {snapshot.netWorth.liabilities > 0 
+                      ? (snapshot.liabilities.reduce((sum, l) => sum + (l.apr * l.balance), 0) / snapshot.netWorth.liabilities).toFixed(2)
+                      : '0.00'}%
+                  </p>
+                </div>
+              </div>
+              
+              {/* Priority Levels */}
+              <div className="flex items-center justify-between mb-6 p-3 bg-muted/20 rounded border">
+                <span className="text-sm font-medium text-muted-foreground">Priority Levels:</span>
+                <div className="flex gap-6">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-destructive" />
+                    <span className="text-sm">
+                      <span className="font-semibold text-destructive">URGENT</span> &gt;18% APR
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-warning" />
+                    <span className="text-sm">
+                      <span className="font-semibold text-warning">Consider</span> 8-18% APR
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full bg-success/20" />
+                    <span className="text-sm">
+                      <span className="font-semibold text-success">Maintain</span> &lt;8% APR
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <Tabs defaultValue="holdings" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="holdings">Holdings & Assets</TabsTrigger>
                 <TabsTrigger value="liabilities">Liabilities</TabsTrigger>

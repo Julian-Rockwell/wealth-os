@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Edit3, Trash2, Plus } from "lucide-react";
+import { Edit3, Trash2, Plus, Home, Car } from "lucide-react";
 import type { Holding } from "@/types/financial";
 import { toast } from "sonner";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
@@ -63,7 +63,11 @@ export const HoldingsTable = ({ holdings, onUpdate, onDelete, onAdd }: HoldingsT
     <>
       <div className="flex justify-between items-center mb-4">
         <h4 className="text-sm font-medium text-muted-foreground">{holdings.length} {holdings.length === 1 ? 'Asset' : 'Assets'} <span className="text-xs font-normal">(from snapshot data)</span></h4>
-        {onAdd && <Button onClick={onAdd} variant="outline" size="sm"><Plus className="w-4 h-4 mr-2" />Add Asset</Button>}
+        <div className="flex gap-2">
+          {onAdd && <Button onClick={onAdd} variant="outline" size="sm"><Plus className="w-4 h-4 mr-2" />Add Asset</Button>}
+          <Button variant="outline" size="sm" onClick={() => {}}><Home className="w-4 h-4 mr-2" />Connect Property</Button>
+          <Button variant="outline" size="sm" onClick={() => {}}><Car className="w-4 h-4 mr-2" />Connect Vehicle</Button>
+        </div>
       </div>
       {holdings.length === 0 ? <p className="text-sm text-muted-foreground text-center py-8">No holdings data available.</p> : (
         <div className="overflow-x-auto">
