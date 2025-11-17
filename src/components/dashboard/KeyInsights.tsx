@@ -145,83 +145,74 @@ export const KeyInsights = ({ data }: KeyInsightsProps) => {
   const insights = generateInsights();
 
   return (
-    <div className="grid grid-cols-1 gap-4">
-      <Card className="p-5 shadow-soft border-l-4 border-l-primary">
-        <div className="flex items-start gap-3">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Biggest Opportunity - Blue Accent */}
+      <Card className="p-6 rounded-xl border-l-4 border-l-primary bg-card shadow-sm">
+        <div className="flex items-center gap-3 mb-3">
           <div className="p-2 rounded-lg bg-primary/10">
             <TrendingUp className="w-5 h-5 text-primary" />
           </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-1 mb-2">
-              <h4 className="text-sm font-semibold text-muted-foreground">
-                Biggest Opportunity
-              </h4>
-              <InfoTooltip content={
-                <div className="space-y-2">
-                  <p><strong>How it's calculated:</strong></p>
-                  <p className="text-xs">We analyze ALL your spending categories and calculate realistic savings:</p>
-                  <p className="text-xs">• <strong>Wants</strong> (Dining, Shopping, Entertainment): 30% reduction</p>
-                  <p className="text-xs">• <strong>Optimizable Needs</strong> (Groceries, Utilities): 15% reduction</p>
-                  <p className="text-xs">• <strong>Subscriptions</strong>: 50% elimination</p>
-                  <p className="text-xs mt-1">Only shows opportunities that save $50+/month.</p>
-                </div>
-              } />
-            </div>
-            <p className="text-sm font-medium leading-relaxed">
-              {insights.biggest_opportunity.insight}
-            </p>
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-foreground">Biggest Opportunity</h3>
+            <InfoTooltip content={
+              <div className="space-y-2">
+                <p><strong>How it's calculated:</strong></p>
+                <p className="text-xs">We analyze ALL your spending categories and calculate realistic savings:</p>
+                <p className="text-xs">• <strong>Wants</strong> (Dining, Shopping, Entertainment): 30% reduction</p>
+                <p className="text-xs">• <strong>Optimizable Needs</strong> (Groceries, Utilities): 15% reduction</p>
+                <p className="text-xs">• <strong>Subscriptions</strong>: 50% elimination</p>
+                <p className="text-xs mt-1">Only shows opportunities that save $50+/month.</p>
+              </div>
+            } />
           </div>
         </div>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {insights.biggest_opportunity.insight}
+        </p>
       </Card>
 
-      <Card className="p-5 shadow-soft border-l-4 border-l-success">
-        <div className="flex items-start gap-3">
+      {/* Positive Trend - Green Accent */}
+      <Card className="p-6 rounded-xl border-l-4 border-l-success bg-card shadow-sm">
+        <div className="flex items-center gap-3 mb-3">
           <div className="p-2 rounded-lg bg-success/10">
             <CheckCircle className="w-5 h-5 text-success" />
           </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-1 mb-2">
-              <h4 className="text-sm font-semibold text-muted-foreground">
-                Positive Trend
-              </h4>
-              <InfoTooltip content={
-                <div className="space-y-2">
-                  <p><strong>What this means:</strong></p>
-                  <p className="text-xs">We identify essential spending categories (like Groceries, Utilities, Healthcare) that you're managing well.</p>
-                  <p className="text-xs">The highlighted category has lower spending compared to similar households, showing good financial discipline.</p>
-                </div>
-              } />
-            </div>
-            <p className="text-sm font-medium leading-relaxed">
-              {insights.positive_trend.insight}
-            </p>
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-foreground">Positive Trend</h3>
+            <InfoTooltip content={
+              <div className="space-y-2">
+                <p><strong>What this means:</strong></p>
+                <p className="text-xs">We identify essential spending categories (like Groceries, Utilities, Healthcare) that you're managing well.</p>
+                <p className="text-xs">The highlighted category has lower spending compared to similar households, showing good financial discipline.</p>
+              </div>
+            } />
           </div>
         </div>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {insights.positive_trend.insight}
+        </p>
       </Card>
 
-      <Card className="p-5 shadow-soft border-l-4 border-l-destructive">
-        <div className="flex items-start gap-3">
+      {/* Red Flag - Red Accent */}
+      <Card className="p-6 rounded-xl border-l-4 border-l-destructive bg-card shadow-sm">
+        <div className="flex items-center gap-3 mb-3">
           <div className="p-2 rounded-lg bg-destructive/10">
             <AlertTriangle className="w-5 h-5 text-destructive" />
           </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-1 mb-2">
-              <h4 className="text-sm font-semibold text-muted-foreground">
-                Red Flag
-              </h4>
-              <InfoTooltip content={
-                <div className="space-y-2">
-                  <p><strong>What to watch for:</strong></p>
-                  <p className="text-xs">We detect discretionary spending patterns with high frequency or amounts that may indicate areas for improvement.</p>
-                  <p className="text-xs">Categories with 8+ transactions/month or significant spending are flagged for your review.</p>
-                </div>
-              } />
-            </div>
-            <p className="text-sm font-medium leading-relaxed">
-              {insights.red_flag.insight}
-            </p>
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-foreground">Red Flag</h3>
+            <InfoTooltip content={
+              <div className="space-y-2">
+                <p><strong>What to watch for:</strong></p>
+                <p className="text-xs">We detect discretionary spending patterns with high frequency or amounts that may indicate areas for improvement.</p>
+                <p className="text-xs">Categories with 8+ transactions/month or significant spending are flagged for your review.</p>
+              </div>
+            } />
           </div>
         </div>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {insights.red_flag.insight}
+        </p>
       </Card>
     </div>
   );

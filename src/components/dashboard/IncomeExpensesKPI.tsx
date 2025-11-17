@@ -77,75 +77,45 @@ export const IncomeExpensesKPI = ({ data, period }: IncomeExpensesKPIProps) => {
   };
 
   return (
-    <div className="space-y-6">{/* Changed from grid to vertical stack */}
-      {/* Income Card */}
-      <Card className="p-6 shadow-soft">
-        <Collapsible open={incomeExpanded} onOpenChange={setIncomeExpanded}>
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-muted-foreground">Income <span className="text-xs font-normal">(calculated from txns)</span></h3>
-            <div className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-success" />
-              <CollapsibleTrigger className="p-1 hover:bg-muted rounded">
-                {incomeExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-              </CollapsibleTrigger>
-            </div>
-          </div>
-          <p className="text-3xl font-bold text-success mb-1">
-            ${totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-          </p>
-          <div className="flex items-center gap-2 text-sm">
-            {getTrendIcon(incomeChange)}
-            <span className={getTrendColor(incomeChange)}>
-              {incomeChange >= 0 ? "+" : ""}{incomeChange.toFixed(1)}% vs prev {period}d
-            </span>
-          </div>
-          
-          <CollapsibleContent className="mt-4 pt-4 border-t space-y-2">
-            {Object.entries(incomeByCategory).map(([category, amount]) => 
-              amount > 0 && (
-                <div key={category} className="flex justify-between text-sm">
-                  <span className="text-muted-foreground capitalize">{category}</span>
-                  <span className="font-medium">${amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-                </div>
-              )
-            )}
-          </CollapsibleContent>
-        </Collapsible>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Income Mini Card */}
+      <Card className="p-6 rounded-xl border border-border bg-card shadow-sm">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-medium text-muted-foreground">
+            Income <span className="text-xs font-normal">(calculated from txns)</span>
+          </h3>
+          <DollarSign className="w-4 h-4 text-success" />
+        </div>
+        <p className="text-3xl font-bold tracking-tight text-success mb-2">
+          ${totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+        </p>
+        <div className="flex items-center gap-2 text-sm">
+          {getTrendIcon(incomeChange)}
+          <span className={getTrendColor(incomeChange)}>
+            {incomeChange > 0 ? '+' : ''}{incomeChange.toFixed(1)}%
+          </span>
+          <span className="text-muted-foreground">vs prev {period}d</span>
+        </div>
       </Card>
 
-      {/* Expenses Card */}
-      <Card className="p-6 shadow-soft">
-        <Collapsible open={expensesExpanded} onOpenChange={setExpensesExpanded}>
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-muted-foreground">Expenses <span className="text-xs font-normal">(calculated from txns)</span></h3>
-            <div className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-destructive" />
-              <CollapsibleTrigger className="p-1 hover:bg-muted rounded">
-                {expensesExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-              </CollapsibleTrigger>
-            </div>
-          </div>
-          <p className="text-3xl font-bold text-destructive mb-1">
-            ${currentExpenses.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-          </p>
-          <div className="flex items-center gap-2 text-sm">
-            {getExpenseTrendIcon(expensesChange)}
-            <span className={getExpenseTrendColor(expensesChange)}>
-              {expensesChange >= 0 ? "+" : ""}{expensesChange.toFixed(1)}% vs prev {period}d
-            </span>
-          </div>
-          
-          <CollapsibleContent className="mt-4 pt-4 border-t space-y-2">
-            {Object.entries(expensesByCategory).map(([category, amount]) => 
-              amount > 0 && (
-                <div key={category} className="flex justify-between text-sm">
-                  <span className="text-muted-foreground capitalize">{category.replace('_', ' ')}</span>
-                  <span className="font-medium">${amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-                </div>
-              )
-            )}
-          </CollapsibleContent>
-        </Collapsible>
+      {/* Expenses Mini Card */}
+      <Card className="p-6 rounded-xl border border-border bg-card shadow-sm">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-medium text-muted-foreground">
+            Expenses <span className="text-xs font-normal">(calculated from txns)</span>
+          </h3>
+          <TrendingDown className="w-4 h-4 text-destructive" />
+        </div>
+        <p className="text-3xl font-bold tracking-tight text-destructive mb-2">
+          ${currentExpenses.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+        </p>
+        <div className="flex items-center gap-2 text-sm">
+          {getExpenseTrendIcon(expensesChange)}
+          <span className={getExpenseTrendColor(expensesChange)}>
+            {expensesChange > 0 ? '+' : ''}{expensesChange.toFixed(1)}%
+          </span>
+          <span className="text-muted-foreground">vs prev {period}d</span>
+        </div>
       </Card>
     </div>
   );
