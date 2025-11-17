@@ -33,29 +33,6 @@ export const LiquidAssetsPanel = ({ holdings }: LiquidAssetsPanelProps) => {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold">Liquid Assets</h3>
-        <InfoTooltip
-          content={
-            <div className="space-y-2">
-              <div className="font-semibold">Only includes assets accessible within 1 week:</div>
-              <div className="text-xs space-y-1">
-                <div>✓ Checking accounts</div>
-                <div>✓ Savings accounts</div>
-                <div>✓ Money market funds</div>
-              </div>
-              <div className="font-semibold mt-2">Excludes:</div>
-              <div className="text-xs space-y-1">
-                <div>✗ Brokerage (semi-liquid)</div>
-                <div>✗ Vehicles (illiquid)</div>
-                <div>✗ Real estate (illiquid)</div>
-                <div>✗ Retirement accounts (illiquid)</div>
-              </div>
-            </div>
-          }
-        />
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* Total Liquid Assets */}
         <div>
