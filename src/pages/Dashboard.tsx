@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
 
-import { FiltersCard } from "@/components/dashboard/FiltersCard";
 import { Card } from "@/components/ui/card";
 import { TransactionsList } from "@/components/dashboard/TransactionsList";
 import { PersonalizedRecommendations } from "@/components/dashboard/PersonalizedRecommendations";
@@ -12,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { AlertCircle, Database, BarChart3 } from "lucide-react";
 import { SAMPLE_REYNOLDS_DATA } from "@/utils/sampleData";
 import { toast } from "sonner";
+import type { Transaction } from "@/types/dashboard";
 export type ViewMode = "category" | "subcategory" | "merchant" | "liquidity" | "custom";
 
 interface DashboardProps {
@@ -30,6 +30,28 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
       setSnapshot(SAMPLE_REYNOLDS_DATA);
       toast.success("Sample data loaded successfully!");
     }
+  };
+
+  const handleUploadTransactions = (newTransactions: Transaction[], fileName: string) => {
+    if (!snapshot) return;
+    
+    // Add new transactions to existing snapshot
+    const updatedSnapshot = {
+      ...snapshot,
+      stagingTxns: [...snapshot.stagingTxns, ...newTransactions.map(t => ({
+        id: t.id,
+        date: t.date,
+        desc: t.desc,
+        amount: t.amount,
+        sign: t.sign,
+        merchant: t.merchant,
+        accountId: t.accountId,
+        source: "file" as const,
+        confidence: t.confidence
+      }))]
+    };
+    
+    setSnapshot(updatedSnapshot);
   };
 
   // If no snapshot, show message
@@ -151,16 +173,16 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
           {/* Personalized Recommendations */}
           <PersonalizedRecommendations data={data} />
 
-          {/* Filters */}
-          <FiltersCard data={data} filters={filters} setFilters={setFilters} />
-
           {/* Transactions List */}
           <TransactionsList 
             key={data.txns[0]?.id || 'no-data'}
             transactions={data.txns} 
             onUpdate={updateTransaction}
             onDelete={deleteTransaction}
+            onUploadTransactions={handleUploadTransactions}
             filters={filters}
+            setFilters={setFilters}
+            accounts={data.accounts}
           />
         </div>
       </div>
