@@ -48,7 +48,7 @@ export const SpendingVisualization = ({ data, viewMode, setViewMode, period }: S
           </div>
           {/* Right: MonthlyStackedBars */}
           <div>
-            <MonthlyStackedBars data={data} />
+            <MonthlyStackedBars data={data} viewMode={viewMode} period={period} />
           </div>
         </div>
       </CardContent>

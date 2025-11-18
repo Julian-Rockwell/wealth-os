@@ -239,7 +239,7 @@ export const BudgetOverviewCard = ({
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <BudgetDonut data={data} viewMode={viewMode} period={period} />
-            <MonthlyStackedBars data={data} />
+            <MonthlyStackedBars data={data} viewMode={viewMode} period={period} />
           </div>
         </div>
       </CardContent>
