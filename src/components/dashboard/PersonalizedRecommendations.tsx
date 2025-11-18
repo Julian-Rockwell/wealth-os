@@ -1,6 +1,5 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Bot, Tag, Calendar, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import type { DashboardData } from "@/types/dashboard";
@@ -125,39 +124,44 @@ export const PersonalizedRecommendations = ({ data }: PersonalizedRecommendation
     <Card className="p-6 shadow-soft">
       <div className="flex items-center gap-2 mb-6">
         <Bot className="w-6 h-6 text-primary" />
-        <h3 className="text-lg font-semibold">Personalized Recommendations <span className="text-xs text-muted-foreground font-normal ml-2">(strange calculation - Rocky's help here)</span></h3>
+        <h3 className="text-lg font-semibold">
+          Personalized Recommendations 
+          <span className="text-xs text-muted-foreground font-normal ml-2">
+            (strange calculation - Rocky's help here)
+          </span>
+        </h3>
       </div>
 
-      <Tabs defaultValue="quick-wins" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="quick-wins">🎯 Quick Wins</TabsTrigger>
-          <TabsTrigger value="this-week">📋 This Week</TabsTrigger>
-          <TabsTrigger value="budget-plan">🏗️ Budget Plan</TabsTrigger>
-        </TabsList>
-
-        {/* Quick Wins Tab */}
-        <TabsContent value="quick-wins" className="space-y-4 mt-6">
-          <div className="flex items-center justify-between mb-4">
-            <h4 className="font-semibold text-sm">Save ${recommendations.totalSavings}/month</h4>
+      {/* Grid de 3 columnas */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Column 1: Quick Wins */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-xl">🎯</span>
+            <h4 className="font-semibold">Quick Wins</h4>
           </div>
-          
+          <div className="mb-4">
+            <p className="text-sm font-medium text-success">
+              Save ${recommendations.totalSavings}/month
+            </p>
+          </div>
           <div className="space-y-3">
             {recommendations.quickWins.map((rec, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-4 rounded-lg border bg-card hover:shadow-soft transition-shadow"
+                className="flex flex-col gap-2 p-3 rounded-lg border bg-card hover:shadow-soft transition-shadow"
               >
-                <div className="flex-1">
-                  <p className="font-medium text-sm mb-1">{rec.title}</p>
-                  <p className="text-xs text-muted-foreground">
-                    Potential savings: <span className="font-semibold text-success">${rec.estMonthlySave}/month</span>
-                  </p>
-                </div>
+                <p className="font-medium text-sm">{rec.title}</p>
+                <p className="text-xs text-muted-foreground">
+                  Potential: <span className="font-semibold text-success">
+                    ${rec.estMonthlySave}/mo
+                  </span>
+                </p>
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => handleApply(rec.title)}
-                  className="ml-4"
+                  className="w-full mt-1"
                 >
                   <Tag className="w-3 h-3 mr-2" />
                   Apply
@@ -165,25 +169,39 @@ export const PersonalizedRecommendations = ({ data }: PersonalizedRecommendation
               </div>
             ))}
           </div>
-        </TabsContent>
+        </div>
 
-        {/* This Week Tab */}
-        <TabsContent value="this-week" className="space-y-4 mt-6">
+        {/* Column 2: This Week */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-xl">📋</span>
+            <h4 className="font-semibold">This Week</h4>
+          </div>
           <ul className="space-y-3">
             {recommendations.thisWeek.map((task, index) => (
-              <li key={index} className="flex items-start gap-3 p-3 rounded-lg border bg-card">
+              <li 
+                key={index} 
+                className="flex items-start gap-3 p-3 rounded-lg border bg-card"
+              >
                 <Calendar className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                 <span className="text-sm">{task}</span>
               </li>
             ))}
           </ul>
-        </TabsContent>
+        </div>
 
-        {/* Budget Restructuring Plan Tab */}
-        <TabsContent value="budget-plan" className="space-y-4 mt-6">
-          <div className="space-y-4">
+        {/* Column 3: Budget Plan */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-xl">🏗️</span>
+            <h4 className="font-semibold">Budget Plan</h4>
+          </div>
+          <div className="space-y-3">
             {recommendations.restructuringPlan.map((phase, index) => (
-              <div key={index} className="flex items-start gap-3 p-4 rounded-lg border bg-card">
+              <div 
+                key={index} 
+                className="flex items-start gap-3 p-3 rounded-lg border bg-card"
+              >
                 <div className="p-2 rounded-lg bg-primary/10 flex-shrink-0">
                   <TrendingUp className="w-4 h-4 text-primary" />
                 </div>
@@ -198,8 +216,8 @@ export const PersonalizedRecommendations = ({ data }: PersonalizedRecommendation
               </div>
             ))}
           </div>
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </Card>
   );
 };

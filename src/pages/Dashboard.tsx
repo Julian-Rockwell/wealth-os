@@ -5,8 +5,7 @@ import { FiltersCard } from "@/components/dashboard/FiltersCard";
 import { Card } from "@/components/ui/card";
 import { TransactionsList } from "@/components/dashboard/TransactionsList";
 import { PersonalizedRecommendations } from "@/components/dashboard/PersonalizedRecommendations";
-import { UnspentIncomeCard } from "@/components/dashboard/UnspentIncomeCard";
-import { SpendingVisualization } from "@/components/dashboard/SpendingVisualization";
+import { BudgetOverviewCard } from "@/components/dashboard/BudgetOverviewCard";
 import { KeyInsightsContainer } from "@/components/dashboard/KeyInsightsContainer";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { Button } from "@/components/ui/button";
@@ -136,47 +135,26 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
         )}
 
         <div className="space-y-6">
-          {/* Period Selector */}
-          <Card className="p-3 shadow-soft">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-muted-foreground">Period:</span>
-              <div className="flex gap-2">
-                {[30, 60, 90].map((days) => (
-                  <Button
-                    key={days}
-                    variant={period === days ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setPeriod(days as 30 | 60 | 90)}
-                  >
-                    {days}d
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </Card>
-
-          {/* Income/Expenses/Unspent Income - Full Width */}
-          <UnspentIncomeCard 
-            data={data} 
+          {/* Budget Overview Card - Consolidates Period + Income/Expenses + Spending */}
+          <BudgetOverviewCard
+            data={data}
             period={period}
+            setPeriod={setPeriod}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
             onUpdateIncome={updateIncome}
           />
 
-          {/* Spending Visualization with ViewToggle - Full Width */}
-          <SpendingVisualization 
-            data={data} 
-            viewMode={viewMode} 
-            setViewMode={setViewMode}
-            period={period}
-          />
-
-          {/* Key Insights Container - Full Width */}
+          {/* Key Insights Container */}
           <KeyInsightsContainer data={data} />
 
-          {/* Filters - Full Width */}
+          {/* Personalized Recommendations */}
+          <PersonalizedRecommendations data={data} />
+
+          {/* Filters */}
           <FiltersCard data={data} filters={filters} setFilters={setFilters} />
 
-          {/* Transactions List - Full Width */}
+          {/* Transactions List */}
           <TransactionsList 
             key={data.txns[0]?.id || 'no-data'}
             transactions={data.txns} 
@@ -184,9 +162,6 @@ export default function Dashboard({ onContinue }: DashboardProps = {}) {
             onDelete={deleteTransaction}
             filters={filters}
           />
-
-          {/* Personalized Recommendations - Full Width */}
-          <PersonalizedRecommendations data={data} />
         </div>
       </div>
     </div>
