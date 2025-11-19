@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AlertCircle, CheckCircle2, Rocket } from "lucide-react";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
-import { STRATEGY_REQUIREMENTS } from "@/utils/brokerRequirements";
+import { deriveRequirementsFromStrategies } from "@/utils/deriveRequirements";
+import { useMemo } from "react";
 
 interface NextActionCardProps {
   readinessScore: number;
@@ -11,11 +12,14 @@ interface NextActionCardProps {
 }
 
 export function NextActionCard({ readinessScore, onOpenWizard }: NextActionCardProps) {
-  const { selectedStrategy, brokerSetup } = useFinancialData();
+  const { selectedStrategies, brokerSetup } = useFinancialData();
 
-  const hasStrategy = !!selectedStrategy;
+  const hasStrategy = selectedStrategies && selectedStrategies.length > 0;
   const isComplete = brokerSetup?.progress.connected === true;
-  const requirements = selectedStrategy ? STRATEGY_REQUIREMENTS[selectedStrategy] : null;
+  
+  const requirements = useMemo(() => {
+    return deriveRequirementsFromStrategies(selectedStrategies || []);
+  }, [selectedStrategies]);
 
   // If complete, show edit button
   if (isComplete) {
@@ -86,13 +90,19 @@ export function NextActionCard({ readinessScore, onOpenWizard }: NextActionCardP
               </div>
             )}
             
-            <div className="space-y-2 text-sm text-muted-foreground mb-4">
-              <p>Your selected strategy requires:</p>
-              <ul className="list-disc list-inside space-y-1 ml-2">
-                <li>Account Type: {requirements?.accountTypeAllowed.join(' or ')}</li>
-                <li>Options Level: L{requirements?.optionsLevelMin}+</li>
-                <li>Minimum Balance: ${requirements?.minBalance.toLocaleString()}</li>
-              </ul>
+            <div className="space-y-2 text-sm mb-4">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Account Type:</span>
+                <span className="font-medium capitalize">{requirements.accountType}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Required Permissions:</span>
+                <span className="font-medium">{requirements.requiredPermissionText}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Minimum Balance:</span>
+                <span className="font-medium">${requirements.minBalance.toLocaleString()}</span>
+              </div>
             </div>
             <Button onClick={onOpenWizard} className="w-full sm:w-auto">
               {brokerSetup?.chosenBroker ? 'Continue Broker Setup' : 'Start Broker Setup'}

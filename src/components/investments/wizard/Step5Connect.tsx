@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, XCircle, Loader2, Rocket } from "lucide-react";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
-import { STRATEGY_REQUIREMENTS, BROKERS } from "@/utils/brokerRequirements";
+import { deriveRequirementsFromStrategies } from "@/utils/deriveRequirements";
+import { BROKERS } from "@/utils/brokerRequirements";
+import { PERMISSION_TO_LEVEL } from "@/constants/permissions";
 import type { TradingStrategy } from "@/types/trading";
 
 interface Step5Props {
@@ -14,11 +16,14 @@ interface Step5Props {
 }
 
 export function Step5Connect({ selectedStrategy, onComplete }: Step5Props) {
-  const { brokerSetup, setBrokerSetup, availableCapital } = useFinancialData();
+  const { brokerSetup, setBrokerSetup, availableCapital, selectedStrategies } = useFinancialData();
   const [isConnecting, setIsConnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(brokerSetup?.progress.connected || false);
   
-  const requirements = STRATEGY_REQUIREMENTS[selectedStrategy];
+  const requirements = useMemo(() => {
+    return deriveRequirementsFromStrategies(selectedStrategies || [selectedStrategy]);
+  }, [selectedStrategies, selectedStrategy]);
+  
   const broker = BROKERS.find(b => b.id === brokerSetup?.chosenBroker);
 
   const handleConnect = async () => {
@@ -43,6 +48,8 @@ export function Step5Connect({ selectedStrategy, onComplete }: Step5Props) {
     console.log('broker_connection_complete');
   };
 
+  const requiredLevel = PERMISSION_TO_LEVEL[requirements.requiredPermission];
+  
   const checks = [
     {
       label: 'Broker Account Configured',
@@ -50,16 +57,14 @@ export function Step5Connect({ selectedStrategy, onComplete }: Step5Props) {
       detail: broker?.name,
     },
     {
-      label: 'Account Balance Sufficient',
+      label: 'Minimum Balance Met',
       status: availableCapital >= requirements.minBalance ? 'pass' : 'fail',
-      detail: `$${availableCapital.toLocaleString()} / $${requirements.minBalance.toLocaleString()}`,
+      detail: `Required: $${requirements.minBalance.toLocaleString()}, Available: $${availableCapital.toLocaleString()}`,
     },
     {
-      label: 'Options Level Approved',
-      status: brokerSetup?.progress.optionsApproved ? 'pass' : 'fail',
-      detail: brokerSetup?.progress.optionsApproved 
-        ? `Level ${brokerSetup.targetOptionsLevel}` 
-        : 'Not approved',
+      label: 'Permissions Confirmed',
+      status: brokerSetup?.progress.optionsApproved && brokerSetup.targetOptionsLevel >= requiredLevel ? 'pass' : 'fail',
+      detail: `Required: ${requirements.requiredPermissionText}`,
     },
     {
       label: 'Funds Settled',
