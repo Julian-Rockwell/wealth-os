@@ -80,7 +80,6 @@ export function Step1ChooseBroker({ selectedStrategy, onNext }: Step1Props) {
           <TableHeader>
             <TableRow>
               <TableHead>Broker</TableHead>
-              <TableHead>Options Levels</TableHead>
               <TableHead>Fee/Contract</TableHead>
               <TableHead>Paper Trading</TableHead>
               <TableHead>API</TableHead>
@@ -105,9 +104,6 @@ export function Step1ChooseBroker({ selectedStrategy, onNext }: Step1Props) {
                         </Badge>
                       )}
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-sm">L{broker.optionsLevels.join(', L')}</span>
                   </TableCell>
                   <TableCell>
                     <span className="text-sm">${broker.feePerContract}</span>
