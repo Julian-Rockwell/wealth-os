@@ -21,30 +21,30 @@ export interface BrokerInfo {
 
 // Strategy requirements map
 export const STRATEGY_REQUIREMENTS: Record<TradingStrategy, StrategyRequirements> = {
-  options_wheel: {
+  wheel: {
     accountTypeAllowed: ['cash', 'margin'],
     optionsLevelMin: 2,
-    minBalance: 5000
+    minBalance: 20000
   },
-  spreads: {
+  spy_bcs: {
     accountTypeAllowed: ['margin'],
     optionsLevelMin: 3,
     minBalance: 10000
   },
-  swing_trading: {
+  mean_reversion_stocks: {
     accountTypeAllowed: ['cash', 'margin'],
     optionsLevelMin: 0,
     minBalance: 2000
   },
-  day_trading: {
+  earnings_vip: {
     accountTypeAllowed: ['cash', 'margin'],
     optionsLevelMin: 1,
-    minBalance: 2000
+    minBalance: 15000
   },
-  covered_calls: {
+  dividend_capture: {
     accountTypeAllowed: ['cash', 'margin'],
-    optionsLevelMin: 1,
-    minBalance: 5000
+    optionsLevelMin: 0,
+    minBalance: 2000
   }
 };
 

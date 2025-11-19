@@ -105,37 +105,30 @@ export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProp
       // Return all strategies with 0% match and placeholder message
       return [
         {
-          strategy: "covered_calls",
-          name: "Covered Calls",
-          description: "Own stock, sell calls for premium. Conservative income enhancement.",
-          match: 0,
-          reasons: ["Answer assessment questions to see your match"]
-        },
-        {
-          strategy: "options_wheel",
+          strategy: "wheel",
           name: "Options Wheel",
           description: "Cash-secured puts and covered calls. Generate 1.5-3%/month.",
           match: 0,
           reasons: ["Answer assessment questions to see your match"]
         },
         {
-          strategy: "spreads",
-          name: "Credit Spreads",
-          description: "Defined-risk options strategies. Target 2-4%/month.",
-          match: 0,
-          reasons: ["Answer assessment questions to see your match"]
-        },
-        {
-          strategy: "swing_trading",
-          name: "Swing Trading",
+          strategy: "mean_reversion_stocks",
+          name: "Mean Reversion (Stocks)",
           description: "Hold positions 2-10 days. Capture short-term momentum.",
           match: 0,
           reasons: ["Answer assessment questions to see your match"]
         },
         {
-          strategy: "day_trading",
-          name: "Day Trading",
-          description: "Intraday positions. High activity, full-time commitment.",
+          strategy: "earnings_vip",
+          name: "Earnings VIP",
+          description: "Event-driven options around earnings. Target high volatility.",
+          match: 0,
+          reasons: ["Answer assessment questions to see your match"]
+        },
+        {
+          strategy: "dividend_capture",
+          name: "Dividend Capture",
+          description: "Event-driven stock strategies. Capture dividend payments.",
           match: 0,
           reasons: ["Answer assessment questions to see your match"]
         }
@@ -149,18 +142,18 @@ export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProp
 
     const recommendations: StrategyRecommendation[] = [];
 
-    // Covered Calls - best for conservative, low time, moderate capital
-    const ccMatch =
+    // Dividend Capture - best for conservative, low time, moderate capital
+    const dcMatch =
       ((capital >= 2 ? 20 : 5) +
         (risk <= 2 ? 25 : risk === 3 ? 15 : 5) +
         (time <= 2 ? 25 : 10) +
         (experience >= 2 ? 20 : 10)) /
       0.9;
     recommendations.push({
-      strategy: "covered_calls",
-      name: "Covered Calls",
-      description: "Own stock, sell calls for premium. Conservative income enhancement.",
-      match: Math.round(ccMatch),
+      strategy: "dividend_capture",
+      name: "Dividend Capture",
+      description: "Event-driven stock strategies. Capture dividend payments.",
+      match: Math.round(dcMatch),
       reasons: [
         capital >= 2 ? "✓ Capital level supports stock ownership" : "⚠ Requires at least $10K capital",
         risk <= 2 ? "✓ Matches your conservative risk profile" : "",
@@ -168,23 +161,23 @@ export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProp
       ].filter(Boolean),
     });
 
-    // Credit Spreads - balanced, defined risk, lower capital needs
-    const csMatch =
+    // Earnings VIP - balanced, defined risk, event-driven
+    const evMatch =
       ((capital >= 1 ? 20 : 10) +
         (risk >= 2 && risk <= 4 ? 25 : 10) +
         (time >= 1 && time <= 2 ? 25 : 10) +
         (experience >= 2 ? 20 : 10)) /
       0.9;
     recommendations.push({
-      strategy: "spreads",
-      name: "Credit Spreads",
-      description: "Defined-risk options strategies. Lower capital requirements, predictable outcomes.",
-      match: Math.round(csMatch),
+      strategy: "earnings_vip",
+      name: "Earnings VIP",
+      description: "Event-driven options around earnings. Target high volatility.",
+      match: Math.round(evMatch),
       reasons: [
         capital >= 1 ? "✓ Works with your capital level" : "",
         risk >= 2 && risk <= 4 ? "✓ Moderate risk tolerance is ideal" : "",
         time <= 2 ? "✓ Time commitment matches your availability" : "",
-        "✓ Defined risk limits downside exposure",
+        "✓ Event-driven approach limits exposure duration",
       ].filter(Boolean),
     });
 
@@ -196,7 +189,7 @@ export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProp
         (experience >= 3 ? 25 : experience === 2 ? 15 : 5)) /
       0.9;
     recommendations.push({
-      strategy: "options_wheel",
+      strategy: "wheel",
       name: "Options Wheel",
       description: "Sell cash-secured puts, get assigned, sell covered calls. Consistent income generation.",
       match: Math.round(owMatch),
@@ -207,42 +200,22 @@ export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProp
       ].filter(Boolean),
     });
 
-    // Swing Trading - technical, medium term
-    const stMatch =
+    // Mean Reversion Stocks - technical, medium term
+    const mrMatch =
       ((capital >= 2 ? 20 : 10) +
         (risk >= 3 ? 25 : 10) +
         (time >= 2 ? 25 : 10) +
         (experience >= 3 ? 20 : 10)) /
       0.9;
     recommendations.push({
-      strategy: "swing_trading",
-      name: "Swing Trading",
+      strategy: "mean_reversion_stocks",
+      name: "Mean Reversion (Stocks)",
       description: "Hold positions for 2-10 days. Technical analysis-based entries and exits.",
-      match: Math.round(stMatch),
+      match: Math.round(mrMatch),
       reasons: [
-        capital >= 2 ? "✓ Capital supports swing positions" : "⚠ Limited capital for diversification",
+        capital >= 2 ? "✓ Capital supports positions" : "⚠ Limited capital for diversification",
         time >= 2 ? "✓ Your time availability supports monitoring" : "⚠ Requires regular market monitoring",
         experience >= 3 ? "✓ Experience level appropriate" : "⚠ Requires technical analysis skills",
-      ].filter(Boolean),
-    });
-
-    // Day Trading - high risk, high time, high capital, experienced only
-    const dtMatch =
-      ((capital >= 4 ? 25 : capital === 3 ? 10 : 0) +
-        (risk >= 4 ? 25 : 5) +
-        (time >= 3 ? 25 : 0) +
-        (experience >= 4 ? 25 : experience === 3 ? 10 : 0)) /
-      1.0;
-    recommendations.push({
-      strategy: "day_trading",
-      name: "Day Trading",
-      description: "Intraday positions. Requires active monitoring and quick decision-making.",
-      match: Math.round(dtMatch),
-      reasons: [
-        capital >= 4 ? "✓ Capital meets PDT requirements" : capital === 3 ? "⚠ Consider PDT rule ($25K minimum)" : "⚠ Insufficient capital for day trading",
-        experience >= 4 ? "✓ Experience level supports day trading" : "⚠ Requires significant experience",
-        time >= 3 ? "✓ Time availability is sufficient" : "⚠ Requires 1-2+ hours daily",
-        risk >= 4 ? "✓ Risk tolerance matches requirements" : "⚠ High risk tolerance needed",
       ].filter(Boolean),
     });
 
