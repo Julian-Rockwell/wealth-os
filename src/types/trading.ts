@@ -30,11 +30,41 @@ export interface PaperTradingProgress {
 }
 
 export type TradingStrategy = 
-  | "options_wheel"
-  | "swing_trading"
-  | "day_trading"
-  | "spreads"
-  | "covered_calls";
+  | "mean_reversion_stocks"
+  | "wheel"
+  | "earnings_vip"
+  | "dividend_capture"
+  | "spy_bcs";
+
+export type PermissionLevel = "stocks" | "wheel" | "spreads" | "naked";
+
+export interface StrategyAlignmentMatrix {
+  capital: [number, number, number, number, number];  // levels 1-5
+  risk: [number, number, number, number, number];
+  dailyTime: [number, number, number, number, number];
+  experience: [number, number, number, number, number];
+  minSuggested: number;
+  requiredPermission: PermissionLevel;
+}
+
+export interface StrategyMatchResult {
+  strategyId: TradingStrategy;
+  matchPercent: number;
+  factorMatches: {
+    capital: number;
+    risk: number;
+    dailyTime: number;
+    experience: number;
+  };
+}
+
+export interface DerivedBrokerRequirements {
+  requiredPermission: PermissionLevel;
+  requiredPermissionText: string;
+  minBalance: number;
+  accountType: 'cash' | 'margin';
+  derivedFrom: TradingStrategy[];
+}
 
 export interface StrategyInfo {
   id: TradingStrategy;
@@ -81,4 +111,5 @@ export interface BrokerSetup {
   wizardStep: number;
   progress: BrokerSetupProgress;
   notes: string[];
+  required?: DerivedBrokerRequirements;
 }
