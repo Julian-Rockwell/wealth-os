@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle, CheckCircle2, Info } from "lucide-react";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
-import { STRATEGY_REQUIREMENTS } from "@/utils/brokerRequirements";
+import { deriveRequirementsFromStrategies } from "@/utils/deriveRequirements";
+import { PERMISSION_TO_LEVEL } from "@/constants/permissions";
 import type { TradingStrategy } from "@/types/trading";
 
 interface Step4Props {
@@ -18,8 +19,13 @@ interface Step4Props {
 type ApprovalStatus = 'not-started' | 'submitted' | 'pending' | 'approved';
 
 export function Step4OptionsApproval({ selectedStrategy, onNext }: Step4Props) {
-  const { brokerSetup, setBrokerSetup } = useFinancialData();
-  const requirements = STRATEGY_REQUIREMENTS[selectedStrategy];
+  const { brokerSetup, setBrokerSetup, selectedStrategies } = useFinancialData();
+  
+  const requirements = useMemo(() => {
+    return deriveRequirementsFromStrategies(selectedStrategies || [selectedStrategy]);
+  }, [selectedStrategies, selectedStrategy]);
+  
+  const requiredLevel = PERMISSION_TO_LEVEL[requirements.requiredPermission];
   
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus>(
     brokerSetup?.progress.optionsApproved ? 'approved' :
@@ -27,7 +33,7 @@ export function Step4OptionsApproval({ selectedStrategy, onNext }: Step4Props) {
   );
   
   const [approvedLevel, setApprovedLevel] = useState<number>(
-    brokerSetup?.targetOptionsLevel || requirements.optionsLevelMin
+    brokerSetup?.targetOptionsLevel || requiredLevel
   );
 
   const handleContinue = () => {
@@ -46,7 +52,7 @@ export function Step4OptionsApproval({ selectedStrategy, onNext }: Step4Props) {
     onNext();
   };
 
-  const levelMet = approvalStatus === 'approved' && approvedLevel >= requirements.optionsLevelMin;
+  const levelMet = approvalStatus === 'approved' && approvedLevel >= requiredLevel;
   const canContinue = approvalStatus !== 'not-started';
 
   return (
@@ -59,16 +65,10 @@ export function Step4OptionsApproval({ selectedStrategy, onNext }: Step4Props) {
       </div>
 
       <Alert>
-        <AlertCircle className="h-4 w-4" />
+        <Info className="h-4 w-4" />
+        <AlertTitle>Required Permissions</AlertTitle>
         <AlertDescription>
-          <strong>Required Level: </strong>
-          <Badge variant="outline" className="ml-2">
-            Level {requirements.optionsLevelMin}+
-          </Badge>
-          <div className="mt-2 text-sm">
-            Your strategy requires at least Level {requirements.optionsLevelMin} options approval 
-            to trade the necessary strategies.
-          </div>
+          {requirements.requiredPermissionText}
         </AlertDescription>
       </Alert>
 
@@ -152,15 +152,15 @@ export function Step4OptionsApproval({ selectedStrategy, onNext }: Step4Props) {
           <AlertDescription>
             <strong>Insufficient Level</strong>
             <div className="mt-1">
-              Your approved level (L{approvedLevel}) is below the required level (L{requirements.optionsLevelMin}). 
+              Your approved level (L{approvedLevel}) is below the required level (L{requiredLevel}). 
               You may need to re-apply with updated information or contact your broker.
             </div>
           </AlertDescription>
         </Alert>
       )}
 
-      <div className="bg-muted/50 p-4 rounded-lg space-y-3">
-        <h4 className="text-sm font-semibold">Options Levels Explained</h4>
+      <div className="bg-muted/50 border rounded-lg p-4">
+        <h4 className="font-medium mb-3">Example Options Levels</h4>
         <ul className="text-sm text-muted-foreground space-y-2">
           <li><strong>Level 0:</strong> No options trading</li>
           <li><strong>Level 1:</strong> Covered calls, protective puts</li>

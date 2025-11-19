@@ -1,9 +1,11 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import type { FinancialSnapshot } from "@/types/financial";
 import type { DashboardData } from "@/types/dashboard";
-import type { PaperTradingProgress, TradingStrategy, BrokerSetup, StrategyAssessmentAnswers } from "@/types/trading";
+import type { PaperTradingProgress, TradingStrategy, BrokerSetup, StrategyAssessmentAnswers, StrategyMatchResult, DerivedBrokerRequirements } from "@/types/trading";
 import type { RpicResult } from "@/utils/rpicCalculations";
 import type { SixMonthPlan } from "@/types/sixMonthPlan";
+import { resolveStrategyAlias } from "@/constants/strategies";
+import { deriveRequirementsFromStrategies } from "@/utils/deriveRequirements";
 
 interface DraftData {
   mockConnections: any[];
@@ -31,6 +33,10 @@ interface FinancialDataContextType {
   setSelectedStrategies: (strategies: TradingStrategy[]) => void;
   strategyAssessmentAnswers: StrategyAssessmentAnswers;
   setStrategyAssessmentAnswers: (answers: StrategyAssessmentAnswers) => void;
+  strategyMatchResults: StrategyMatchResult[] | null;
+  setStrategyMatchResults: (results: StrategyMatchResult[] | null) => void;
+  brokerRequirements: DerivedBrokerRequirements | null;
+  setBrokerRequirements: (requirements: DerivedBrokerRequirements | null) => void;
   monthlyIncome: number | null;
   setMonthlyIncome: (income: number | null) => void;
   brokerSetup: BrokerSetup | null;
@@ -100,12 +106,29 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
 
   const [selectedStrategies, setSelectedStrategiesState] = useState<TradingStrategy[]>(() => {
     const stored = localStorage.getItem("selectedStrategies");
-    return stored ? JSON.parse(stored) : [];
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Resolver aliases
+      return Array.isArray(parsed) 
+        ? parsed.map(s => resolveStrategyAlias(s))
+        : [];
+    }
+    return [];
   });
 
   const [strategyAssessmentAnswers, setStrategyAssessmentAnswersState] = useState<StrategyAssessmentAnswers>(() => {
     const stored = localStorage.getItem("strategyAssessmentAnswers");
     return stored ? JSON.parse(stored) : { capital: "", risk: "", time: "", experience: "" };
+  });
+
+  const [strategyMatchResults, setStrategyMatchResultsState] = useState<StrategyMatchResult[] | null>(() => {
+    const saved = localStorage.getItem("strategyMatchResults");
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const [brokerRequirements, setBrokerRequirementsState] = useState<DerivedBrokerRequirements | null>(() => {
+    const saved = localStorage.getItem("brokerRequirements");
+    return saved ? JSON.parse(saved) : null;
   });
 
   const [sixMonthPlan, setSixMonthPlanState] = useState<SixMonthPlan | null>(() => {
@@ -189,11 +212,33 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
   const setSelectedStrategies = (strategies: TradingStrategy[]) => {
     setSelectedStrategiesState(strategies);
     localStorage.setItem("selectedStrategies", JSON.stringify(strategies));
+    
+    // Auto-derivar requirements
+    const requirements = deriveRequirementsFromStrategies(strategies);
+    setBrokerRequirements(requirements);
   };
 
   const setStrategyAssessmentAnswers = (answers: StrategyAssessmentAnswers) => {
     setStrategyAssessmentAnswersState(answers);
     localStorage.setItem("strategyAssessmentAnswers", JSON.stringify(answers));
+  };
+
+  const setStrategyMatchResults = (results: StrategyMatchResult[] | null) => {
+    setStrategyMatchResultsState(results);
+    if (results) {
+      localStorage.setItem("strategyMatchResults", JSON.stringify(results));
+    } else {
+      localStorage.removeItem("strategyMatchResults");
+    }
+  };
+
+  const setBrokerRequirements = (requirements: DerivedBrokerRequirements | null) => {
+    setBrokerRequirementsState(requirements);
+    if (requirements) {
+      localStorage.setItem("brokerRequirements", JSON.stringify(requirements));
+    } else {
+      localStorage.removeItem("brokerRequirements");
+    }
   };
 
   const setSixMonthPlan = (plan: SixMonthPlan | null) => {
@@ -220,6 +265,8 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     setSelectedStrategyState(null);
     setSelectedStrategiesState([]);
     setStrategyAssessmentAnswersState({ capital: "", risk: "", time: "", experience: "" });
+    setStrategyMatchResultsState(null);
+    setBrokerRequirementsState(null);
     setMonthlyIncomeState(null);
     setBrokerSetupState(null);
     localStorage.removeItem("financialSnapshot");
@@ -231,6 +278,8 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     localStorage.removeItem("selectedStrategy");
     localStorage.removeItem("selectedStrategies");
     localStorage.removeItem("strategyAssessmentAnswers");
+    localStorage.removeItem("strategyMatchResults");
+    localStorage.removeItem("brokerRequirements");
     localStorage.removeItem("monthlyIncome");
     localStorage.removeItem("brokerSetup");
     localStorage.removeItem("sixMonthPlan");
@@ -257,6 +306,10 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
         setSelectedStrategies,
         strategyAssessmentAnswers,
         setStrategyAssessmentAnswers,
+        strategyMatchResults,
+        setStrategyMatchResults,
+        brokerRequirements,
+        setBrokerRequirements,
       monthlyIncome,
       setMonthlyIncome,
       brokerSetup,
