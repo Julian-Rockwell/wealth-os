@@ -4,10 +4,13 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Target, TrendingUp } from "lucide-react";
+import { CheckCircle2, Target, TrendingUp, Info } from "lucide-react";
 import { toast } from "sonner";
-import type { TradingStrategy } from "@/types/trading";
+import type { TradingStrategy, StrategyMatchResult } from "@/types/trading";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
+import { CANONICAL_STRATEGIES } from "@/constants/strategies";
+import { calculateAllStrategyMatches, AssessmentAnswers } from "@/utils/strategyAlignmentMatrix";
+import { useCallback } from "react";
 
 interface Question {
   id: string;
@@ -60,13 +63,7 @@ const ASSESSMENT_QUESTIONS: Question[] = [
   },
 ];
 
-interface StrategyRecommendation {
-  strategy: TradingStrategy;
-  name: string;
-  description: string;
-  match: number; // 0-100%
-  reasons: string[];
-}
+// Removed - now using StrategyMatchResult from types
 
 interface StrategySelectionProps {
   onStrategyConfirmed: (strategy: TradingStrategy) => void;
@@ -97,130 +94,29 @@ export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProp
 
   const allQuestionsAnswered = ASSESSMENT_QUESTIONS.every((q) => answers[q.id] !== undefined);
 
-  const getRecommendations = (): StrategyRecommendation[] => {
-    // Check if any questions have been answered
-    const hasAnyAnswers = Object.values(answers).some(a => a !== undefined && a !== null);
+  const getRecommendations = useCallback((): StrategyMatchResult[] => {
+    const { capital, risk, time, experience } = answers;
     
-    if (!hasAnyAnswers) {
-      // Return all strategies with 0% match and placeholder message
-      return [
-        {
-          strategy: "wheel",
-          name: "Options Wheel",
-          description: "Cash-secured puts and covered calls. Generate 1.5-3%/month.",
-          match: 0,
-          reasons: ["Answer assessment questions to see your match"]
-        },
-        {
-          strategy: "mean_reversion_stocks",
-          name: "Mean Reversion (Stocks)",
-          description: "Hold positions 2-10 days. Capture short-term momentum.",
-          match: 0,
-          reasons: ["Answer assessment questions to see your match"]
-        },
-        {
-          strategy: "earnings_vip",
-          name: "Earnings VIP",
-          description: "Event-driven options around earnings. Target high volatility.",
-          match: 0,
-          reasons: ["Answer assessment questions to see your match"]
-        },
-        {
-          strategy: "dividend_capture",
-          name: "Dividend Capture",
-          description: "Event-driven stock strategies. Capture dividend payments.",
-          match: 0,
-          reasons: ["Answer assessment questions to see your match"]
-        }
-      ];
+    // Solo calcular si HAY respuestas (no usar defaults)
+    if (!capital || !risk || !time || !experience) {
+      return CANONICAL_STRATEGIES.map(s => ({
+        strategyId: s.id,
+        matchPercent: 0,
+        factorMatches: { capital: 0, risk: 0, dailyTime: 0, experience: 0 }
+      }));
     }
+    
+    const assessmentAnswers: AssessmentAnswers = {
+      capital,
+      risk,
+      time,
+      experience
+    };
+    
+    return calculateAllStrategyMatches(assessmentAnswers, false); // false = no SPY BCS
+  }, [answers]);
 
-    const capital = answers.capital || 3;
-    const risk = answers.risk || 3;
-    const time = answers.time || 2;
-    const experience = answers.experience || 2;
-
-    const recommendations: StrategyRecommendation[] = [];
-
-    // Dividend Capture - best for conservative, low time, moderate capital
-    const dcMatch =
-      ((capital >= 2 ? 20 : 5) +
-        (risk <= 2 ? 25 : risk === 3 ? 15 : 5) +
-        (time <= 2 ? 25 : 10) +
-        (experience >= 2 ? 20 : 10)) /
-      0.9;
-    recommendations.push({
-      strategy: "dividend_capture",
-      name: "Dividend Capture",
-      description: "Event-driven stock strategies. Capture dividend payments.",
-      match: Math.round(dcMatch),
-      reasons: [
-        capital >= 2 ? "✓ Capital level supports stock ownership" : "⚠ Requires at least $10K capital",
-        risk <= 2 ? "✓ Matches your conservative risk profile" : "",
-        time <= 2 ? "✓ Low time commitment fits your schedule" : "",
-      ].filter(Boolean),
-    });
-
-    // Earnings VIP - balanced, defined risk, event-driven
-    const evMatch =
-      ((capital >= 1 ? 20 : 10) +
-        (risk >= 2 && risk <= 4 ? 25 : 10) +
-        (time >= 1 && time <= 2 ? 25 : 10) +
-        (experience >= 2 ? 20 : 10)) /
-      0.9;
-    recommendations.push({
-      strategy: "earnings_vip",
-      name: "Earnings VIP",
-      description: "Event-driven options around earnings. Target high volatility.",
-      match: Math.round(evMatch),
-      reasons: [
-        capital >= 1 ? "✓ Works with your capital level" : "",
-        risk >= 2 && risk <= 4 ? "✓ Moderate risk tolerance is ideal" : "",
-        time <= 2 ? "✓ Time commitment matches your availability" : "",
-        "✓ Event-driven approach limits exposure duration",
-      ].filter(Boolean),
-    });
-
-    // Options Wheel - medium complexity, consistent income
-    const owMatch =
-      ((capital >= 3 ? 25 : capital === 2 ? 15 : 5) +
-        (risk >= 2 && risk <= 4 ? 20 : 10) +
-        (time >= 2 ? 20 : 10) +
-        (experience >= 3 ? 25 : experience === 2 ? 15 : 5)) /
-      0.9;
-    recommendations.push({
-      strategy: "wheel",
-      name: "Options Wheel",
-      description: "Sell cash-secured puts, get assigned, sell covered calls. Consistent income generation.",
-      match: Math.round(owMatch),
-      reasons: [
-        capital >= 3 ? "✓ Capital level ideal for wheel strategy" : capital >= 2 ? "⚠ Minimum capital, consider smaller positions" : "⚠ Requires at least $10K",
-        experience >= 3 ? "✓ Experience level supports this strategy" : experience === 2 ? "⚠ Consider paper trading first" : "⚠ Requires intermediate knowledge",
-        risk >= 2 && risk <= 4 ? "✓ Risk profile is well-suited" : "",
-      ].filter(Boolean),
-    });
-
-    // Mean Reversion Stocks - technical, medium term
-    const mrMatch =
-      ((capital >= 2 ? 20 : 10) +
-        (risk >= 3 ? 25 : 10) +
-        (time >= 2 ? 25 : 10) +
-        (experience >= 3 ? 20 : 10)) /
-      0.9;
-    recommendations.push({
-      strategy: "mean_reversion_stocks",
-      name: "Mean Reversion (Stocks)",
-      description: "Hold positions for 2-10 days. Technical analysis-based entries and exits.",
-      match: Math.round(mrMatch),
-      reasons: [
-        capital >= 2 ? "✓ Capital supports positions" : "⚠ Limited capital for diversification",
-        time >= 2 ? "✓ Your time availability supports monitoring" : "⚠ Requires regular market monitoring",
-        experience >= 3 ? "✓ Experience level appropriate" : "⚠ Requires technical analysis skills",
-      ].filter(Boolean),
-    });
-
-    return recommendations.sort((a, b) => b.match - a.match);
-  };
+  // Removed old recommendation logic - now using matrix-based calculation
 
   const handleConfirmStrategy = () => {
     if (selectedStrategies.length > 0) {
@@ -252,9 +148,12 @@ export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProp
                 <p className="text-sm font-semibold mb-2">
                   {selectedStrategies.length} strateg{selectedStrategies.length > 1 ? 'ies' : 'y'} selected
                 </p>
-                <p className="text-xs text-muted-foreground mb-3">
-                  Selected: {selectedStrategies.map(s => recommendations.find(r => r.strategy === s)?.name).join(', ')}
-                </p>
+                 <p className="text-xs text-muted-foreground mb-3">
+                   Selected: {selectedStrategies.map(s => {
+                     const strategyInfo = CANONICAL_STRATEGIES.find(cs => cs.id === s);
+                     return strategyInfo?.label || s;
+                   }).join(', ')}
+                 </p>
                 <Button onClick={handleConfirmStrategy} className="w-full">
                   Confirm Strategy & Continue
                 </Button>
@@ -310,47 +209,81 @@ export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProp
             </CardTitle>
             <CardDescription>Based on your assessment, here are your best matches (sorted by fit)</CardDescription>
           </CardHeader>
-          <CardContent>
+           <CardContent>
             <div className="space-y-3">
-              {recommendations.map((rec) => (
+              {recommendations.map((rec) => {
+                const isSelected = selectedStrategies.includes(rec.strategyId);
+                const strategyInfo = CANONICAL_STRATEGIES.find(s => s.id === rec.strategyId);
+                
+                return (
                   <div
-                    key={rec.strategy}
+                    key={rec.strategyId}
                     className={`p-4 border rounded-lg transition-colors ${
-                      selectedStrategies.includes(rec.strategy)
+                      isSelected
                         ? "border-primary bg-primary/5"
                         : "border-border hover:border-primary/50"
                     }`}
                   >
                     <div className="flex items-start space-x-3">
                       <Checkbox
-                        checked={selectedStrategies.includes(rec.strategy)}
-                        onCheckedChange={() => handleToggleStrategy(rec.strategy)}
-                        id={rec.strategy}
+                        checked={isSelected}
+                        onCheckedChange={() => handleToggleStrategy(rec.strategyId)}
+                        id={rec.strategyId}
                         className="mt-1"
                       />
-                      <Label htmlFor={rec.strategy} className="flex-1 cursor-pointer space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="font-semibold">{rec.name}</span>
-                          <Badge variant={rec.match >= 70 ? "default" : rec.match >= 50 ? "secondary" : "outline"}>
-                            {rec.match}% match
-                          </Badge>
+                      <Label htmlFor={rec.strategyId} className="flex-1 cursor-pointer">
+                        <div className="space-y-3">
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-semibold">{strategyInfo?.label}</span>
+                              <Badge variant={rec.matchPercent >= 70 ? "default" : rec.matchPercent >= 50 ? "secondary" : "outline"}>
+                                {rec.matchPercent}% Match
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {strategyInfo?.shortLabel} Strategy
+                            </p>
+                          </div>
+                          
+                          {/* Factor Breakdown - solo si hay respuestas */}
+                          {rec.matchPercent > 0 ? (
+                            <div className="space-y-1.5 text-xs">
+                              <div className="flex justify-between items-center">
+                                <span className="text-muted-foreground">Capital fit:</span>
+                                <span className="font-medium">{rec.factorMatches.capital}%</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-muted-foreground">Risk fit:</span>
+                                <span className="font-medium">{rec.factorMatches.risk}%</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-muted-foreground">Time fit:</span>
+                                <span className="font-medium">{rec.factorMatches.dailyTime}%</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-muted-foreground">Experience fit:</span>
+                                <span className="font-medium">{rec.factorMatches.experience}%</span>
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="text-xs text-muted-foreground italic">
+                              Answer all assessment questions to see your match
+                            </p>
+                          )}
                         </div>
-                        <p className="text-sm text-muted-foreground">{rec.description}</p>
-                        {rec.reasons.length > 0 && (
-                          <ul className="text-xs space-y-1 mt-2">
-                            {rec.reasons.map((reason, idx) => (
-                              <li key={idx} className="text-muted-foreground">
-                                {reason}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
                       </Label>
                     </div>
                   </div>
-                ))}
-              </div>
-              </CardContent>
+                );
+              })}
+            </div>
+            
+            {/* Info note about alignment matrix */}
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-4 pt-4 border-t">
+              <Info className="h-3 w-3 flex-shrink-0" />
+              <span>Based on Strategy Alignment matrix</span>
+            </div>
+          </CardContent>
             </Card>
       </div>
     </div>
