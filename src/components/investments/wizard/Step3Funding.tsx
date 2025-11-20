@@ -82,7 +82,7 @@ export function Step3Funding({ selectedStrategy, onNext }: Step3Props) {
             <div className="flex-1">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-sm text-muted-foreground">Required Minimum</div>
+                  <div className="text-sm text-muted-foreground">Suggested Balance</div>
                   <div className="text-2xl font-bold">
                     ${requirements.minBalance.toLocaleString()}
                   </div>
@@ -103,7 +103,7 @@ export function Step3Funding({ selectedStrategy, onNext }: Step3Props) {
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Your available capital is below the recommended minimum for this strategy. 
+            Your available capital is below the suggested balance for this strategy. 
             Consider building more capital before starting live trading.
           </AlertDescription>
         </Alert>

@@ -16,13 +16,17 @@ interface Step5Props {
 }
 
 export function Step5Connect({ selectedStrategy, onComplete }: Step5Props) {
-  const { brokerSetup, setBrokerSetup, availableCapital, selectedStrategies } = useFinancialData();
+  const { brokerSetup, setBrokerSetup, availableCapital, selectedStrategies, strategyAssessmentAnswers } = useFinancialData();
   const [isConnecting, setIsConnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(brokerSetup?.progress.connected || false);
   
+  const experienceLevel = strategyAssessmentAnswers.experience 
+    ? parseInt(strategyAssessmentAnswers.experience) 
+    : undefined;
+  
   const requirements = useMemo(() => {
-    return deriveRequirementsFromStrategies(selectedStrategies || [selectedStrategy]);
-  }, [selectedStrategies, selectedStrategy]);
+    return deriveRequirementsFromStrategies(selectedStrategies || [selectedStrategy], experienceLevel);
+  }, [selectedStrategies, selectedStrategy, experienceLevel]);
   
   const broker = BROKERS.find(b => b.id === brokerSetup?.chosenBroker);
 
@@ -57,9 +61,9 @@ export function Step5Connect({ selectedStrategy, onComplete }: Step5Props) {
       detail: broker?.name,
     },
     {
-      label: 'Minimum Balance Met',
+      label: 'Suggested Balance Met',
       status: availableCapital >= requirements.minBalance ? 'pass' : 'fail',
-      detail: `Required: $${requirements.minBalance.toLocaleString()}, Available: $${availableCapital.toLocaleString()}`,
+      detail: `Suggested: $${requirements.minBalance.toLocaleString()}, Available: $${availableCapital.toLocaleString()}`,
     },
     {
       label: 'Permissions Confirmed',

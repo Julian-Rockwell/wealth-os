@@ -7,7 +7,8 @@ import {
 } from "@/constants/permissions";
 
 export function deriveRequirementsFromStrategies(
-  selectedStrategies: TradingStrategy[]
+  selectedStrategies: TradingStrategy[],
+  experienceLevel?: number
 ): DerivedBrokerRequirements {
   if (selectedStrategies.length === 0) {
     return {
@@ -30,7 +31,19 @@ export function deriveRequirementsFromStrategies(
   // Calcular máximos
   const requiredPermission = getHighestPermission(permissions);
   const minBalance = Math.max(...balances);
-  const accountType = requiresMargin(requiredPermission) ? "margin" : "cash";
+  
+  // Derivar Account Type desde Experience Level (Rockwell recommendation)
+  let accountType: "cash" | "margin" | "cash or margin" = "cash";
+  if (experienceLevel) {
+    if (experienceLevel >= 4) {
+      accountType = "cash or margin"; // Experience 4-5: can choose
+    } else {
+      accountType = "cash"; // Experience 1-3: cash only (beginner-friendly)
+    }
+  } else if (requiresMargin(requiredPermission)) {
+    // Fallback: if permission requires margin
+    accountType = "margin";
+  }
   
   return {
     requiredPermission,
