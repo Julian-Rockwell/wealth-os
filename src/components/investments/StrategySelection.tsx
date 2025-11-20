@@ -4,7 +4,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Target, TrendingUp, Info } from "lucide-react";
+import { CheckCircle2, Target, TrendingUp, Info, DollarSign, Gauge, Clock, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
 import type { TradingStrategy, StrategyMatchResult } from "@/types/trading";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
@@ -63,7 +63,13 @@ const ASSESSMENT_QUESTIONS: Question[] = [
   },
 ];
 
-// Removed - now using StrategyMatchResult from types
+const STRATEGY_SUBTITLES: Record<TradingStrategy, string> = {
+  mean_reversion_stocks: "Buy oversold stocks; sell upon mean reversion.",
+  dividend_capture: "Buy stock before ex-div; sell post price recovery.",
+  wheel: "Sell Cash-Secured Puts & Covered Calls for income.",
+  earnings_vip: "Capitalize on post-earnings volatility crush.",
+  spy_bcs: "Sell credit spreads on SPY for consistent income.",
+};
 
 interface StrategySelectionProps {
   onStrategyConfirmed: (strategy: TradingStrategy) => void;
@@ -209,82 +215,98 @@ export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProp
             </CardTitle>
             <CardDescription>Based on your assessment, here are your best matches (sorted by fit)</CardDescription>
           </CardHeader>
-           <CardContent>
-            <div className="space-y-3">
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {recommendations.map((rec) => {
                 const isSelected = selectedStrategies.includes(rec.strategyId);
                 const strategyInfo = CANONICAL_STRATEGIES.find(s => s.id === rec.strategyId);
                 
                 return (
-                  <div
+                  <Card
                     key={rec.strategyId}
-                    className={`p-4 border rounded-lg transition-colors ${
+                    className={`cursor-pointer transition-all ${
                       isSelected
-                        ? "border-primary bg-primary/5"
+                        ? "border-primary bg-primary/5 shadow-md"
                         : "border-border hover:border-primary/50"
                     }`}
+                    onClick={() => handleToggleStrategy(rec.strategyId)}
                   >
-                    <div className="flex items-start space-x-3">
-                      <Checkbox
-                        checked={isSelected}
-                        onCheckedChange={() => handleToggleStrategy(rec.strategyId)}
-                        id={rec.strategyId}
-                        className="mt-1"
-                      />
-                      <Label htmlFor={rec.strategyId} className="flex-1 cursor-pointer">
-                        <div className="space-y-3">
-                          <div>
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="font-semibold">{strategyInfo?.label}</span>
-                              <Badge variant={rec.matchPercent >= 70 ? "default" : rec.matchPercent >= 50 ? "secondary" : "outline"}>
-                                {rec.matchPercent}% Match
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground">
-                              {strategyInfo?.shortLabel} Strategy
-                            </p>
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-start gap-2 flex-1">
+                          <Checkbox
+                            checked={isSelected}
+                            onCheckedChange={() => handleToggleStrategy(rec.strategyId)}
+                            id={rec.strategyId}
+                            className="mt-0.5"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-sm leading-tight">
+                              {strategyInfo?.label}
+                            </h4>
                           </div>
-                          
-                          {/* Factor Breakdown - solo si hay respuestas */}
-                          {rec.matchPercent > 0 ? (
-                            <div className="space-y-1.5 text-xs">
-                              <div className="flex justify-between items-center">
-                                <span className="text-muted-foreground">Capital fit:</span>
-                                <span className="font-medium">{rec.factorMatches.capital}%</span>
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <span className="text-muted-foreground">Risk fit:</span>
-                                <span className="font-medium">{rec.factorMatches.risk}%</span>
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <span className="text-muted-foreground">Time fit:</span>
-                                <span className="font-medium">{rec.factorMatches.dailyTime}%</span>
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <span className="text-muted-foreground">Experience fit:</span>
-                                <span className="font-medium">{rec.factorMatches.experience}%</span>
-                              </div>
-                            </div>
-                          ) : (
-                            <p className="text-xs text-muted-foreground italic">
-                              Answer all assessment questions to see your match
-                            </p>
-                          )}
                         </div>
-                      </Label>
-                    </div>
-                  </div>
+                        <Badge 
+                          variant={rec.matchPercent >= 70 ? "default" : rec.matchPercent >= 50 ? "secondary" : "outline"}
+                          className="ml-2 flex-shrink-0"
+                        >
+                          {rec.matchPercent}% Match
+                        </Badge>
+                      </div>
+                      
+                      <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
+                        {STRATEGY_SUBTITLES[rec.strategyId]}
+                      </p>
+                      
+                      {rec.matchPercent > 0 ? (
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-md">
+                            <DollarSign className="w-4 h-4 text-muted-foreground" />
+                            <div className="flex-1 min-w-0">
+                              <div className="text-xs text-muted-foreground">Capital</div>
+                              <div className="text-sm font-semibold">{rec.factorMatches.capital}%</div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-md">
+                            <Clock className="w-4 h-4 text-muted-foreground" />
+                            <div className="flex-1 min-w-0">
+                              <div className="text-xs text-muted-foreground">Time</div>
+                              <div className="text-sm font-semibold">{rec.factorMatches.dailyTime}%</div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-md">
+                            <Gauge className="w-4 h-4 text-muted-foreground" />
+                            <div className="flex-1 min-w-0">
+                              <div className="text-xs text-muted-foreground">Risk</div>
+                              <div className="text-sm font-semibold">{rec.factorMatches.risk}%</div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-md">
+                            <GraduationCap className="w-4 h-4 text-muted-foreground" />
+                            <div className="flex-1 min-w-0">
+                              <div className="text-xs text-muted-foreground">Exp</div>
+                              <div className="text-sm font-semibold">{rec.factorMatches.experience}%</div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-muted-foreground italic text-center py-4">
+                          Answer all questions to see your match
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
                 );
               })}
             </div>
             
-            {/* Info note about alignment matrix */}
             <div className="flex items-center gap-2 text-xs text-muted-foreground mt-4 pt-4 border-t">
               <Info className="h-3 w-3 flex-shrink-0" />
               <span>Based on Strategy Alignment matrix</span>
             </div>
           </CardContent>
-            </Card>
+        </Card>
       </div>
     </div>
   );

@@ -17,48 +17,37 @@ interface Step2Props {
 }
 
 export function Step2AccountType({ selectedStrategy, onNext }: Step2Props) {
-  const { brokerSetup, setBrokerSetup, selectedStrategies } = useFinancialData();
+  const { brokerSetup, setBrokerSetup, selectedStrategies, strategyAssessmentAnswers } = useFinancialData();
+  
+  const experienceLevel = strategyAssessmentAnswers.experience 
+    ? parseInt(strategyAssessmentAnswers.experience) 
+    : undefined;
   
   const requirements = useMemo(() => {
-    return deriveRequirementsFromStrategies(selectedStrategies || [selectedStrategy]);
-  }, [selectedStrategies, selectedStrategy]);
-  
-  const [accountType, setAccountType] = useState<'cash' | 'margin' | 'retirement' | null>(
-    brokerSetup?.accountType || null
-  );
+    return deriveRequirementsFromStrategies(selectedStrategies || [selectedStrategy], experienceLevel);
+  }, [selectedStrategies, selectedStrategy, experienceLevel]);
 
   const handleContinue = () => {
-    if (!accountType || !brokerSetup) return;
+    if (!brokerSetup) return;
+
+    // Convert "cash or margin" to actual account type for storage
+    let finalAccountType: 'cash' | 'margin' | 'retirement';
+    
+    if (requirements.accountType === "cash or margin") {
+      // For experienced traders, default to margin but they could choose cash
+      finalAccountType = "margin";
+    } else {
+      finalAccountType = requirements.accountType as 'cash' | 'margin';
+    }
 
     setBrokerSetup({
       ...brokerSetup,
-      accountType,
+      accountType: finalAccountType,
       targetOptionsLevel: PERMISSION_TO_LEVEL[requirements.requiredPermission] as 0 | 1 | 2 | 3 | 4,
     });
 
     onNext();
   };
-
-  const accountTypes = [
-    {
-      value: 'cash',
-      label: 'Cash Account',
-      description: 'No margin borrowing. Settled funds required. Good for beginners.',
-      allowed: requirements.accountType === 'cash' || true
-    },
-    {
-      value: 'margin',
-      label: 'Margin Account',
-      description: 'Allows borrowing and advanced strategies. Required for spreads.',
-      allowed: true
-    },
-    {
-      value: 'retirement',
-      label: 'Retirement Account (IRA)',
-      description: 'Tax-advantaged but limited options strategies.',
-      allowed: requirements.accountType === 'cash'
-    }
-  ] as const;
 
   return (
     <div className="space-y-6">
@@ -70,11 +59,30 @@ export function Step2AccountType({ selectedStrategy, onNext }: Step2Props) {
         </p>
       </div>
 
-      <Alert>
-        <Info className="h-4 w-4" />
-        <AlertTitle>Required Permissions</AlertTitle>
+      <Alert className="bg-primary/5 border-primary/20">
+        <Info className="h-4 w-4 text-primary" />
+        <AlertTitle>Recommended Account Type</AlertTitle>
         <AlertDescription>
-          Your selected strategy requires: <strong>{requirements.requiredPermissionText}</strong>
+          <div className="space-y-2">
+            <p>
+              Based on your experience level {experienceLevel ? `(${experienceLevel})` : ''}, we recommend:
+            </p>
+            <p className="font-semibold text-foreground capitalize">
+              {requirements.accountType} Account
+            </p>
+            {experienceLevel && experienceLevel <= 3 && (
+              <p className="text-xs mt-2">
+                💡 Rockwell Trading recommends cash accounts for first-year traders to build discipline 
+                and avoid overleveraging.
+              </p>
+            )}
+            {requirements.accountType === "cash or margin" && (
+              <p className="text-xs mt-2">
+                ✅ With your experience level, you can choose either Cash or Margin account based on your 
+                strategy needs and risk tolerance.
+              </p>
+            )}
+          </div>
         </AlertDescription>
       </Alert>
       
@@ -94,42 +102,6 @@ export function Step2AccountType({ selectedStrategy, onNext }: Step2Props) {
         </ul>
       </div>
 
-      <div className="space-y-4">
-        <Label>Choose Account Type</Label>
-        <RadioGroup value={accountType || ''} onValueChange={(v) => setAccountType(v as any)}>
-          <div className="space-y-3">
-            {accountTypes.map((type) => (
-              <div
-                key={type.value}
-                className={`flex items-start space-x-3 border rounded-lg p-4 ${
-                  !type.allowed ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-primary'
-                }`}
-              >
-                <RadioGroupItem 
-                  value={type.value} 
-                  id={type.value}
-                  disabled={!type.allowed}
-                />
-                <div className="flex-1">
-                  <Label 
-                    htmlFor={type.value} 
-                    className={`font-medium ${!type.allowed ? 'cursor-not-allowed' : 'cursor-pointer'}`}
-                  >
-                    {type.label}
-                    {!type.allowed && (
-                      <Badge variant="outline" className="ml-2 text-xs">Not Compatible</Badge>
-                    )}
-                  </Label>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {type.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </RadioGroup>
-      </div>
-
       <div className="bg-muted/50 border rounded-lg p-4">
         <h4 className="font-medium mb-3">Example Options Levels</h4>
         <ul className="text-sm text-muted-foreground space-y-2">
@@ -142,8 +114,7 @@ export function Step2AccountType({ selectedStrategy, onNext }: Step2Props) {
       </div>
 
       <Button
-        onClick={handleContinue} 
-        disabled={!accountType}
+        onClick={handleContinue}
         className="w-full"
       >
         Continue to Funding

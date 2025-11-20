@@ -12,14 +12,18 @@ interface NextActionCardProps {
 }
 
 export function NextActionCard({ readinessScore, onOpenWizard }: NextActionCardProps) {
-  const { selectedStrategies, brokerSetup } = useFinancialData();
+  const { selectedStrategies, brokerSetup, strategyAssessmentAnswers } = useFinancialData();
 
   const hasStrategy = selectedStrategies && selectedStrategies.length > 0;
   const isComplete = brokerSetup?.progress.connected === true;
   
+  const experienceLevel = strategyAssessmentAnswers.experience 
+    ? parseInt(strategyAssessmentAnswers.experience) 
+    : undefined;
+  
   const requirements = useMemo(() => {
-    return deriveRequirementsFromStrategies(selectedStrategies || []);
-  }, [selectedStrategies]);
+    return deriveRequirementsFromStrategies(selectedStrategies || [], experienceLevel);
+  }, [selectedStrategies, experienceLevel]);
 
   // If complete, show edit button
   if (isComplete) {
@@ -100,7 +104,7 @@ export function NextActionCard({ readinessScore, onOpenWizard }: NextActionCardP
                 <span className="font-medium">{requirements.requiredPermissionText}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Minimum Balance:</span>
+                <span className="text-muted-foreground">Suggested Balance:</span>
                 <span className="font-medium">${requirements.minBalance.toLocaleString()}</span>
               </div>
             </div>

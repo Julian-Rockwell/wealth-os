@@ -62,7 +62,7 @@ export interface DerivedBrokerRequirements {
   requiredPermission: PermissionLevel;
   requiredPermissionText: string;
   minBalance: number;
-  accountType: 'cash' | 'margin';
+  accountType: 'cash' | 'margin' | 'cash or margin';
   derivedFrom: TradingStrategy[];
 }
 
