@@ -27,22 +27,20 @@ export function Step2AccountType({ selectedStrategy, onNext }: Step2Props) {
     return deriveRequirementsFromStrategies(selectedStrategies || [selectedStrategy], experienceLevel);
   }, [selectedStrategies, selectedStrategy, experienceLevel]);
 
+  // Determine recommended account type based on experience
+  const recommendedAccountType = experienceLevel && experienceLevel <= 3 ? 'cash' : 'margin';
+  
+  // Initialize selection with recommended type if not already set
+  const [selectedAccountType, setSelectedAccountType] = useState<'cash' | 'margin' | 'retirement'>(
+    brokerSetup?.accountType || recommendedAccountType
+  );
+
   const handleContinue = () => {
     if (!brokerSetup) return;
 
-    // Convert "cash or margin" to actual account type for storage
-    let finalAccountType: 'cash' | 'margin' | 'retirement';
-    
-    if (requirements.accountType === "cash or margin") {
-      // For experienced traders, default to margin but they could choose cash
-      finalAccountType = "margin";
-    } else {
-      finalAccountType = requirements.accountType as 'cash' | 'margin';
-    }
-
     setBrokerSetup({
       ...brokerSetup,
-      accountType: finalAccountType,
+      accountType: selectedAccountType,
       targetOptionsLevel: PERMISSION_TO_LEVEL[requirements.requiredPermission] as 0 | 1 | 2 | 3 | 4,
     });
 
@@ -59,32 +57,66 @@ export function Step2AccountType({ selectedStrategy, onNext }: Step2Props) {
         </p>
       </div>
 
-      <Alert className="bg-primary/5 border-primary/20">
-        <Info className="h-4 w-4 text-primary" />
-        <AlertTitle>Recommended Account Type</AlertTitle>
-        <AlertDescription>
-          <div className="space-y-2">
-            <p>
-              Based on your experience level {experienceLevel ? `(${experienceLevel})` : ''}, we recommend:
-            </p>
-            <p className="font-semibold text-foreground capitalize">
-              {requirements.accountType} Account
-            </p>
-            {experienceLevel && experienceLevel <= 3 && (
-              <p className="text-xs mt-2">
-                💡 Rockwell Trading recommends cash accounts for first-year traders to build discipline 
-                and avoid overleveraging.
-              </p>
-            )}
-            {requirements.accountType === "cash or margin" && (
-              <p className="text-xs mt-2">
-                ✅ With your experience level, you can choose either Cash or Margin account based on your 
-                strategy needs and risk tolerance.
-              </p>
-            )}
+      <div className="space-y-4">
+        <Label className="text-base font-semibold">Select Account Type</Label>
+        <RadioGroup value={selectedAccountType} onValueChange={(value) => setSelectedAccountType(value as 'cash' | 'margin' | 'retirement')}>
+          <div className="space-y-3">
+            {/* Cash Account */}
+            <div className="flex items-center space-x-3 border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+              <RadioGroupItem value="cash" id="cash" />
+              <Label htmlFor="cash" className="flex-1 cursor-pointer">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">Cash Account</span>
+                  {recommendedAccountType === 'cash' && (
+                    <Badge variant="success" className="text-xs">Recommended</Badge>
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Trade with settled funds only. Best for beginners to build discipline.
+                </p>
+              </Label>
+            </div>
+
+            {/* Margin Account */}
+            <div className="flex items-center space-x-3 border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+              <RadioGroupItem value="margin" id="margin" />
+              <Label htmlFor="margin" className="flex-1 cursor-pointer">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">Margin Account</span>
+                  {recommendedAccountType === 'margin' && (
+                    <Badge variant="success" className="text-xs">Recommended</Badge>
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Trade with leverage. Required for spreads and advanced strategies.
+                </p>
+              </Label>
+            </div>
+
+            {/* Retirement Account */}
+            <div className="flex items-center space-x-3 border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+              <RadioGroupItem value="retirement" id="retirement" />
+              <Label htmlFor="retirement" className="flex-1 cursor-pointer">
+                <span className="font-semibold">Retirement Account (IRA)</span>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Tax-advantaged account. Limited margin, specific rules apply.
+                </p>
+              </Label>
+            </div>
           </div>
-        </AlertDescription>
-      </Alert>
+        </RadioGroup>
+      </div>
+
+      {experienceLevel && experienceLevel <= 3 && (
+        <Alert className="bg-primary/5 border-primary/20">
+          <Info className="h-4 w-4 text-primary" />
+          <AlertTitle>Recommendation for Beginners</AlertTitle>
+          <AlertDescription>
+            💡 Rockwell Trading recommends cash accounts for first-year traders to build discipline 
+            and avoid overleveraging.
+          </AlertDescription>
+        </Alert>
+      )}
       
       {/* Guidance bullets condicionales */}
       <div className="bg-muted/50 border rounded-lg p-4">
