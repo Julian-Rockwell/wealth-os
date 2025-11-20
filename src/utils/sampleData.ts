@@ -132,7 +132,19 @@ const generateReynoldsTransactions = (): Transaction[] => {
     {id:"t_20251009_1",date:"2025-10-09",desc:"Online Payment - PYMT*WEB",amount:95.50,sign:"debit",category:"want",subcategory:"Shopping",merchant:"Web Payment",accountId:"acc_chk_5724",confidence:0.71},
     {id:"t_20251016_1",date:"2025-10-16",desc:"Venmo - Mike Johnson",amount:60.00,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Venmo",accountId:"acc_chk_5724",confidence:0.65},
     {id:"t_20251023_2",date:"2025-10-23",desc:"ATM Cash Withdrawal",amount:100.00,sign:"debit",category:"want",subcategory:"Shopping",merchant:"Chase ATM",accountId:"acc_chk_5724",confidence:0.70},
-    {id:"t_20251025_2",date:"2025-10-25",desc:"TST* Downtown Market",amount:42.30,sign:"debit",category:"need",subcategory:"Groceries",merchant:"Local Market",accountId:"acc_chk_5724",confidence:0.78}
+    {id:"t_20251025_2",date:"2025-10-25",desc:"TST* Downtown Market",amount:42.30,sign:"debit",category:"need",subcategory:"Groceries",merchant:"Local Market",accountId:"acc_chk_5724",confidence:0.78},
+
+    // December 2025
+    {id:"t_20251201_1",date:"2025-12-01",desc:"Payroll Deposit - Acme Corp W-2",amount:12150.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Acme Corp",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251202_1",date:"2025-12-02",desc:"Mortgage Payment - FirstHome Mortgage",amount:3650.00,sign:"debit",category:"need",subcategory:"Rent/Mortgage",merchant:"FirstHome Mortgage",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251205_1",date:"2025-12-05",desc:"Year-End Bonus - Acme Corp",amount:6000.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Acme Corp",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251206_1",date:"2025-12-06",desc:"HEB Grocery",amount:1012.88,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_5724",confidence:0.98},
+    {id:"t_20251208_1",date:"2025-12-08",desc:"Austin Energy",amount:289.77,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Austin Energy",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251210_1",date:"2025-12-10",desc:"Shell Gas Station",amount:232.11,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251212_1",date:"2025-12-12",desc:"Netflix Subscription",amount:15.49,sign:"debit",category:"want",subcategory:"Subscriptions",merchant:"Netflix",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251212_2",date:"2025-12-12",desc:"Spotify Premium",amount:10.99,sign:"debit",category:"want",subcategory:"Subscriptions",merchant:"Spotify",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251215_1",date:"2025-12-15",desc:"Credit Card Payment",amount:600.00,sign:"debit",category:"saving",subcategory:"Extra Debt Payment",merchant:"Chase Credit Card",accountId:"acc_chk_5724",confidence:0.99},
+    {id:"t_20251220_1",date:"2025-12-20",desc:"DCA - Vanguard Taxable",amount:1000.00,sign:"debit",category:"saving",subcategory:"Investment",merchant:"Vanguard",accountId:"acc_chk_5724",confidence:0.99}
   ];
 };
 
@@ -211,14 +223,26 @@ const generateJohnsonTransactions = (): Transaction[] => {
     {id:"tj_20251023_1",date:"2025-10-23",desc:"King Soopers",amount:135.89,sign:"debit",category:"need",subcategory:"Groceries",merchant:"King Soopers",accountId:"acc_chk_j001",confidence:0.98},
     {id:"tj_20251025_1",date:"2025-10-25",desc:"Sweet Basil Restaurant",amount:78.50,sign:"debit",category:"want",subcategory:"Dining Out",merchant:"Sweet Basil",accountId:"acc_chk_j001",confidence:0.98},
     {id:"tj_20251026_1",date:"2025-10-26",desc:"State Farm Insurance",amount:245.00,sign:"debit",category:"need",subcategory:"Insurance",merchant:"State Farm",accountId:"acc_chk_j001",confidence:0.99},
-    {id:"tj_20251027_1",date:"2025-10-27",desc:"Shell Gas Station",amount:58.75,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_j001",confidence:0.99}
+    {id:"tj_20251027_1",date:"2025-10-27",desc:"Shell Gas Station",amount:58.75,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_j001",confidence:0.99},
+
+    // December 2025
+    {id:"tj_20251201_1",date:"2025-12-01",desc:"Payroll Deposit - Tech Solutions Inc",amount:5850.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Tech Solutions Inc",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251203_1",date:"2025-12-03",desc:"Mortgage Payment - Rocket Mortgage",amount:2450.00,sign:"debit",category:"need",subcategory:"Rent/Mortgage",merchant:"Rocket Mortgage",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251205_1",date:"2025-12-05",desc:"Year-End Bonus - Tech Solutions Inc",amount:4000.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Tech Solutions Inc",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251206_1",date:"2025-12-06",desc:"King Soopers",amount:812.30,sign:"debit",category:"need",subcategory:"Groceries",merchant:"King Soopers",accountId:"acc_chk_j001",confidence:0.98},
+    {id:"tj_20251208_1",date:"2025-12-08",desc:"Xcel Energy",amount:215.99,sign:"debit",category:"need",subcategory:"Utilities",merchant:"Xcel Energy",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251210_1",date:"2025-12-10",desc:"Shell Gas Station",amount:210.44,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251212_1",date:"2025-12-12",desc:"Netflix Subscription",amount:15.49,sign:"debit",category:"want",subcategory:"Subscriptions",merchant:"Netflix",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251215_1",date:"2025-12-15",desc:"Payroll Deposit - Tech Solutions Inc",amount:5850.00,sign:"credit",category:"need",subcategory:"Income",merchant:"Tech Solutions Inc",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251215_2",date:"2025-12-15",desc:"Auto-Invest - Schwab",amount:1500.00,sign:"debit",category:"saving",subcategory:"Investment",merchant:"Schwab",accountId:"acc_chk_j001",confidence:0.99},
+    {id:"tj_20251220_1",date:"2025-12-20",desc:"Savings Transfer",amount:1500.00,sign:"debit",category:"saving",subcategory:"Savings",merchant:"WF Savings",accountId:"acc_chk_j001",confidence:0.99}
   ];
 };
 
 // Reynolds Family: Has high-interest debt, insufficient emergency fund - needs foundation work
 // Designed to fail investment readiness (score < 80)
-const reynoldsTotalAssets = 12500.00 + 8000.00 + 90000.00 + 120000.00 + 43000.00 + 820000.00 + 24000.00;
-const reynoldsTotalLiabilities = 510000.00 + 18900.00 + 9800.00 + 12400.00;
+const reynoldsTotalAssets = 47900.00 + 25000.00 + 94000.00 + 126500.00 + 43000.00 + 820000.00 + 24000.00;
+const reynoldsTotalLiabilities = 510000.00 + 18900.00 + 6050.00 + 12400.00;
 const reynoldsNetWorth = reynoldsTotalAssets - reynoldsTotalLiabilities;
 
 export const SAMPLE_REYNOLDS_DATA: FinancialSnapshot = {
@@ -238,10 +262,10 @@ export const SAMPLE_REYNOLDS_DATA: FinancialSnapshot = {
     {id:"acc_cc_chase",name:"Chase Credit Card",type:"credit_card",providerStatus:"connected",lastSync:"2025-10-01T10:00:00Z"}
   ],
   holdings: [
-    {id:"h_chk",accountId:"acc_chk_5724",name:"Checking Balance",accountType:"checking",assetClass:"cash",liquidity:"liquid",balance:12500.00,currency:"USD",source:"mock"},
-    {id:"h_svg",accountId:"acc_svg_001",name:"Emergency Savings",accountType:"savings",assetClass:"cash",liquidity:"liquid",balance:8000.00,currency:"USD",source:"mock"},
-    {id:"h_brg",accountId:"acc_brg_vaa",name:"Vanguard Taxable",accountType:"brokerage",assetClass:"stocks",liquidity:"semi_liquid",balance:90000.00,currency:"USD",source:"mock"},
-    {id:"h_401k",accountId:"acc_401k_fid",name:"Fidelity 401(k)",accountType:"401k",assetClass:"stocks",liquidity:"illiquid",balance:120000.00,currency:"USD",source:"mock"},
+    {id:"h_chk",accountId:"acc_chk_5724",name:"Checking Balance",accountType:"checking",assetClass:"cash",liquidity:"liquid",balance:47900.00,currency:"USD",source:"mock"},
+    {id:"h_svg",accountId:"acc_svg_001",name:"Emergency Savings",accountType:"savings",assetClass:"cash",liquidity:"liquid",balance:25000.00,currency:"USD",source:"mock"},
+    {id:"h_brg",accountId:"acc_brg_vaa",name:"Vanguard Taxable",accountType:"brokerage",assetClass:"stocks",liquidity:"semi_liquid",balance:94000.00,currency:"USD",source:"mock"},
+    {id:"h_401k",accountId:"acc_401k_fid",name:"Fidelity 401(k)",accountType:"401k",assetClass:"stocks",liquidity:"illiquid",balance:126500.00,currency:"USD",source:"mock"},
     {id:"h_roth",accountId:"acc_ira_roth",name:"Roth IRA",accountType:"IRA",assetClass:"stocks",liquidity:"illiquid",balance:43000.00,currency:"USD",source:"mock"},
     {id:"h_home",accountId:"acc_real_home",name:"Home Valuation (Zillow)",accountType:"real_estate",assetClass:"real_estate",liquidity:"illiquid",balance:820000.00,currency:"USD",source:"mock"},
     {id:"h_vehicle",accountId:"acc_vehicle_1",name:"Vehicle Value (KBB)",accountType:"vehicle",assetClass:"other",liquidity:"illiquid",balance:24000.00,currency:"USD",source:"mock"}
@@ -249,14 +273,14 @@ export const SAMPLE_REYNOLDS_DATA: FinancialSnapshot = {
   liabilities: [
     {id:"l_mort",accountId:"acc_real_home",name:"FirstHome Mortgage",type:"mortgage",apr:4.25,balance:510000.00,monthlyPayment:3650.00,remainingTermMonths:325,notes:"FirstHome Mortgage"},
     {id:"l_auto",accountId:"acc_vehicle_1",name:"Chase Auto Loan",type:"auto",apr:5.9,balance:18900.00,monthlyPayment:540.12,remainingTermMonths:42,notes:"Chase Auto"},
-    {id:"l_cc",accountId:"acc_cc_chase",name:"Chase Credit Card",type:"credit_card",apr:22.99,balance:9800.00,monthlyPayment:250.00,remainingTermMonths:0,notes:"High priority - needs payoff"},
+    {id:"l_cc",accountId:"acc_cc_chase",name:"Chase Credit Card",type:"credit_card",apr:22.99,balance:6050.00,monthlyPayment:250.00,remainingTermMonths:0,notes:"High priority - needs payoff"},
     {id:"l_student",accountId:"acc_chk_5724",name:"Student Loan",type:"student",apr:4.9,balance:12400.00,monthlyPayment:180.00,remainingTermMonths:96,notes:"Nelnet"}
   ],
   trends: {
     d30:{abs:-9.48,pct:-0.02},
     d60:{abs:-732.88,pct:-0.18},
     d90:{abs:-4741.88,pct:-1.12},
-    series12m:[745000,748000,751000,752500,753000,755000,757000,760000,762000,765000,768000,770000]
+    series12m:[745000,748000,751000,752500,753000,755000,757000,760000,762000,765000,768000,reynoldsNetWorth]
   },
   stagingTxns: generateReynoldsTransactions().map(toStagingTransaction),
   syncLog: [
@@ -281,7 +305,7 @@ export const SAMPLE_REYNOLDS_DATA: FinancialSnapshot = {
 };
 
 // Johnson Family: Investment-ready (passes 5-factor assessment)
-const johnsonTotalAssets = 45000.00 + 35000.00 + 65000.00 + 95000.00 + 38000.00 + 625000.00 + 19000.00;
+const johnsonTotalAssets = 17900.00 + 38500.00 + 70000.00 + 95000.00 + 40500.00 + 625000.00 + 19000.00;
 const johnsonTotalLiabilities = 380000.00 + 14500.00 + 8900.00;
 const johnsonNetWorth = johnsonTotalAssets - johnsonTotalLiabilities;
 
@@ -301,11 +325,11 @@ export const SAMPLE_JOHNSON_DATA: FinancialSnapshot = {
     {id:"acc_vehicle_j007",name:"2020 Honda CR-V",type:"vehicle",providerStatus:"connected",lastSync:"2025-09-01T10:00:00Z"}
   ],
   holdings: [
-    {id:"h_chk_j",accountId:"acc_chk_j001",name:"Checking Balance",accountType:"checking",assetClass:"cash",liquidity:"liquid",balance:45000.00,currency:"USD",source:"mock"},
-    {id:"h_svg_j",accountId:"acc_svg_j002",name:"Emergency Savings",accountType:"savings",assetClass:"cash",liquidity:"liquid",balance:35000.00,currency:"USD",source:"mock"},
-    {id:"h_brg_j",accountId:"acc_brg_j003",name:"Schwab Taxable",accountType:"brokerage",assetClass:"stocks",liquidity:"semi_liquid",balance:65000.00,currency:"USD",source:"mock"},
+    {id:"h_chk_j",accountId:"acc_chk_j001",name:"Checking Balance",accountType:"checking",assetClass:"cash",liquidity:"liquid",balance:17900.00,currency:"USD",source:"mock"},
+    {id:"h_svg_j",accountId:"acc_svg_j002",name:"Emergency Savings",accountType:"savings",assetClass:"cash",liquidity:"liquid",balance:38500.00,currency:"USD",source:"mock"},
+    {id:"h_brg_j",accountId:"acc_brg_j003",name:"Schwab Taxable",accountType:"brokerage",assetClass:"stocks",liquidity:"semi_liquid",balance:70000.00,currency:"USD",source:"mock"},
     {id:"h_401k_j",accountId:"acc_401k_j004",name:"Vanguard 401(k)",accountType:"401k",assetClass:"stocks",liquidity:"illiquid",balance:95000.00,currency:"USD",source:"mock"},
-    {id:"h_roth_j",accountId:"acc_ira_j005",name:"Roth IRA",accountType:"IRA",assetClass:"stocks",liquidity:"illiquid",balance:38000.00,currency:"USD",source:"mock"},
+    {id:"h_roth_j",accountId:"acc_ira_j005",name:"Roth IRA",accountType:"IRA",assetClass:"stocks",liquidity:"illiquid",balance:40500.00,currency:"USD",source:"mock"},
     {id:"h_home_j",accountId:"acc_real_j006",name:"Home Valuation (Redfin)",accountType:"real_estate",assetClass:"real_estate",liquidity:"illiquid",balance:625000.00,currency:"USD",source:"mock"},
     {id:"h_vehicle_j",accountId:"acc_vehicle_j007",name:"Vehicle Value (KBB)",accountType:"vehicle",assetClass:"other",liquidity:"illiquid",balance:19000.00,currency:"USD",source:"mock"}
   ],
@@ -318,7 +342,7 @@ export const SAMPLE_JOHNSON_DATA: FinancialSnapshot = {
     d30:{abs:1250.00,pct:0.24},
     d60:{abs:2480.00,pct:0.48},
     d90:{abs:3720.00,pct:0.72},
-    series12m:[510000,512000,514000,515500,517000,519000,521000,523000,525000,527000,529000,531000]
+    series12m:[510000,512000,514000,515500,517000,519000,521000,523000,525000,527000,529000,johnsonNetWorth]
   },
   stagingTxns: generateJohnsonTransactions().map(toStagingTransaction),
   syncLog: [
@@ -501,12 +525,24 @@ const generateAustinTransactions = (): Transaction[] => {
     {id:"ta_20251025_1",date:"2025-10-25",desc:"Transfer to Vanguard Brokerage",amount:1200.00,sign:"debit",category:"saving",subcategory:"Investment Transfer",merchant:"Vanguard",accountId:"acc_chk_a001",confidence:0.99},
     {id:"ta_20251027_1",date:"2025-10-27",desc:"Shell Gas Station",amount:98.40,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_a001",confidence:0.99},
     {id:"ta_20251029_1",date:"2025-10-29",desc:"HEB Grocery Store",amount:153.90,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_a001",confidence:0.98},
+
+    // December 2025
+    {id:"ta_20251201_1",date:"2025-12-01",desc:"Payroll Deposit - Tech Company",amount:9300.00,sign:"credit",category:"need",subcategory:"Payroll",merchant:"Horizon Co",accountId:"acc_chk_a001",confidence:0.99},
+    {id:"ta_20251202_1",date:"2025-12-02",desc:"Mortgage Payment - FirstHome Mortgage",amount:3100.00,sign:"debit",category:"need",subcategory:"Rent/Mortgage",merchant:"FirstHome Mortgage",accountId:"acc_chk_a001",confidence:0.99},
+    {id:"ta_20251205_1",date:"2025-12-05",desc:"HEB Grocery Store",amount:876.90,sign:"debit",category:"need",subcategory:"Groceries",merchant:"HEB",accountId:"acc_chk_a001",confidence:0.98},
+    {id:"ta_20251207_1",date:"2025-12-07",desc:"Austin Energy Electric",amount:247.33,sign:"debit",category:"need",subcategory:"Utilities",merchant:"City Utilities",accountId:"acc_chk_a001",confidence:0.99},
+    {id:"ta_20251208_1",date:"2025-12-08",desc:"Shell Gas Station",amount:231.77,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_a001",confidence:0.99},
+    {id:"ta_20251212_1",date:"2025-12-12",desc:"Netflix Subscription",amount:15.49,sign:"debit",category:"want",subcategory:"Subscriptions",merchant:"Netflix",accountId:"acc_chk_a001",confidence:0.99},
+    {id:"ta_20251212_2",date:"2025-12-12",desc:"Spotify Premium",amount:10.99,sign:"debit",category:"want",subcategory:"Subscriptions",merchant:"Spotify",accountId:"acc_chk_a001",confidence:0.99},
+    {id:"ta_20251215_1",date:"2025-12-15",desc:"Auto Loan Payment",amount:540.12,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Ally Auto",accountId:"acc_chk_a001",confidence:0.99},
+    {id:"ta_20251218_1",date:"2025-12-18",desc:"Credit Card Payment",amount:350.00,sign:"debit",category:"saving",subcategory:"Credit Card Payment",merchant:"Ally Card",accountId:"acc_chk_a001",confidence:0.99},
+    {id:"ta_20251220_1",date:"2025-12-20",desc:"Transfer to Vanguard Brokerage",amount:300.00,sign:"debit",category:"saving",subcategory:"Investment Transfer",merchant:"Vanguard",accountId:"acc_chk_a001",confidence:0.99}
   ];
 };
 
 // Austin Family: Middle-class with some savings potential
-const austinTotalAssets = 40799.00 + 4400.00 + 80000.00 + 520000.00 + 28000.00;
-const austinTotalLiabilities = 415000.00 + 14000.00 + 6500.00;
+const austinTotalAssets = 12400.00 + 8000.00 + 5500.00 + 80000.00 + 520000.00 + 28000.00;
+const austinTotalLiabilities = 415000.00 + 16600.00 + 1800.00;
 const austinNetWorth = austinTotalAssets - austinTotalLiabilities;
 
 export const SAMPLE_AUSTIN_DATA: FinancialSnapshot = {
@@ -517,36 +553,39 @@ export const SAMPLE_AUSTIN_DATA: FinancialSnapshot = {
   },
   accounts: [
     {id:"acc_chk_a001",name:"Chase Checking •••8923",type:"checking",providerStatus:"connected",lastSync:"2025-11-15T10:00:00Z"},
-    {id:"acc_brg_a002",name:"Vanguard Brokerage",type:"brokerage",providerStatus:"connected",lastSync:"2025-11-15T10:00:00Z"},
-    {id:"acc_401k_a003",name:"Fidelity 401(k)",type:"401k",providerStatus:"needs_attention",lastSync:"2025-10-20T10:00:00Z"},
-    {id:"acc_real_a004",name:"Primary Residence — Austin, TX",type:"real_estate",providerStatus:"connected",lastSync:"2025-11-15T10:00:00Z"},
-    {id:"acc_vehicle_a005",name:"2021 Honda Accord",type:"vehicle",providerStatus:"connected",lastSync:"2025-11-15T10:00:00Z"}
+    {id:"acc_svg_a002",name:"Emergency Fund Savings",type:"savings",providerStatus:"connected",lastSync:"2025-11-15T10:00:00Z"},
+    {id:"acc_brg_a003",name:"Vanguard Brokerage",type:"brokerage",providerStatus:"connected",lastSync:"2025-11-15T10:00:00Z"},
+    {id:"acc_401k_a004",name:"Fidelity 401(k)",type:"401k",providerStatus:"needs_attention",lastSync:"2025-10-20T10:00:00Z"},
+    {id:"acc_real_a005",name:"Primary Residence — Austin, TX",type:"real_estate",providerStatus:"connected",lastSync:"2025-11-15T10:00:00Z"},
+    {id:"acc_vehicle_a006",name:"2021 Honda Accord",type:"vehicle",providerStatus:"connected",lastSync:"2025-11-15T10:00:00Z"}
   ],
   holdings: [
-    {id:"h_chk_a",accountId:"acc_chk_a001",name:"Checking Balance",accountType:"checking",assetClass:"cash",liquidity:"liquid",balance:40799.00,currency:"USD",source:"mock"},
-    {id:"h_brg_a",accountId:"acc_brg_a002",name:"Vanguard Taxable",accountType:"brokerage",assetClass:"stocks",liquidity:"semi_liquid",balance:4400.00,currency:"USD",source:"mock"},
-    {id:"h_401k_a",accountId:"acc_401k_a003",name:"Fidelity 401(k)",accountType:"401k",assetClass:"stocks",liquidity:"illiquid",balance:80000.00,currency:"USD",source:"mock"},
-    {id:"h_home_a",accountId:"acc_real_a004",name:"Home Valuation (Zillow)",accountType:"real_estate",assetClass:"real_estate",liquidity:"illiquid",balance:520000.00,currency:"USD",source:"mock"},
-    {id:"h_vehicle_a",accountId:"acc_vehicle_a005",name:"Vehicle Value (KBB)",accountType:"vehicle",assetClass:"other",liquidity:"illiquid",balance:28000.00,currency:"USD",source:"mock"}
+    {id:"h_chk_a",accountId:"acc_chk_a001",name:"Checking Balance",accountType:"checking",assetClass:"cash",liquidity:"liquid",balance:12400.00,currency:"USD",source:"mock"},
+    {id:"h_svg_a",accountId:"acc_svg_a002",name:"Emergency Savings",accountType:"savings",assetClass:"cash",liquidity:"liquid",balance:8000.00,currency:"USD",source:"mock"},
+    {id:"h_brg_a",accountId:"acc_brg_a003",name:"Vanguard Taxable",accountType:"brokerage",assetClass:"stocks",liquidity:"semi_liquid",balance:5500.00,currency:"USD",source:"mock"},
+    {id:"h_401k_a",accountId:"acc_401k_a004",name:"Fidelity 401(k)",accountType:"401k",assetClass:"stocks",liquidity:"illiquid",balance:80000.00,currency:"USD",source:"mock"},
+    {id:"h_home_a",accountId:"acc_real_a005",name:"Home Valuation (Zillow)",accountType:"real_estate",assetClass:"real_estate",liquidity:"illiquid",balance:520000.00,currency:"USD",source:"mock"},
+    {id:"h_vehicle_a",accountId:"acc_vehicle_a006",name:"Vehicle Value (KBB)",accountType:"vehicle",assetClass:"other",liquidity:"illiquid",balance:28000.00,currency:"USD",source:"mock"}
   ],
   liabilities: [
-    {id:"l_mort_a",accountId:"acc_real_a004",name:"FirstHome Mortgage",type:"mortgage",apr:3.75,balance:415000.00,monthlyPayment:3650.00,remainingTermMonths:298,notes:"FirstHome Mortgage"},
-    {id:"l_auto_a",accountId:"acc_vehicle_a005",name:"Chase Auto Loan",type:"auto",apr:4.9,balance:14000.00,monthlyPayment:540.12,remainingTermMonths:26,notes:"Chase Auto"},
-    {id:"l_cc_a",accountId:"acc_chk_a001",name:"Chase Credit Card",type:"credit_card",apr:18.99,balance:6500.00,monthlyPayment:1300.00,remainingTermMonths:0,notes:"Variable monthly payment"}
+    {id:"l_mort_a",accountId:"acc_real_a005",name:"FirstHome Mortgage",type:"mortgage",apr:3.75,balance:415000.00,monthlyPayment:3650.00,remainingTermMonths:298,notes:"FirstHome Mortgage"},
+    {id:"l_auto_a",accountId:"acc_vehicle_a006",name:"Chase Auto Loan",type:"auto",apr:4.9,balance:16600.00,monthlyPayment:540.12,remainingTermMonths:26,notes:"Chase Auto"},
+    {id:"l_cc_a",accountId:"acc_chk_a001",name:"Chase Credit Card",type:"credit_card",apr:18.99,balance:1800.00,monthlyPayment:1300.00,remainingTermMonths:0,notes:"Variable monthly payment"}
   ],
   trends: {
     d30:{abs:850.00,pct:0.18},
     d60:{abs:1720.00,pct:0.36},
     d90:{abs:2580.00,pct:0.54},
-    series12m:[620000,622000,624000,626000,628000,630000,632000,634000,636000,638000,640000,642000]
+    series12m:[620000,622000,624000,626000,628000,630000,632000,634000,636000,638000,640000,austinNetWorth]
   },
   stagingTxns: generateAustinTransactions().map(toStagingTransaction),
   syncLog: [
     {accountId:"acc_chk_a001",status:"connected",ts:"2025-10-15T10:00:00Z"},
-    {accountId:"acc_brg_a002",status:"connected",ts:"2025-10-15T10:00:00Z"},
-    {accountId:"acc_401k_a003",status:"needs_attention",ts:"2025-09-20T10:00:00Z"},
-    {accountId:"acc_real_a004",status:"connected",ts:"2025-10-15T10:00:00Z"},
-    {accountId:"acc_vehicle_a005",status:"connected",ts:"2025-10-15T10:00:00Z"}
+    {accountId:"acc_svg_a002",status:"connected",ts:"2025-10-15T10:00:00Z"},
+    {accountId:"acc_brg_a003",status:"connected",ts:"2025-10-15T10:00:00Z"},
+    {accountId:"acc_401k_a004",status:"needs_attention",ts:"2025-09-20T10:00:00Z"},
+    {accountId:"acc_real_a005",status:"connected",ts:"2025-10-15T10:00:00Z"},
+    {accountId:"acc_vehicle_a006",status:"connected",ts:"2025-10-15T10:00:00Z"}
   ],
   netWorth: {
     assets: austinTotalAssets,
@@ -696,12 +735,25 @@ const generatePhoenixTransactions = (): Transaction[] => {
     {id:"tp_20251029_1",date:"2025-10-29",desc:"Amazon Prime Subscription",amount:14.99,sign:"debit",category:"want",subcategory:"Subscriptions",merchant:"Amazon",accountId:"acc_chk_p001",confidence:0.99},
     {id:"tp_20251030_1",date:"2025-10-30",desc:"Fry's Food Store",amount:88.50,sign:"debit",category:"need",subcategory:"Groceries",merchant:"Fry's",accountId:"acc_chk_p001",confidence:0.98},
     {id:"tp_20251031_1",date:"2025-10-31",desc:"Transfer to IRA Savings",amount:150.00,sign:"debit",category:"saving",subcategory:"Retirement",merchant:"Fidelity IRA",accountId:"acc_chk_p001",confidence:0.99},
+
+    // December 2025
+    {id:"tp_20251201_1",date:"2025-12-01",desc:"Paycheck - GigWorks",amount:5200.00,sign:"credit",category:"need",subcategory:"Payroll",merchant:"GigWorks",accountId:"acc_chk_p001",confidence:0.99},
+    {id:"tp_20251203_1",date:"2025-12-03",desc:"Rent Payment",amount:1700.00,sign:"debit",category:"need",subcategory:"Rent/Mortgage",merchant:"Oak Ridge Apts",accountId:"acc_chk_p001",confidence:0.99},
+    {id:"tp_20251205_1",date:"2025-12-05",desc:"Walmart Grocery",amount:712.55,sign:"debit",category:"need",subcategory:"Groceries",merchant:"Walmart",accountId:"acc_chk_p001",confidence:0.98},
+    {id:"tp_20251207_1",date:"2025-12-07",desc:"APS Electric Utility",amount:189.33,sign:"debit",category:"need",subcategory:"Utilities",merchant:"City Utilities",accountId:"acc_chk_p001",confidence:0.99},
+    {id:"tp_20251210_1",date:"2025-12-10",desc:"Shell Gas Station",amount:168.77,sign:"debit",category:"need",subcategory:"Transportation",merchant:"Shell",accountId:"acc_chk_p001",confidence:0.99},
+    {id:"tp_20251212_1",date:"2025-12-12",desc:"Netflix Subscription",amount:15.49,sign:"debit",category:"want",subcategory:"Subscriptions",merchant:"Netflix",accountId:"acc_chk_p001",confidence:0.99},
+    {id:"tp_20251212_2",date:"2025-12-12",desc:"Spotify Premium",amount:10.99,sign:"debit",category:"want",subcategory:"Subscriptions",merchant:"Spotify",accountId:"acc_chk_p001",confidence:0.99},
+    {id:"tp_20251215_1",date:"2025-12-15",desc:"Credit Card A - Minimum",amount:125.00,sign:"debit",category:"need",subcategory:"Debt Payment",merchant:"Card A",accountId:"acc_chk_p001",confidence:0.99},
+    {id:"tp_20251215_2",date:"2025-12-15",desc:"Credit Card B - Minimum",amount:50.00,sign:"debit",category:"need",subcategory:"Debt Payment",merchant:"Card B",accountId:"acc_chk_p001",confidence:0.99},
+    {id:"tp_20251220_1",date:"2025-12-20",desc:"Personal Loan Payment",amount:220.00,sign:"debit",category:"need",subcategory:"Debt Payment",merchant:"LendCo",accountId:"acc_chk_p001",confidence:0.99},
+    {id:"tp_20251227_1",date:"2025-12-27",desc:"Extra Payment - Card B",amount:150.00,sign:"debit",category:"saving",subcategory:"Extra Debt Payment",merchant:"Card B",accountId:"acc_chk_p001",confidence:0.99}
   ];
 };
 
 // Phoenix Family: Lower income, multiple high-interest debts, struggling
-const phoenixTotalAssets = 3400.00 + 1200.00 + 9200.00 + 11000.00;
-const phoenixTotalLiabilities = 14000.00 + 7500.00 + 9000.00 + 1100.00;
+const phoenixTotalAssets = 780.00 + 350.00 + 9200.00 + 11000.00;
+const phoenixTotalLiabilities = 14000.00 + 14000.00 + 6500.00 + 7840.00;
 const phoenixNetWorth = phoenixTotalAssets - phoenixTotalLiabilities;
 
 export const SAMPLE_PHOENIX_DATA: FinancialSnapshot = {
@@ -717,22 +769,22 @@ export const SAMPLE_PHOENIX_DATA: FinancialSnapshot = {
     {id:"acc_vehicle_p004",name:"2017 Toyota Camry",type:"vehicle",providerStatus:"disconnected",lastSync:"2025-08-10T10:00:00Z"}
   ],
   holdings: [
-    {id:"h_chk_p",accountId:"acc_chk_p001",name:"Checking Balance",accountType:"checking",assetClass:"cash",liquidity:"liquid",balance:3400.00,currency:"USD",source:"mock"},
-    {id:"h_svg_p",accountId:"acc_svg_p002",name:"Emergency Savings",accountType:"savings",assetClass:"cash",liquidity:"liquid",balance:1200.00,currency:"USD",source:"mock"},
+    {id:"h_chk_p",accountId:"acc_chk_p001",name:"Checking Balance",accountType:"checking",assetClass:"cash",liquidity:"liquid",balance:780.00,currency:"USD",source:"mock"},
+    {id:"h_svg_p",accountId:"acc_svg_p002",name:"Emergency Savings",accountType:"savings",assetClass:"cash",liquidity:"liquid",balance:350.00,currency:"USD",source:"mock"},
     {id:"h_ira_p",accountId:"acc_ira_p003",name:"Fidelity IRA",accountType:"IRA",assetClass:"stocks",liquidity:"illiquid",balance:9200.00,currency:"USD",source:"mock"},
     {id:"h_vehicle_p",accountId:"acc_vehicle_p004",name:"Vehicle Value (KBB)",accountType:"vehicle",assetClass:"other",liquidity:"illiquid",balance:11000.00,currency:"USD",source:"mock"}
   ],
   liabilities: [
     {id:"l_auto_p",accountId:"acc_vehicle_p004",name:"Bank of America Auto Loan",type:"auto",apr:6.9,balance:14000.00,monthlyPayment:410.00,remainingTermMonths:34,notes:"Bank of America Auto"},
-    {id:"l_personal_p",accountId:"acc_chk_p001",name:"Personal Loan - LendingClub",type:"personal",apr:20.99,balance:7500.00,monthlyPayment:320.00,remainingTermMonths:24,notes:"High interest - priority payoff"},
-    {id:"l_student_p",accountId:"acc_chk_p001",name:"Student Loan - Navient",type:"student",apr:5.5,balance:9000.00,monthlyPayment:125.00,remainingTermMonths:72,notes:"Federal loan"},
-    {id:"l_cc_p",accountId:"acc_chk_p001",name:"Target Store Card",type:"credit_card",apr:24.99,balance:1100.00,monthlyPayment:40.00,remainingTermMonths:0,notes:"Store card"}
+    {id:"l_cc_a_p",accountId:"acc_chk_p001",name:"Credit Card A",type:"credit_card",apr:21.9,balance:14000.00,monthlyPayment:125.00,remainingTermMonths:0,notes:"High interest - priority payoff"},
+    {id:"l_cc_b_p",accountId:"acc_chk_p001",name:"Credit Card B",type:"credit_card",apr:18.4,balance:6500.00,monthlyPayment:50.00,remainingTermMonths:0,notes:"Store card"},
+    {id:"l_personal_p",accountId:"acc_chk_p001",name:"Personal Loan - LendingClub",type:"personal",apr:15.0,balance:7840.00,monthlyPayment:220.00,remainingTermMonths:24,notes:"Personal loan"}
   ],
   trends: {
     d30:{abs:-320.00,pct:-1.45},
     d60:{abs:-580.00,pct:-2.63},
     d90:{abs:-890.00,pct:-4.04},
-    series12m:[18000,17800,17600,17400,17200,17000,16800,16600,16400,16200,16000,15800]
+    series12m:[18000,17800,17600,17400,17200,17000,16800,16600,16400,16200,16000,phoenixNetWorth]
   },
   stagingTxns: generatePhoenixTransactions().map(toStagingTransaction),
   syncLog: [
