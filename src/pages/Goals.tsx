@@ -9,7 +9,8 @@ import { VisualRoadmap } from "@/components/goals/VisualRoadmap";
 import { AssumptionsPanel } from "@/components/goals/AssumptionsPanel";
 import { RequiredCapitalTable } from "@/components/goals/RequiredCapitalTable";
 import { ProjectionSettingsPanel } from "@/components/goals/ProjectionSettingsPanel";
-import { ProjectionChart } from "@/components/goals/ProjectionChart";
+import { ProjectionKPIHeader } from "@/components/goals/ProjectionKPIHeader";
+import { IncomeLifestyleChart } from "@/components/goals/IncomeLifestyleChart";
 import { ProjectionTable } from "@/components/goals/ProjectionTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -319,6 +320,9 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
         <TabsContent value="projection" className="space-y-6">
           {projectionSettings && (
             <>
+              {/* KPI Header */}
+              <ProjectionKPIHeader settings={projectionSettings} />
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Settings Panel */}
                 <ProjectionSettingsPanel
@@ -327,11 +331,8 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
                   autoMonthlyExpenses={autoMonthlyExpenses}
                 />
 
-                {/* Chart */}
-                <ProjectionChart
-                  settings={projectionSettings}
-                  rows={[]} // Will be populated by calculateRows logic
-                />
+                {/* Income & Lifestyle Chart */}
+                <IncomeLifestyleChart settings={projectionSettings} />
               </div>
 
               {/* Table */}

@@ -15,6 +15,7 @@ export interface ProjectionSettings {
   startYear: number;
   initialTradingAccount: number;
   incomeGoalPercent: number;
+  inflationPercent: number;
   rowGoalPercents: number[];
   rowCashInOut: number[];
 }
@@ -165,6 +166,7 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
       startYear: currentYear,
       initialTradingAccount: 10000,
       incomeGoalPercent: 10,
+      inflationPercent: 3,
       rowGoalPercents: Array(20).fill(60),
       rowCashInOut: Array(20).fill(0),
     };

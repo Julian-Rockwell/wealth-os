@@ -165,6 +165,27 @@ export function ProjectionSettingsPanel({
             onBlur={() => onSettingsChange({ ...settings })}
           />
         </div>
+
+        {/* Inflation % */}
+        <div className="space-y-2">
+          <Label htmlFor="inflationPercent">Inflation %</Label>
+          <Input
+            id="inflationPercent"
+            type="number"
+            min="0"
+            max="20"
+            step="0.1"
+            value={settings.inflationPercent}
+            onChange={(e) => onSettingsChange({
+              ...settings,
+              inflationPercent: parseFloat(e.target.value) || 3
+            })}
+            onBlur={() => onSettingsChange({ ...settings })}
+          />
+          <p className="text-xs text-muted-foreground">
+            Annual inflation rate for expense adjustments (0-20%)
+          </p>
+        </div>
       </CardContent>
     </Card>
   );
