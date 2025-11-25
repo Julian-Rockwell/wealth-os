@@ -1,10 +1,16 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, CheckCircle2, Rocket } from "lucide-react";
+import { AlertCircle, CheckCircle2, Rocket, Info } from "lucide-react";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
 import { deriveRequirementsFromStrategies } from "@/utils/deriveRequirements";
 import { useMemo } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface NextActionCardProps {
   readinessScore: number;
@@ -95,9 +101,30 @@ export function NextActionCard({ readinessScore, onOpenWizard }: NextActionCardP
             )}
             
             <div className="space-y-2 text-sm mb-4">
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Account Type:</span>
-                <span className="font-medium capitalize">{requirements.accountType}</span>
+                <div className="flex items-center gap-1">
+                  <span className="font-medium">
+                    {experienceLevel && experienceLevel <= 2 
+                      ? "Margin (treat as Cash)" 
+                      : "Margin"}
+                  </span>
+                  {experienceLevel && experienceLevel <= 2 && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Info className="w-3.5 h-3.5 text-muted-foreground" />
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p className="text-xs">
+                            Open Margin to future-proof your account, but <strong>use it like Cash</strong> for 
+                            the first year: avoid borrowing on margin and focus on foundational execution.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                </div>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Required Permissions:</span>

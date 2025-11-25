@@ -32,18 +32,10 @@ export function deriveRequirementsFromStrategies(
   const requiredPermission = getHighestPermission(permissions);
   const minBalance = Math.max(...balances);
   
-  // Derivar Account Type desde Experience Level (Rockwell recommendation)
-  let accountType: "cash" | "margin" | "cash or margin" = "cash";
-  if (experienceLevel) {
-    if (experienceLevel >= 4) {
-      accountType = "cash or margin"; // Experience 4-5: can choose
-    } else {
-      accountType = "cash"; // Experience 1-3: cash only (beginner-friendly)
-    }
-  } else if (requiresMargin(requiredPermission)) {
-    // Fallback: if permission requires margin
-    accountType = "margin";
-  }
+  // POLICY: Default Account Type = Margin for ALL experience levels
+  const accountType: "cash" | "margin" | "cash or margin" = "margin";
+  
+  console.log('broker_setup_accountType_recommended: "margin"');
   
   return {
     requiredPermission,
