@@ -7,6 +7,18 @@ import type { SixMonthPlan } from "@/types/sixMonthPlan";
 import { resolveStrategyAlias } from "@/constants/strategies";
 import { deriveRequirementsFromStrategies } from "@/utils/deriveRequirements";
 
+export interface ProjectionSettings {
+  costOfLivingMode: 'rough' | 'accurate';
+  costOfLiving: number;
+  currentRetirementSavings: number;
+  accountSizeComfortable: number;
+  startYear: number;
+  initialTradingAccount: number;
+  incomeGoalPercent: number;
+  rowGoalPercents: number[];
+  rowCashInOut: number[];
+}
+
 interface DraftData {
   mockConnections: any[];
   files: any[];
@@ -43,6 +55,8 @@ interface FinancialDataContextType {
   setBrokerSetup: (setup: BrokerSetup | null) => void;
   sixMonthPlan: SixMonthPlan | null;
   setSixMonthPlan: (plan: SixMonthPlan | null) => void;
+  projectionSettings: ProjectionSettings | null;
+  setProjectionSettings: (settings: ProjectionSettings | null) => void;
   resetAllData: () => void;
 }
 
@@ -134,6 +148,26 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
   const [sixMonthPlan, setSixMonthPlanState] = useState<SixMonthPlan | null>(() => {
     const stored = localStorage.getItem("sixMonthPlan");
     return stored ? JSON.parse(stored) : null;
+  });
+
+  const [projectionSettings, setProjectionSettingsState] = useState<ProjectionSettings | null>(() => {
+    const stored = localStorage.getItem("projectionSettings");
+    if (stored) {
+      return JSON.parse(stored);
+    }
+    // Default values
+    const currentYear = new Date().getFullYear();
+    return {
+      costOfLivingMode: 'rough',
+      costOfLiving: 5000,
+      currentRetirementSavings: 0,
+      accountSizeComfortable: 400000,
+      startYear: currentYear,
+      initialTradingAccount: 10000,
+      incomeGoalPercent: 10,
+      rowGoalPercents: Array(20).fill(60),
+      rowCashInOut: Array(20).fill(0),
+    };
   });
 
   const setSnapshot = (newSnapshot: FinancialSnapshot | null) => {
@@ -250,6 +284,15 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     }
   };
 
+  const setProjectionSettings = (settings: ProjectionSettings | null) => {
+    setProjectionSettingsState(settings);
+    if (settings) {
+      localStorage.setItem("projectionSettings", JSON.stringify(settings));
+    } else {
+      localStorage.removeItem("projectionSettings");
+    }
+  };
+
   const resetAllData = () => {
     setSnapshotState(null);
     setDashboardDataState(null);
@@ -269,6 +312,8 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     setBrokerRequirementsState(null);
     setMonthlyIncomeState(null);
     setBrokerSetupState(null);
+    setSixMonthPlanState(null);
+    setProjectionSettingsState(null);
     localStorage.removeItem("financialSnapshot");
     localStorage.removeItem("dashboardData");
     localStorage.removeItem("paperTradingData");
@@ -283,6 +328,7 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     localStorage.removeItem("monthlyIncome");
     localStorage.removeItem("brokerSetup");
     localStorage.removeItem("sixMonthPlan");
+    localStorage.removeItem("projectionSettings");
   };
 
   return (
@@ -316,6 +362,8 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
       setBrokerSetup,
       sixMonthPlan,
       setSixMonthPlan,
+      projectionSettings,
+      setProjectionSettings,
       resetAllData,
     }}
   >
