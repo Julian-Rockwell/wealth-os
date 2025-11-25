@@ -8,6 +8,10 @@ import { TimelineCompareCards } from "@/components/goals/TimelineCompareCards";
 import { VisualRoadmap } from "@/components/goals/VisualRoadmap";
 import { AssumptionsPanel } from "@/components/goals/AssumptionsPanel";
 import { RequiredCapitalTable } from "@/components/goals/RequiredCapitalTable";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   calculateMonthlyExpensesFromDashboard,
   getStartingCapital,
@@ -155,66 +159,166 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
         </div>
       </div>
 
-      {/* Full-width: Expense Baseline */}
-      <ExpenseBaselineCard
-        autoMonthlyExpenses={autoMonthlyExpenses}
-        onExpensesConfirmed={setConfirmedExpenses}
-      />
+      {/* Tabs Layout */}
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="inputs">Inputs</TabsTrigger>
+          <TabsTrigger value="compare">Compare Paths</TabsTrigger>
+          <TabsTrigger value="roadmap">Roadmap</TabsTrigger>
+          <TabsTrigger value="projection">Projection</TabsTrigger>
+        </TabsList>
 
-      {/* Two-column layout: Goal Questions & RPIC Result */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Column: Goal Questions */}
-        <GoalQuestionsCard
-          timing={timing}
-          lifestyle={lifestyle}
-          geography={geography}
-          onTimingChange={(value) => setTiming(typeof value === 'string' ? parseInt(value) : value)}
-          onLifestyleChange={setLifestyle}
-          onGeographyChange={setGeography}
-        />
-
-        {/* Right Column: RPIC Result */}
-        {rpicResult && (
-          <RpicResultCard rpic={rpicResult} foundationScore={foundationScore} />
-        )}
-      </div>
-
-      {/* Timeline Comparison */}
-      {rpicResult && timelineResult && (
-        <TimelineCompareCards
-          timeline={timelineResult}
-          startingCapital={startingCapital}
-          monthlyContribution={monthlyContribution}
-          onStartingCapitalChange={setStartingCapital}
-          onMonthlyContributionChange={setMonthlyContribution}
-        />
-      )}
-
-      {/* Visual Roadmap */}
-      {milestones.length > 0 && <VisualRoadmap milestones={milestones} />}
-
-      {/* Two-column layout for detailed results */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left: Required Capital Table */}
-        {rpicResult && timelineResult && (
-          <RequiredCapitalTable
-            rpic={rpicResult}
-            timeline={timelineResult}
-            startingCapital={startingCapital}
+        {/* TAB 1: Overview */}
+        <TabsContent value="overview" className="space-y-6">
+          <ExpenseBaselineCard
+            autoMonthlyExpenses={autoMonthlyExpenses}
+            onExpensesConfirmed={setConfirmedExpenses}
           />
-        )}
 
-        {/* Right: Assumptions Panel */}
-        <AssumptionsPanel
-          activeReturn={activeReturn}
-          passiveYield={passiveYield}
-          inflation={inflation}
-          onActiveReturnChange={setActiveReturn}
-          onPassiveYieldChange={setPassiveYield}
-          onInflationChange={setInflation}
-          onReset={handleResetAssumptions}
-        />
-      </div>
+          {rpicResult && (
+            <RpicResultCard 
+              rpic={rpicResult} 
+              foundationScore={foundationScore}
+              onNavigateToTab={onNavigateToTab}
+            />
+          )}
+        </TabsContent>
+
+        {/* TAB 2: Inputs */}
+        <TabsContent value="inputs" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left & Center: Input Forms */}
+            <div className="lg:col-span-2 space-y-6">
+              <GoalQuestionsCard
+                timing={timing}
+                lifestyle={lifestyle}
+                geography={geography}
+                onTimingChange={(value) => setTiming(typeof value === 'string' ? parseInt(value) : value)}
+                onLifestyleChange={setLifestyle}
+                onGeographyChange={setGeography}
+              />
+
+              {/* Timeline Inputs */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Timeline Inputs</CardTitle>
+                  <CardDescription>Adjust your starting capital and monthly contribution to see how it affects your timeline.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="startingCapital">Starting Capital</Label>
+                    <Input
+                      id="startingCapital"
+                      type="number"
+                      value={startingCapital}
+                      onChange={(e) => setStartingCapital(Number(e.target.value))}
+                      className="text-lg"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="monthlyContribution">Monthly Contribution</Label>
+                    <Input
+                      id="monthlyContribution"
+                      type="number"
+                      value={monthlyContribution}
+                      onChange={(e) => setMonthlyContribution(Number(e.target.value))}
+                      className="text-lg"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Right: Sticky RPIC Target Summary */}
+            <div className="lg:sticky lg:top-6 lg:h-fit">
+              {rpicResult && (
+                <Card className="bg-gradient-to-br from-primary/5 to-accent/5">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Your RPIC Target</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">RPIC Index</p>
+                      <p className="text-2xl font-bold text-primary">{rpicResult.rpicIndex}%</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Monthly RPIC</p>
+                      <p className="text-xl font-semibold">${rpicResult.monthlyRpic.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Annual RPIC</p>
+                      <p className="text-xl font-semibold">${rpicResult.annualRpic.toLocaleString()}</p>
+                    </div>
+                    <div className="pt-4 border-t">
+                      <p className="text-xs text-muted-foreground mb-2">Required Capital</p>
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-sm">
+                          <span>Traditional (4%):</span>
+                          <span className="font-medium">${rpicResult.targetCapitalPassive.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Wealth OS:</span>
+                          <span className="font-medium text-primary">${rpicResult.targetCapitalActive.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
+        </TabsContent>
+
+        {/* TAB 3: Compare Paths */}
+        <TabsContent value="compare" className="space-y-6">
+          {rpicResult && timelineResult && (
+            <>
+              <TimelineCompareCards
+                timeline={timelineResult}
+                startingCapital={startingCapital}
+                monthlyContribution={monthlyContribution}
+                onStartingCapitalChange={setStartingCapital}
+                onMonthlyContributionChange={setMonthlyContribution}
+              />
+
+              <RequiredCapitalTable
+                rpic={rpicResult}
+                timeline={timelineResult}
+                startingCapital={startingCapital}
+              />
+            </>
+          )}
+        </TabsContent>
+
+        {/* TAB 4: Roadmap */}
+        <TabsContent value="roadmap" className="space-y-6">
+          {milestones.length > 0 && <VisualRoadmap milestones={milestones} />}
+
+          <AssumptionsPanel
+            activeReturn={activeReturn}
+            passiveYield={passiveYield}
+            inflation={inflation}
+            onActiveReturnChange={setActiveReturn}
+            onPassiveYieldChange={setPassiveYield}
+            onInflationChange={setInflation}
+            onReset={handleResetAssumptions}
+          />
+        </TabsContent>
+
+        {/* TAB 5: Projection (Placeholder for Phase B) */}
+        <TabsContent value="projection">
+          <Card>
+            <CardHeader>
+              <CardTitle>Income Machine Calculator</CardTitle>
+              <CardDescription>Project your trading account growth and passive income generation over time.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">Coming in Phase B...</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
