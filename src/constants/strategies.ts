@@ -7,7 +7,7 @@ export const CANONICAL_STRATEGIES: Array<{
 }> = [
   { 
     id: "mean_reversion_stocks", 
-    label: "WTF (Mean Reversion — Stocks)",
+    label: "Mean Reversion (e.g, Win The Fear - WTF)",
     shortLabel: "WTF"
   },
   { 
