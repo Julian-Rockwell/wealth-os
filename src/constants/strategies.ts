@@ -5,26 +5,26 @@ export const CANONICAL_STRATEGIES: Array<{
   label: string;
   shortLabel: string;
 }> = [
-  { 
-    id: "mean_reversion_stocks", 
+  {
+    id: "mean_reversion_stocks",
     label: "Mean Reversion (e.g, Win The Fear - WTF)",
-    shortLabel: "WTF"
+    shortLabel: "WTF",
   },
-  { 
-    id: "wheel", 
-    label: "Options Income — Wheel",
-    shortLabel: "Wheel"
+  {
+    id: "wheel",
+    label: "Options Income (e.g, The Wheel)",
+    shortLabel: "Wheel",
   },
-  { 
-    id: "earnings_vip", 
-    label: "Event-Driven — Options (Earnings VIP)",
-    shortLabel: "Earnings VIP"
+  {
+    id: "earnings_vip",
+    label: "Option Events (e.g, Earnings VIP)",
+    shortLabel: "Earnings VIP",
   },
-  { 
-    id: "dividend_capture", 
-    label: "Event-Driven — Stocks (Dividend Capture)",
-    shortLabel: "Dividend Capture"
-  }
+  {
+    id: "dividend_capture",
+    label: "Stock Events (e.g, Div. Capture)",
+    shortLabel: "Dividend Capture",
+  },
 ];
 
 export const ADVANCED_STRATEGIES: Array<{
@@ -32,20 +32,20 @@ export const ADVANCED_STRATEGIES: Array<{
   label: string;
   parent: TradingStrategy;
 }> = [
-  { 
-    id: "spy_bcs", 
+  {
+    id: "spy_bcs",
     label: "SPY BCS (Credit Spreads)",
-    parent: "earnings_vip"
-  }
+    parent: "earnings_vip",
+  },
 ];
 
 // Alias map for backward compatibility
 export const ALIAS_TO_CANONICAL: Record<string, TradingStrategy> = {
-  "options_wheel": "wheel",
-  "covered_calls": "wheel",
-  "spreads": "spy_bcs",
-  "swing_trading": "mean_reversion_stocks",
-  "day_trading": "mean_reversion_stocks"
+  options_wheel: "wheel",
+  covered_calls: "wheel",
+  spreads: "spy_bcs",
+  swing_trading: "mean_reversion_stocks",
+  day_trading: "mean_reversion_stocks",
 };
 
 export function resolveStrategyAlias(strategyId: string): TradingStrategy {
