@@ -2,6 +2,8 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { CheckCircle2, XCircle, Loader2, Rocket } from "lucide-react";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
 import { deriveRequirementsFromStrategies } from "@/utils/deriveRequirements";
@@ -19,6 +21,9 @@ export function Step5Connect({ selectedStrategy, onComplete }: Step5Props) {
   const { brokerSetup, setBrokerSetup, availableCapital, selectedStrategies, strategyAssessmentAnswers } = useFinancialData();
   const [isConnecting, setIsConnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(brokerSetup?.progress.connected || false);
+  const [cashDisciplineAcknowledged, setCashDisciplineAcknowledged] = useState(
+    brokerSetup?.progress.cashDisciplineAcknowledged || false
+  );
   
   const experienceLevel = strategyAssessmentAnswers.experience 
     ? parseInt(strategyAssessmentAnswers.experience) 
@@ -54,6 +59,9 @@ export function Step5Connect({ selectedStrategy, onComplete }: Step5Props) {
 
   const requiredLevel = PERMISSION_TO_LEVEL[requirements.requiredPermission];
   
+  const needsCashDisciplineAcknowledgement = 
+    experienceLevel && experienceLevel <= 2 && brokerSetup?.accountType === 'margin';
+  
   const checks = [
     {
       label: 'Broker Account Configured',
@@ -77,7 +85,8 @@ export function Step5Connect({ selectedStrategy, onComplete }: Step5Props) {
     },
   ];
 
-  const allChecksPassed = checks.every(c => c.status === 'pass') && isConnected;
+  const allChecksPassed = checks.every(c => c.status === 'pass') && isConnected && 
+    (!needsCashDisciplineAcknowledgement || cashDisciplineAcknowledged);
 
   return (
     <div className="space-y-6">
@@ -162,6 +171,39 @@ export function Step5Connect({ selectedStrategy, onComplete }: Step5Props) {
           </div>
         ))}
       </div>
+
+      {/* Cash Discipline Acknowledgement for Experience 1-2 with Margin */}
+      {needsCashDisciplineAcknowledgement && isConnected && (
+        <div className="border rounded-lg p-4 bg-muted/50">
+          <div className="flex items-start gap-3">
+            <Checkbox 
+              id="cashDiscipline"
+              checked={cashDisciplineAcknowledged}
+              onCheckedChange={(checked) => {
+                const acknowledged = checked === true;
+                setCashDisciplineAcknowledged(acknowledged);
+                if (brokerSetup) {
+                  setBrokerSetup({
+                    ...brokerSetup,
+                    progress: {
+                      ...brokerSetup.progress,
+                      cashDisciplineAcknowledged: acknowledged,
+                    },
+                  });
+                }
+              }}
+              className="mt-1"
+            />
+            <Label htmlFor="cashDiscipline" className="flex-1 cursor-pointer text-sm">
+              <span className="font-medium">Use margin as cash (no borrowing) — acknowledged</span>
+              <p className="text-xs text-muted-foreground mt-1">
+                I understand that I should use my margin account like a cash account for the first year, 
+                avoiding borrowing on margin while building discipline and experience.
+              </p>
+            </Label>
+          </div>
+        </div>
+      )}
 
       {allChecksPassed && (
         <Card className="border-green-500/20 bg-green-500/5">

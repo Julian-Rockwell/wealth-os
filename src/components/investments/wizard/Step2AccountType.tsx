@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Info } from "lucide-react";
+import { AlertTriangle, Info } from "lucide-react";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
 import { deriveRequirementsFromStrategies } from "@/utils/deriveRequirements";
 import { PERMISSION_TO_LEVEL } from "@/constants/permissions";
@@ -27,22 +27,52 @@ export function Step2AccountType({ selectedStrategy, onNext }: Step2Props) {
     return deriveRequirementsFromStrategies(selectedStrategies || [selectedStrategy], experienceLevel);
   }, [selectedStrategies, selectedStrategy, experienceLevel]);
 
-  // Determine recommended account type based on experience
-  const recommendedAccountType = experienceLevel && experienceLevel <= 3 ? 'cash' : 'margin';
+  // POLICY: Default to Margin, derive usageHint
+  const usageHint: 'cash_discipline' | 'normal' = 
+    (experienceLevel && experienceLevel <= 2) ? 'cash_discipline' : 'normal';
   
-  // Initialize selection with recommended type if not already set
   const [selectedAccountType, setSelectedAccountType] = useState<'cash' | 'margin' | 'retirement'>(
-    brokerSetup?.accountType || recommendedAccountType
+    brokerSetup?.accountType || 'margin'
   );
+  
+  const [cashOverrideWarning, setCashOverrideWarning] = useState<string | null>(null);
+  const [cashBlockError, setCashBlockError] = useState<string | null>(null);
+
+  const requiresMarginPermissions = PERMISSION_TO_LEVEL[requirements.requiredPermission] >= PERMISSION_TO_LEVEL["spreads"];
+
+  const handleAccountTypeChange = (value: 'cash' | 'margin' | 'retirement') => {
+    setSelectedAccountType(value);
+    setCashOverrideWarning(null);
+    setCashBlockError(null);
+    
+    if (value === 'cash') {
+      if (requiresMarginPermissions) {
+        // BLOCK: spreads/naked require margin
+        setCashBlockError("This strategy requires margin approval. Please keep Account Type = Margin.");
+        console.log('cash_override_attempted', { requiredPermission: requirements.requiredPermission });
+      } else {
+        // WARN: stocks/wheel can use cash but margin is recommended
+        setCashOverrideWarning("Cash accounts can limit option permissions. You may need a margin upgrade later.");
+      }
+    }
+  };
 
   const handleContinue = () => {
     if (!brokerSetup) return;
+    
+    // Block if trying to continue with Cash when spreads/naked required
+    if (selectedAccountType === 'cash' && requiresMarginPermissions) {
+      return;
+    }
 
     setBrokerSetup({
       ...brokerSetup,
       accountType: selectedAccountType,
       targetOptionsLevel: PERMISSION_TO_LEVEL[requirements.requiredPermission] as 0 | 1 | 2 | 3 | 4,
+      usageHint: selectedAccountType === 'margin' ? usageHint : 'normal',
     });
+    
+    console.log('usageHint:', usageHint);
 
     onNext();
   };
@@ -57,9 +87,21 @@ export function Step2AccountType({ selectedStrategy, onNext }: Step2Props) {
         </p>
       </div>
 
+      {/* Caution Banner for Experience 1-2 */}
+      {experienceLevel && experienceLevel <= 2 && (
+        <Alert className="bg-amber-500/5 border-amber-500/20">
+          <AlertTriangle className="h-4 w-4 text-amber-500" />
+          <AlertTitle className="text-amber-700 dark:text-amber-400">Caution for New Traders</AlertTitle>
+          <AlertDescription className="text-amber-600 dark:text-amber-300">
+            Open Margin to future-proof your account, but <strong>use it like Cash</strong> for the first year: 
+            avoid borrowing on margin and focus on foundational execution.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="space-y-4">
         <Label className="text-base font-semibold">Select Account Type</Label>
-        <RadioGroup value={selectedAccountType} onValueChange={(value) => setSelectedAccountType(value as 'cash' | 'margin' | 'retirement')}>
+        <RadioGroup value={selectedAccountType} onValueChange={handleAccountTypeChange}>
           <div className="space-y-3">
             {/* Cash Account */}
             <div className="flex items-center space-x-3 border rounded-lg p-4 hover:bg-muted/50 transition-colors">
@@ -67,9 +109,6 @@ export function Step2AccountType({ selectedStrategy, onNext }: Step2Props) {
               <Label htmlFor="cash" className="flex-1 cursor-pointer">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">Cash Account</span>
-                  {recommendedAccountType === 'cash' && (
-                    <Badge variant="success" className="text-xs">Recommended</Badge>
-                  )}
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">
                   Trade with settled funds only. Best for beginners to build discipline.
@@ -77,18 +116,19 @@ export function Step2AccountType({ selectedStrategy, onNext }: Step2Props) {
               </Label>
             </div>
 
-            {/* Margin Account */}
-            <div className="flex items-center space-x-3 border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+            {/* Margin Account - RECOMMENDED */}
+            <div className="flex items-center space-x-3 border rounded-lg p-4 hover:bg-muted/50 transition-colors border-primary/40 bg-primary/5">
               <RadioGroupItem value="margin" id="margin" />
               <Label htmlFor="margin" className="flex-1 cursor-pointer">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">Margin Account</span>
-                  {recommendedAccountType === 'margin' && (
-                    <Badge variant="success" className="text-xs">Recommended</Badge>
-                  )}
+                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-xs">
+                    Recommended
+                  </Badge>
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Trade with leverage. Required for spreads and advanced strategies.
+                  Future-proof option. Required for spreads and advanced strategies.
+                  {experienceLevel && experienceLevel <= 2 && " Use like cash initially."}
                 </p>
               </Label>
             </div>
@@ -107,18 +147,27 @@ export function Step2AccountType({ selectedStrategy, onNext }: Step2Props) {
         </RadioGroup>
       </div>
 
-      {experienceLevel && experienceLevel <= 3 && (
-        <Alert className="bg-primary/5 border-primary/20">
-          <Info className="h-4 w-4 text-primary" />
-          <AlertTitle>Recommendation for Beginners</AlertTitle>
-          <AlertDescription>
-            💡 Rockwell Trading recommends cash accounts for first-year traders to build discipline 
-            and avoid overleveraging.
+      {/* Cash Override Warning */}
+      {cashOverrideWarning && (
+        <Alert className="bg-amber-500/5 border-amber-500/20">
+          <AlertTriangle className="h-4 w-4 text-amber-500" />
+          <AlertDescription className="text-amber-600 dark:text-amber-300">
+            {cashOverrideWarning}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Cash Block Error */}
+      {cashBlockError && (
+        <Alert className="bg-destructive/10 border-destructive/20">
+          <AlertTriangle className="h-4 w-4 text-destructive" />
+          <AlertDescription className="text-destructive">
+            {cashBlockError}
           </AlertDescription>
         </Alert>
       )}
       
-      {/* Guidance bullets condicionales */}
+      {/* Guidance bullets */}
       <div className="bg-muted/50 border rounded-lg p-4">
         <h4 className="font-medium mb-2 text-sm">Tips for Options Approval</h4>
         <ul className="text-sm space-y-2 text-muted-foreground">
@@ -148,6 +197,7 @@ export function Step2AccountType({ selectedStrategy, onNext }: Step2Props) {
       <Button
         onClick={handleContinue}
         className="w-full"
+        disabled={!!cashBlockError}
       >
         Continue to Funding
       </Button>

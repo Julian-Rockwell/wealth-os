@@ -95,6 +95,7 @@ export interface BrokerSetupProgress {
   optionsSubmitted: boolean;
   optionsApproved: boolean;
   connected: boolean;
+  cashDisciplineAcknowledged?: boolean;
 }
 
 export interface StrategyAssessmentAnswers {
@@ -112,4 +113,5 @@ export interface BrokerSetup {
   progress: BrokerSetupProgress;
   notes: string[];
   required?: DerivedBrokerRequirements;
+  usageHint?: 'cash_discipline' | 'normal';
 }
