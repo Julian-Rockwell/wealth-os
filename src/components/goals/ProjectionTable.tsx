@@ -157,7 +157,7 @@ export function ProjectionTable({ settings, onSettingsChange }: ProjectionTableP
                   <TableCell>
                     <div className="space-y-1">
                       <div className={`font-medium ${getRpicColor(row.rpicIndex)}`}>
-                        {row.rpicIndex.toFixed(0)}%
+                        {Math.ceil(row.rpicIndex)}%
                       </div>
                       <div className="w-full bg-muted rounded-full h-2">
                         <div 
