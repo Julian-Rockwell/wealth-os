@@ -8,6 +8,9 @@ import { TimelineCompareCards } from "@/components/goals/TimelineCompareCards";
 import { VisualRoadmap } from "@/components/goals/VisualRoadmap";
 import { AssumptionsPanel } from "@/components/goals/AssumptionsPanel";
 import { RequiredCapitalTable } from "@/components/goals/RequiredCapitalTable";
+import { ProjectionSettingsPanel } from "@/components/goals/ProjectionSettingsPanel";
+import { ProjectionChart } from "@/components/goals/ProjectionChart";
+import { ProjectionTable } from "@/components/goals/ProjectionTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -30,7 +33,13 @@ interface GoalsProps {
 }
 
 export default function Goals({ onNavigateToTab }: GoalsProps) {
-  const { snapshot, dashboardData, setRpicResult: saveRpicResult } = useFinancialData();
+  const { 
+    snapshot, 
+    dashboardData, 
+    setRpicResult: saveRpicResult,
+    projectionSettings,
+    setProjectionSettings 
+  } = useFinancialData();
 
   // Auto-populated expense baseline
   const autoMonthlyExpenses = dashboardData
@@ -306,17 +315,32 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
           />
         </TabsContent>
 
-        {/* TAB 5: Projection (Placeholder for Phase B) */}
-        <TabsContent value="projection">
-          <Card>
-            <CardHeader>
-              <CardTitle>Income Machine Calculator</CardTitle>
-              <CardDescription>Project your trading account growth and passive income generation over time.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Coming in Phase B...</p>
-            </CardContent>
-          </Card>
+        {/* TAB 5: Projection - Income Machine Calculator */}
+        <TabsContent value="projection" className="space-y-6">
+          {projectionSettings && (
+            <>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Settings Panel */}
+                <ProjectionSettingsPanel
+                  settings={projectionSettings}
+                  onSettingsChange={setProjectionSettings}
+                  autoMonthlyExpenses={autoMonthlyExpenses}
+                />
+
+                {/* Chart */}
+                <ProjectionChart
+                  settings={projectionSettings}
+                  rows={[]} // Will be populated by calculateRows logic
+                />
+              </div>
+
+              {/* Table */}
+              <ProjectionTable
+                settings={projectionSettings}
+                onSettingsChange={setProjectionSettings}
+              />
+            </>
+          )}
         </TabsContent>
       </Tabs>
     </div>
