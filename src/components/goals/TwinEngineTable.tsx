@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
@@ -22,30 +22,56 @@ const formatMoney = (value: number) => {
 export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
   const topScrollRef = useRef<HTMLDivElement>(null);
   const bottomScrollRef = useRef<HTMLDivElement>(null);
+  const tableRef = useRef<HTMLTableElement>(null);
   const [tableWidth, setTableWidth] = useState(0);
+  const isSyncingRef = useRef(false);
 
-  // Measure table width for top scrollbar
+  // Measure table width using ResizeObserver
   useEffect(() => {
-    if (bottomScrollRef.current) {
-      const table = bottomScrollRef.current.querySelector('table');
-      if (table) {
-        setTableWidth(table.scrollWidth);
-      }
-    }
+    const table = tableRef.current;
+    if (!table) return;
+
+    const updateWidth = () => {
+      setTableWidth(table.scrollWidth);
+    };
+
+    // Initial measurement
+    updateWidth();
+
+    // Use ResizeObserver for dynamic updates
+    const resizeObserver = new ResizeObserver(() => {
+      updateWidth();
+    });
+
+    resizeObserver.observe(table);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
   }, [data]);
 
-  // Sync scroll handlers
-  const handleTopScroll = () => {
+  // Sync scroll handlers with flag to prevent loops
+  const handleTopScroll = useCallback(() => {
+    if (isSyncingRef.current) return;
     if (topScrollRef.current && bottomScrollRef.current) {
+      isSyncingRef.current = true;
       bottomScrollRef.current.scrollLeft = topScrollRef.current.scrollLeft;
+      requestAnimationFrame(() => {
+        isSyncingRef.current = false;
+      });
     }
-  };
+  }, []);
 
-  const handleBottomScroll = () => {
+  const handleBottomScroll = useCallback(() => {
+    if (isSyncingRef.current) return;
     if (topScrollRef.current && bottomScrollRef.current) {
+      isSyncingRef.current = true;
       topScrollRef.current.scrollLeft = bottomScrollRef.current.scrollLeft;
+      requestAnimationFrame(() => {
+        isSyncingRef.current = false;
+      });
     }
-  };
+  }, []);
 
   return (
     <Card>
@@ -57,13 +83,16 @@ export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
       </CardHeader>
       <CardContent>
         {/* Top scrollbar (mirror) */}
-        <div 
-          ref={topScrollRef}
-          className="overflow-x-auto mb-2"
-          onScroll={handleTopScroll}
-        >
-          <div style={{ width: tableWidth, height: 1 }} />
-        </div>
+        {tableWidth > 0 && (
+          <div 
+            ref={topScrollRef}
+            className="overflow-x-auto mb-2 scrollbar-thin"
+            onScroll={handleTopScroll}
+            style={{ overflowY: 'hidden' }}
+          >
+            <div style={{ width: tableWidth, height: 12 }} />
+          </div>
+        )}
 
         {/* Table with bottom scrollbar */}
         <div 
@@ -71,7 +100,7 @@ export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
           className="overflow-x-auto"
           onScroll={handleBottomScroll}
         >
-          <Table>
+          <Table ref={tableRef}>
             <TableHeader>
               <TableRow>
                 <TableHead className="text-center">Year</TableHead>
