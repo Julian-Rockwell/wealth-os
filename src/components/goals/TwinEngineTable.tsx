@@ -1,3 +1,4 @@
+import { useRef, useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
@@ -19,6 +20,33 @@ const formatMoney = (value: number) => {
 };
 
 export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
+  const topScrollRef = useRef<HTMLDivElement>(null);
+  const bottomScrollRef = useRef<HTMLDivElement>(null);
+  const [tableWidth, setTableWidth] = useState(0);
+
+  // Measure table width for top scrollbar
+  useEffect(() => {
+    if (bottomScrollRef.current) {
+      const table = bottomScrollRef.current.querySelector('table');
+      if (table) {
+        setTableWidth(table.scrollWidth);
+      }
+    }
+  }, [data]);
+
+  // Sync scroll handlers
+  const handleTopScroll = () => {
+    if (topScrollRef.current && bottomScrollRef.current) {
+      bottomScrollRef.current.scrollLeft = topScrollRef.current.scrollLeft;
+    }
+  };
+
+  const handleBottomScroll = () => {
+    if (topScrollRef.current && bottomScrollRef.current) {
+      topScrollRef.current.scrollLeft = bottomScrollRef.current.scrollLeft;
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -28,7 +56,21 @@ export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
+        {/* Top scrollbar (mirror) */}
+        <div 
+          ref={topScrollRef}
+          className="overflow-x-auto mb-2"
+          onScroll={handleTopScroll}
+        >
+          <div style={{ width: tableWidth, height: 1 }} />
+        </div>
+
+        {/* Table with bottom scrollbar */}
+        <div 
+          ref={bottomScrollRef}
+          className="overflow-x-auto"
+          onScroll={handleBottomScroll}
+        >
           <Table>
             <TableHeader>
               <TableRow>
