@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getDefaultTwinEngineSettings } from "@/utils/twinEngineCalculations";
 import { Upload as UploadIcon, FileText, CheckCircle2, AlertCircle, TrendingUp, Plus, Link2, Edit3, Trash2, X, Check, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -34,7 +35,7 @@ interface UploadProps {
 }
 
 export default function Upload({ onComplete }: UploadProps = {}) {
-  const { setSnapshot, setDashboardData, setPaperTradingData, draftData, setDraftData, resetAllData, snapshot } = useFinancialData();
+  const { setSnapshot, setDashboardData, setPaperTradingData, draftData, setDraftData, resetAllData, snapshot, setProjectionSettings } = useFinancialData();
   const [files, setFiles] = useState<FileUploadState[]>(draftData.files || []);
   const [isDragging, setIsDragging] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -380,6 +381,7 @@ export default function Upload({ onComplete }: UploadProps = {}) {
                           setDashboardData(SAMPLE_DASHBOARD_DATA);
                           setSnapshot(SAMPLE_REYNOLDS_DATA);
                           setPaperTradingData(REYNOLDS_PAPER_TRADING_DATA);
+                          setProjectionSettings(getDefaultTwinEngineSettings());
                           toast.success("Reynolds Family data loaded! Check Transaction Details for Austin-based spending.");
                           setTimeout(() => {
                             if (onComplete) {
@@ -418,6 +420,7 @@ export default function Upload({ onComplete }: UploadProps = {}) {
                           setDashboardData(SAMPLE_JOHNSON_DASHBOARD_DATA);
                           setSnapshot(SAMPLE_JOHNSON_DATA);
                           setPaperTradingData(JOHNSON_PAPER_TRADING_DATA);
+                          setProjectionSettings(getDefaultTwinEngineSettings());
                           toast.success("Johnson Family data loaded! Check Transaction Details for Denver-based spending.");
                           setTimeout(() => {
                             if (onComplete) {
@@ -453,6 +456,7 @@ export default function Upload({ onComplete }: UploadProps = {}) {
                           setDashboardData(SAMPLE_AUSTIN_DASHBOARD_DATA);
                           setSnapshot(SAMPLE_AUSTIN_DATA);
                           setPaperTradingData(AUSTIN_PAPER_TRADING_DATA);
+                          setProjectionSettings(getDefaultTwinEngineSettings());
                           toast.success("Austin Family data loaded! Check Transaction Details for Austin-based spending.");
                           setTimeout(() => {
                             if (onComplete) {
@@ -489,6 +493,7 @@ export default function Upload({ onComplete }: UploadProps = {}) {
                           setDashboardData(SAMPLE_PHOENIX_DASHBOARD_DATA);
                           setSnapshot(SAMPLE_PHOENIX_DATA);
                           setPaperTradingData(PHOENIX_PAPER_TRADING_DATA);
+                          setProjectionSettings(getDefaultTwinEngineSettings());
                           toast.success("Phoenix Family data loaded! Check Transaction Details for Phoenix-based spending.");
                           setTimeout(() => {
                             if (onComplete) {
