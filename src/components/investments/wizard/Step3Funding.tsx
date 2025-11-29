@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -5,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { DollarSign, AlertCircle } from "lucide-react";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
-import { STRATEGY_REQUIREMENTS } from "@/utils/brokerRequirements";
+import { deriveRequirementsFromStrategies } from "@/utils/deriveRequirements";
 import type { TradingStrategy } from "@/types/trading";
 
 interface Step3Props {
@@ -15,8 +16,15 @@ interface Step3Props {
 }
 
 export function Step3Funding({ selectedStrategy, onNext }: Step3Props) {
-  const { brokerSetup, setBrokerSetup, availableCapital } = useFinancialData();
-  const requirements = STRATEGY_REQUIREMENTS[selectedStrategy];
+  const { brokerSetup, setBrokerSetup, availableCapital, selectedStrategies, strategyAssessmentAnswers } = useFinancialData();
+  
+  const experienceLevel = strategyAssessmentAnswers?.experience 
+    ? parseInt(strategyAssessmentAnswers.experience) 
+    : undefined;
+
+  const requirements = useMemo(() => {
+    return deriveRequirementsFromStrategies(selectedStrategies || [], experienceLevel);
+  }, [selectedStrategies, experienceLevel]);
   
   const progress = brokerSetup?.progress || {
     openAccount: false,
