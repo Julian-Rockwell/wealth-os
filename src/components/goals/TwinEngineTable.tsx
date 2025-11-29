@@ -1,6 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import type { TwinEngineRow, TwinEngineSettings } from "@/utils/twinEngineCalculations";
 
@@ -22,35 +21,35 @@ const formatMoney = (value: number) => {
 export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
   const topScrollRef = useRef<HTMLDivElement>(null);
   const bottomScrollRef = useRef<HTMLDivElement>(null);
-  const tableRef = useRef<HTMLTableElement>(null);
   const [tableWidth, setTableWidth] = useState(0);
   const isSyncingRef = useRef(false);
 
-  // Measure table width using ResizeObserver
+  // Measure table width
   useEffect(() => {
-    const table = tableRef.current;
-    if (!table) return;
+    const container = bottomScrollRef.current;
+    if (!container) return;
 
     const updateWidth = () => {
-      setTableWidth(table.scrollWidth);
+      const table = container.querySelector('table');
+      if (table) {
+        setTableWidth(table.scrollWidth);
+      }
     };
 
-    // Initial measurement
-    updateWidth();
+    // Initial measurement with small delay for render
+    const timer = setTimeout(updateWidth, 50);
 
     // Use ResizeObserver for dynamic updates
-    const resizeObserver = new ResizeObserver(() => {
-      updateWidth();
-    });
-
-    resizeObserver.observe(table);
+    const resizeObserver = new ResizeObserver(updateWidth);
+    resizeObserver.observe(container);
 
     return () => {
+      clearTimeout(timer);
       resizeObserver.disconnect();
     };
   }, [data]);
 
-  // Sync scroll handlers with flag to prevent loops
+  // Sync scroll handlers
   const handleTopScroll = useCallback(() => {
     if (isSyncingRef.current) return;
     if (topScrollRef.current && bottomScrollRef.current) {
@@ -73,6 +72,10 @@ export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
     }
   }, []);
 
+  // Table styles
+  const thClass = "h-12 px-4 text-left align-middle font-medium text-muted-foreground whitespace-nowrap";
+  const tdClass = "p-4 align-middle whitespace-nowrap";
+
   return (
     <Card>
       <CardHeader>
@@ -82,95 +85,95 @@ export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {/* Top scrollbar (mirror) */}
+        {/* Top scrollbar */}
         {tableWidth > 0 && (
           <div 
             ref={topScrollRef}
-            className="overflow-x-auto mb-2 scrollbar-thin"
+            className="overflow-x-auto mb-2"
             onScroll={handleTopScroll}
-            style={{ overflowY: 'hidden' }}
           >
-            <div style={{ width: tableWidth, height: 12 }} />
+            <div style={{ width: tableWidth, height: 1 }} />
           </div>
         )}
 
-        {/* Table with bottom scrollbar */}
+        {/* Table with bottom scrollbar - using native elements */}
         <div 
           ref={bottomScrollRef}
           className="overflow-x-auto"
           onScroll={handleBottomScroll}
         >
-          <Table ref={tableRef}>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-center">Year</TableHead>
-                <TableHead className="text-center">Age</TableHead>
-                <TableHead className="text-right">Act. Profit</TableHead>
-                <TableHead className="text-right">Net Spillover</TableHead>
-                <TableHead className="text-right">Pas. Bal</TableHead>
-                <TableHead className="text-right">Pas. Growth</TableHead>
-                <TableHead className="text-center">RPIC %</TableHead>
-                <TableHead className="text-right">Other Inc.</TableHead>
-                <TableHead className="text-right">Gross W/D</TableHead>
-                <TableHead className="text-right">Net Wallet</TableHead>
-                <TableHead className="text-right">Expenses</TableHead>
-                <TableHead className="text-right">Trad. Bal</TableHead>
-                <TableHead className="text-right">Trad. W/D</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+          <table className="w-full caption-bottom text-sm">
+            <thead className="[&_tr]:border-b">
+              <tr className="border-b">
+                <th className={cn(thClass, "text-center")}>Year</th>
+                <th className={cn(thClass, "text-center")}>Age</th>
+                <th className={cn(thClass, "text-right")}>Act. Profit</th>
+                <th className={cn(thClass, "text-right")}>Net Spillover</th>
+                <th className={cn(thClass, "text-right")}>Pas. Bal</th>
+                <th className={cn(thClass, "text-right")}>Pas. Growth</th>
+                <th className={cn(thClass, "text-center")}>RPIC %</th>
+                <th className={cn(thClass, "text-right")}>Other Inc.</th>
+                <th className={cn(thClass, "text-right")}>Gross W/D</th>
+                <th className={cn(thClass, "text-right")}>Net Wallet</th>
+                <th className={cn(thClass, "text-right")}>Expenses</th>
+                <th className={cn(thClass, "text-right")}>Trad. Bal</th>
+                <th className={cn(thClass, "text-right")}>Trad. W/D</th>
+              </tr>
+            </thead>
+            <tbody className="[&_tr:last-child]:border-0">
               {data.map((row) => (
-                <TableRow 
+                <tr 
                   key={row.year}
                   className={cn(
+                    "border-b transition-colors hover:bg-muted/50",
                     row.isFreedom && "bg-green-50 dark:bg-green-950/20",
                     row.isCapHit && !row.isFreedom && "bg-blue-50 dark:bg-blue-950/20"
                   )}
                 >
-                  <TableCell className="text-center font-medium">{row.year}</TableCell>
-                  <TableCell className="text-center">{row.age}</TableCell>
-                  <TableCell className="text-right">
+                  <td className={cn(tdClass, "text-center font-medium")}>{row.year}</td>
+                  <td className={cn(tdClass, "text-center")}>{row.age}</td>
+                  <td className={cn(tdClass, "text-right")}>
                     {row.activeBalance > 0 ? formatMoney(row.activeProfitGross) : '-'}
-                  </TableCell>
-                  <TableCell className="text-right">
+                  </td>
+                  <td className={cn(tdClass, "text-right")}>
                     {row.spilloverNet > 0 ? formatMoney(row.spilloverNet) : '-'}
-                  </TableCell>
-                  <TableCell className="text-right font-medium">
+                  </td>
+                  <td className={cn(tdClass, "text-right font-medium")}>
                     {formatMoney(row.passiveBalance)}
-                  </TableCell>
-                  <TableCell className="text-right">
+                  </td>
+                  <td className={cn(tdClass, "text-right")}>
                     {formatMoney(row.passiveGrowth)}
-                  </TableCell>
-                  <TableCell className="text-center">
+                  </td>
+                  <td className={cn(tdClass, "text-center")}>
                     <span className={cn(
                       "font-medium",
                       row.rpicScore >= 100 ? "text-green-600" : "text-muted-foreground"
                     )}>
                       {row.rpicScore.toFixed(1)}%
                     </span>
-                  </TableCell>
-                  <TableCell className="text-right">
+                  </td>
+                  <td className={cn(tdClass, "text-right")}>
                     {row.retirementIncome > 0 ? formatMoney(row.retirementIncome) : '-'}
-                  </TableCell>
-                  <TableCell className="text-right">
+                  </td>
+                  <td className={cn(tdClass, "text-right")}>
                     {row.withdrawalAmount > 0 ? formatMoney(row.withdrawalAmount) : '-'}
-                  </TableCell>
-                  <TableCell className="text-right font-medium">
+                  </td>
+                  <td className={cn(tdClass, "text-right font-medium")}>
                     {row.netWallet > 0 ? formatMoney(row.netWallet) : '-'}
-                  </TableCell>
-                  <TableCell className="text-right">
+                  </td>
+                  <td className={cn(tdClass, "text-right")}>
                     {formatMoney(row.expenses)}
-                  </TableCell>
-                  <TableCell className="text-right text-muted-foreground">
+                  </td>
+                  <td className={cn(tdClass, "text-right text-muted-foreground")}>
                     {formatMoney(row.tradBalance)}
-                  </TableCell>
-                  <TableCell className="text-right text-muted-foreground">
+                  </td>
+                  <td className={cn(tdClass, "text-right text-muted-foreground")}>
                     {row.tradWithdrawal > 0 ? formatMoney(row.tradWithdrawal) : '-'}
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ))}
-            </TableBody>
-          </Table>
+            </tbody>
+          </table>
         </div>
       </CardContent>
     </Card>
