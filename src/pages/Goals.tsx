@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
-import { Target } from "lucide-react";
+import { Target, LayoutDashboard, Table2 } from "lucide-react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { ExpenseBaselineCard } from "@/components/goals/ExpenseBaselineCard";
 import { GoalQuestionsCard } from "@/components/goals/GoalQuestionsCard";
 import { RpicResultCard } from "@/components/goals/RpicResultCard";
@@ -124,6 +125,9 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
     setPassiveYield(10);
     setInflation(3);
   };
+
+  // Projection view toggle state
+  const [projectionView, setProjectionView] = useState<'dashboard' | 'datagrid'>('dashboard');
 
   // Twin-Engine projection calculations
   const twinEngineResult = useMemo(() => {
@@ -341,9 +345,9 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
               {/* KPI Header */}
               <TwinEngineKPIHeader kpis={twinEngineKPIs} />
 
-              {/* Settings + Chart */}
+              {/* Settings + Content */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Settings Panel */}
+                {/* Settings Panel - Always visible */}
                 <div className="lg:col-span-1">
                   <TwinEngineSettingsPanel
                     settings={projectionSettings}
@@ -351,27 +355,57 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
                   />
                 </div>
 
-                {/* Chart */}
-                <div className="lg:col-span-2">
-                  <TwinEngineChart 
-                    data={twinEngineResult.rows}
-                    milestones={twinEngineResult.milestones}
-                    settings={projectionSettings}
-                  />
+                {/* Right Column - Toggle between Dashboard and Data Grid */}
+                <div className="lg:col-span-2 space-y-6">
+                  {/* Toggle Buttons */}
+                  <div className="flex justify-start">
+                    <ToggleGroup 
+                      type="single" 
+                      value={projectionView} 
+                      onValueChange={(v) => v && setProjectionView(v as 'dashboard' | 'datagrid')}
+                      className="bg-muted p-1 rounded-lg"
+                    >
+                      <ToggleGroupItem 
+                        value="dashboard" 
+                        className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-4 py-2 rounded-md"
+                      >
+                        <LayoutDashboard className="w-4 h-4 mr-2" />
+                        Dashboard
+                      </ToggleGroupItem>
+                      <ToggleGroupItem 
+                        value="datagrid" 
+                        className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-4 py-2 rounded-md"
+                      >
+                        <Table2 className="w-4 h-4 mr-2" />
+                        Data Grid
+                      </ToggleGroupItem>
+                    </ToggleGroup>
+                  </div>
+
+                  {/* Conditional Content */}
+                  {projectionView === 'dashboard' ? (
+                    <>
+                      {/* Chart */}
+                      <TwinEngineChart 
+                        data={twinEngineResult.rows}
+                        milestones={twinEngineResult.milestones}
+                        settings={projectionSettings}
+                      />
+                      {/* Strategic Roadmap */}
+                      <StrategicRoadmap 
+                        milestones={twinEngineResult.milestones}
+                        settings={projectionSettings}
+                      />
+                    </>
+                  ) : (
+                    /* Detailed Table */
+                    <TwinEngineTable 
+                      data={twinEngineResult.rows}
+                      settings={projectionSettings}
+                    />
+                  )}
                 </div>
               </div>
-
-              {/* Strategic Roadmap */}
-              <StrategicRoadmap 
-                milestones={twinEngineResult.milestones}
-                settings={projectionSettings}
-              />
-
-              {/* Detailed Table */}
-              <TwinEngineTable 
-                data={twinEngineResult.rows}
-                settings={projectionSettings}
-              />
             </>
           )}
         </TabsContent>
