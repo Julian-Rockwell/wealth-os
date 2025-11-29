@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
 import { Target } from "lucide-react";
 import { ExpenseBaselineCard } from "@/components/goals/ExpenseBaselineCard";
@@ -8,10 +8,11 @@ import { TimelineCompareCards } from "@/components/goals/TimelineCompareCards";
 import { VisualRoadmap } from "@/components/goals/VisualRoadmap";
 import { AssumptionsPanel } from "@/components/goals/AssumptionsPanel";
 import { RequiredCapitalTable } from "@/components/goals/RequiredCapitalTable";
-import { ProjectionSettingsPanel } from "@/components/goals/ProjectionSettingsPanel";
-import { ProjectionKPIHeader } from "@/components/goals/ProjectionKPIHeader";
-import { IncomeLifestyleChart } from "@/components/goals/IncomeLifestyleChart";
-import { ProjectionTable } from "@/components/goals/ProjectionTable";
+import { TwinEngineSettingsPanel } from "@/components/goals/TwinEngineSettingsPanel";
+import { TwinEngineKPIHeader } from "@/components/goals/TwinEngineKPIHeader";
+import { TwinEngineChart } from "@/components/goals/TwinEngineChart";
+import { TwinEngineTable } from "@/components/goals/TwinEngineTable";
+import { StrategicRoadmap } from "@/components/goals/StrategicRoadmap";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -28,6 +29,11 @@ import {
   type Milestone,
 } from "@/utils/rpicCalculations";
 import { calculateReadinessScore } from "@/utils/investmentCalculations";
+import { 
+  calculateTwinEngineProjection, 
+  calculateTwinEngineKPIs,
+  type TwinEngineSettings 
+} from "@/utils/twinEngineCalculations";
 
 interface GoalsProps {
   onNavigateToTab?: (tabName: string) => void;
@@ -119,6 +125,17 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
     setInflation(3);
   };
 
+  // Twin-Engine projection calculations
+  const twinEngineResult = useMemo(() => {
+    if (!projectionSettings) return null;
+    return calculateTwinEngineProjection(projectionSettings);
+  }, [projectionSettings]);
+
+  const twinEngineKPIs = useMemo(() => {
+    if (!twinEngineResult || !projectionSettings) return null;
+    return calculateTwinEngineKPIs(twinEngineResult, projectionSettings);
+  }, [twinEngineResult, projectionSettings]);
+
   if (!dashboardData) {
     return (
       <div className="container mx-auto p-6">
@@ -198,73 +215,74 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
         {/* TAB 2: Inputs */}
         <TabsContent value="inputs" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left & Center: Input Forms */}
+            {/* Left Column - Goal Questions */}
             <div className="lg:col-span-2 space-y-6">
               <GoalQuestionsCard
                 timing={timing}
                 lifestyle={lifestyle}
                 geography={geography}
-                onTimingChange={(value) => setTiming(typeof value === 'string' ? parseInt(value) : value)}
+                onTimingChange={setTiming}
                 onLifestyleChange={setLifestyle}
                 onGeographyChange={setGeography}
               />
 
-              {/* Timeline Inputs */}
+              {/* Starting Capital & Monthly Contribution */}
               <Card>
                 <CardHeader>
                   <CardTitle>Timeline Inputs</CardTitle>
-                  <CardDescription>Adjust your starting capital and monthly contribution to see how it affects your timeline.</CardDescription>
+                  <CardDescription>Set your starting capital and monthly contribution</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="startingCapital">Starting Capital</Label>
-                    <Input
-                      id="startingCapital"
-                      type="number"
-                      value={startingCapital}
-                      onChange={(e) => setStartingCapital(Number(e.target.value))}
-                      className="text-lg"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="monthlyContribution">Monthly Contribution</Label>
-                    <Input
-                      id="monthlyContribution"
-                      type="number"
-                      value={monthlyContribution}
-                      onChange={(e) => setMonthlyContribution(Number(e.target.value))}
-                      className="text-lg"
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="startingCapital">Starting Capital</Label>
+                      <Input
+                        id="startingCapital"
+                        type="number"
+                        value={startingCapital}
+                        onChange={(e) => setStartingCapital(Number(e.target.value))}
+                        className="w-full"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Auto-detected: ${autoStartingCapital.toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="monthlyContribution">Monthly Contribution</Label>
+                      <Input
+                        id="monthlyContribution"
+                        type="number"
+                        value={monthlyContribution}
+                        onChange={(e) => setMonthlyContribution(Number(e.target.value))}
+                        className="w-full"
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Right: Sticky RPIC Target Summary */}
-            <div className="lg:sticky lg:top-6 lg:h-fit">
+            {/* Right Column - Sticky RPIC Summary */}
+            <div className="lg:col-span-1">
               {rpicResult && (
-                <Card className="bg-gradient-to-br from-primary/5 to-accent/5">
+                <Card className="sticky top-6 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
                   <CardHeader>
-                    <CardTitle className="text-lg">Your RPIC Target</CardTitle>
+                    <CardTitle className="text-lg">RPIC Target</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <p className="text-sm text-muted-foreground">RPIC Index</p>
-                      <p className="text-2xl font-bold text-primary">{rpicResult.rpicIndex}%</p>
+                      <p className="text-xs text-muted-foreground">Monthly RPIC</p>
+                      <p className="text-2xl font-bold text-primary">${rpicResult.monthlyRpic.toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Monthly RPIC</p>
-                      <p className="text-xl font-semibold">${rpicResult.monthlyRpic.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Annual RPIC</p>
+                      <p className="text-xs text-muted-foreground">Annual RPIC</p>
                       <p className="text-xl font-semibold">${rpicResult.annualRpic.toLocaleString()}</p>
                     </div>
-                    <div className="pt-4 border-t">
-                      <p className="text-xs text-muted-foreground mb-2">Required Capital</p>
-                      <div className="space-y-1">
+                    <div className="pt-2 border-t">
+                      <p className="text-xs text-muted-foreground">Target Capital Required</p>
+                      <div className="space-y-1 mt-2">
                         <div className="flex justify-between text-sm">
-                          <span>Traditional (4%):</span>
+                          <span>Traditional:</span>
                           <span className="font-medium">${rpicResult.targetCapitalPassive.toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between text-sm">
@@ -316,29 +334,43 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
           />
         </TabsContent>
 
-        {/* TAB 5: Projection - Income Machine Calculator */}
+        {/* TAB 5: Projection - Twin-Engine Goal Simulator */}
         <TabsContent value="projection" className="space-y-6">
-          {projectionSettings && (
+          {projectionSettings && twinEngineResult && twinEngineKPIs && (
             <>
               {/* KPI Header */}
-              <ProjectionKPIHeader settings={projectionSettings} />
+              <TwinEngineKPIHeader kpis={twinEngineKPIs} />
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Settings + Chart */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Settings Panel */}
-                <ProjectionSettingsPanel
-                  settings={projectionSettings}
-                  onSettingsChange={setProjectionSettings}
-                  autoMonthlyExpenses={autoMonthlyExpenses}
-                />
+                <div className="lg:col-span-1">
+                  <TwinEngineSettingsPanel
+                    settings={projectionSettings}
+                    onSettingsChange={setProjectionSettings}
+                  />
+                </div>
 
-                {/* Income & Lifestyle Chart */}
-                <IncomeLifestyleChart settings={projectionSettings} />
+                {/* Chart */}
+                <div className="lg:col-span-2">
+                  <TwinEngineChart 
+                    data={twinEngineResult.rows}
+                    milestones={twinEngineResult.milestones}
+                    settings={projectionSettings}
+                  />
+                </div>
               </div>
 
-              {/* Table */}
-              <ProjectionTable
+              {/* Strategic Roadmap */}
+              <StrategicRoadmap 
+                milestones={twinEngineResult.milestones}
                 settings={projectionSettings}
-                onSettingsChange={setProjectionSettings}
+              />
+
+              {/* Detailed Table */}
+              <TwinEngineTable 
+                data={twinEngineResult.rows}
+                settings={projectionSettings}
               />
             </>
           )}

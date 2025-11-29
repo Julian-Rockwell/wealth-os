@@ -6,19 +6,10 @@ import type { RpicResult } from "@/utils/rpicCalculations";
 import type { SixMonthPlan } from "@/types/sixMonthPlan";
 import { resolveStrategyAlias } from "@/constants/strategies";
 import { deriveRequirementsFromStrategies } from "@/utils/deriveRequirements";
+import { type TwinEngineSettings, getDefaultTwinEngineSettings } from "@/utils/twinEngineCalculations";
 
-export interface ProjectionSettings {
-  costOfLivingMode: 'rough' | 'accurate';
-  costOfLiving: number;
-  currentRetirementSavings: number;
-  accountSizeComfortable: number;
-  startYear: number;
-  initialTradingAccount: number;
-  incomeGoalPercent: number;
-  inflationPercent: number;
-  rowGoalPercents: number[];
-  rowCashInOut: number[];
-}
+// Re-export TwinEngineSettings as ProjectionSettings for backward compatibility
+export type ProjectionSettings = TwinEngineSettings;
 
 interface DraftData {
   mockConnections: any[];
@@ -154,22 +145,11 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
   const [projectionSettings, setProjectionSettingsState] = useState<ProjectionSettings | null>(() => {
     const stored = localStorage.getItem("projectionSettings");
     if (stored) {
-      return JSON.parse(stored);
+      // Merge stored with defaults to handle new fields
+      const parsed = JSON.parse(stored);
+      return { ...getDefaultTwinEngineSettings(), ...parsed };
     }
-    // Default values
-    const currentYear = new Date().getFullYear();
-    return {
-      costOfLivingMode: 'rough',
-      costOfLiving: 5000,
-      currentRetirementSavings: 0,
-      accountSizeComfortable: 400000,
-      startYear: currentYear,
-      initialTradingAccount: 10000,
-      incomeGoalPercent: 10,
-      inflationPercent: 3,
-      rowGoalPercents: Array(20).fill(60),
-      rowCashInOut: Array(20).fill(0),
-    };
+    return getDefaultTwinEngineSettings();
   });
 
   const setSnapshot = (newSnapshot: FinancialSnapshot | null) => {
