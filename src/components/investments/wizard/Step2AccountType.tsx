@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -40,10 +40,34 @@ export function Step2AccountType({ selectedStrategy, onNext }: Step2Props) {
 
   const requiresMarginPermissions = PERMISSION_TO_LEVEL[requirements.requiredPermission] >= PERMISSION_TO_LEVEL["spreads"];
 
+  // Auto-save the default account type when component mounts if not already set
+  useEffect(() => {
+    if (brokerSetup && !brokerSetup.accountType) {
+      setBrokerSetup({
+        ...brokerSetup,
+        accountType: 'margin',
+        targetOptionsLevel: PERMISSION_TO_LEVEL[requirements.requiredPermission] as 0 | 1 | 2 | 3 | 4,
+        usageHint: usageHint,
+      });
+    }
+  }, []);
+
   const handleAccountTypeChange = (value: 'cash' | 'margin' | 'retirement') => {
     setSelectedAccountType(value);
     setCashOverrideWarning(null);
     setCashBlockError(null);
+    
+    // Immediately persist valid selections to context
+    if (value !== 'cash' || !requiresMarginPermissions) {
+      if (brokerSetup) {
+        setBrokerSetup({
+          ...brokerSetup,
+          accountType: value,
+          targetOptionsLevel: PERMISSION_TO_LEVEL[requirements.requiredPermission] as 0 | 1 | 2 | 3 | 4,
+          usageHint: value === 'margin' ? usageHint : 'normal',
+        });
+      }
+    }
     
     if (value === 'cash') {
       if (requiresMarginPermissions) {
