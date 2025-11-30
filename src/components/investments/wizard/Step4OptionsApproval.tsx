@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -27,28 +27,46 @@ export function Step4OptionsApproval({ selectedStrategy, onNext }: Step4Props) {
   
   const requiredLevel = PERMISSION_TO_LEVEL[requirements.requiredPermission];
   
+  // Initialize from persisted optionsApprovalStatus field
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus>(
-    brokerSetup?.progress.optionsApproved ? 'approved' :
-    brokerSetup?.progress.optionsSubmitted ? 'pending' : 'not-started'
+    brokerSetup?.progress.optionsApprovalStatus || 'not-started'
   );
   
   const [approvedLevel, setApprovedLevel] = useState<number>(
     brokerSetup?.targetOptionsLevel || requiredLevel
   );
 
-  const handleContinue = () => {
+  // Auto-save approvalStatus when it changes
+  useEffect(() => {
     if (!brokerSetup) return;
+    
+    const currentStatus = brokerSetup.progress.optionsApprovalStatus || 'not-started';
+    if (approvalStatus !== currentStatus) {
+      setBrokerSetup({
+        ...brokerSetup,
+        progress: {
+          ...brokerSetup.progress,
+          optionsSubmitted: approvalStatus !== 'not-started',
+          optionsApproved: approvalStatus === 'approved',
+          optionsApprovalStatus: approvalStatus,
+        },
+      });
+    }
+  }, [approvalStatus]);
 
-    setBrokerSetup({
-      ...brokerSetup,
-      progress: {
-        ...brokerSetup.progress,
-        optionsSubmitted: approvalStatus !== 'not-started',
-        optionsApproved: approvalStatus === 'approved',
-      },
-      targetOptionsLevel: approvedLevel as any,
-    });
+  // Auto-save approvedLevel when it changes (only if approved)
+  useEffect(() => {
+    if (!brokerSetup || approvalStatus !== 'approved') return;
+    
+    if (approvedLevel !== brokerSetup.targetOptionsLevel) {
+      setBrokerSetup({
+        ...brokerSetup,
+        targetOptionsLevel: approvedLevel as 0 | 1 | 2 | 3 | 4,
+      });
+    }
+  }, [approvedLevel]);
 
+  const handleContinue = () => {
     onNext();
   };
 

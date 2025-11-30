@@ -96,6 +96,7 @@ export interface BrokerSetupProgress {
   optionsApproved: boolean;
   connected: boolean;
   cashDisciplineAcknowledged?: boolean;
+  optionsApprovalStatus?: 'not-started' | 'submitted' | 'pending' | 'approved';
 }
 
 export interface StrategyAssessmentAnswers {
