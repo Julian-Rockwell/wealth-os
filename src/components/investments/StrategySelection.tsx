@@ -146,24 +146,26 @@ export function StrategySelection({ onStrategyConfirmed }: StrategySelectionProp
     <div className="space-y-6">
       {/* Confirmation Card - shown above when strategies are selected */}
       {selectedStrategies.length > 0 && (
-        <Card className="border-green-500/20 bg-green-500/5">
+      <Card className="border-green-500/20 bg-green-500/5">
           <CardContent className="pt-6">
-            <div className="flex items-start gap-3">
-              <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <p className="text-sm font-semibold mb-2">
-                  {selectedStrategies.length} strateg{selectedStrategies.length > 1 ? 'ies' : 'y'} selected
-                </p>
-                 <p className="text-xs text-muted-foreground mb-3">
-                   Selected: {selectedStrategies.map(s => {
-                     const strategyInfo = CANONICAL_STRATEGIES.find(cs => cs.id === s);
-                     return strategyInfo?.label || s;
-                   }).join(', ')}
-                 </p>
-                <Button onClick={handleConfirmStrategy} className="w-full">
-                  Confirm Strategy & Continue
-                </Button>
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-semibold">
+                    {selectedStrategies.length} strateg{selectedStrategies.length > 1 ? 'ies' : 'y'} selected
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {selectedStrategies.map(s => {
+                      const strategyInfo = CANONICAL_STRATEGIES.find(cs => cs.id === s);
+                      return strategyInfo?.label || s;
+                    }).join(', ')}
+                  </p>
+                </div>
               </div>
+              <Button onClick={handleConfirmStrategy}>
+                Confirm Strategy & Continue
+              </Button>
             </div>
           </CardContent>
         </Card>
