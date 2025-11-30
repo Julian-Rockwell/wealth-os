@@ -415,16 +415,49 @@ export const REYNOLDS_PAPER_TRADING_DATA: PaperTradingProgress = {
   isReadyForLiveTrading: false,
 };
 
-// Paper Trading Progress Data for Johnson Family (more conservative, further from ready)
+// Paper Trading Progress Data for Johnson Family (READY FOR LIVE TRADING - all gates passed)
 export const JOHNSON_PAPER_TRADING_DATA: PaperTradingProgress = {
-  totalTrades: 22,
+  totalTrades: 45,
   requiredTrades: 40,
-  adherenceRate: 88,
+  adherenceRate: 97,
   requiredAdherence: 95,
-  checklist: [],
-  checklistScore: 52,
+  checklist: [
+    // Planning (4/4 complete)
+    { id: "check-0", category: "Planning", item: "Written trading plan with entry/exit rules", completed: true, required: true },
+    { id: "check-1", category: "Planning", item: "Risk management strategy defined", completed: true, required: true },
+    { id: "check-2", category: "Planning", item: "Position sizing rules established", completed: true, required: true },
+    { id: "check-3", category: "Planning", item: "Stop-loss and take-profit levels identified", completed: true, required: true },
+    // Psychology (3/3 complete)
+    { id: "check-4", category: "Psychology", item: "Emotional trading triggers documented", completed: true, required: true },
+    { id: "check-5", category: "Psychology", item: "Daily pre-market routine established", completed: true, required: true },
+    { id: "check-6", category: "Psychology", item: "Loss acceptance protocol in place", completed: true, required: true },
+    // Technical (4/4 complete)
+    { id: "check-7", category: "Technical", item: "Platform proficiency demonstrated", completed: true, required: true },
+    { id: "check-8", category: "Technical", item: "Order types mastered (limit, stop, etc.)", completed: true, required: true },
+    { id: "check-9", category: "Technical", item: "Chart reading skills validated", completed: true, required: true },
+    { id: "check-10", category: "Technical", item: "Indicator interpretation documented", completed: true, required: true },
+    // Risk (4/4 complete)
+    { id: "check-11", category: "Risk", item: "Max loss per trade defined (1-2% rule)", completed: true, required: true },
+    { id: "check-12", category: "Risk", item: "Daily loss limit established", completed: true, required: true },
+    { id: "check-13", category: "Risk", item: "Account drawdown threshold set", completed: true, required: true },
+    { id: "check-14", category: "Risk", item: "Portfolio correlation analyzed", completed: true, required: true },
+    // Execution (4/4 complete)
+    { id: "check-15", category: "Execution", item: "Trade journal maintained consistently", completed: true, required: true },
+    { id: "check-16", category: "Execution", item: "Post-trade review process implemented", completed: true, required: true },
+    { id: "check-17", category: "Execution", item: "Mistake documentation system in place", completed: true, required: true },
+    { id: "check-18", category: "Execution", item: "Win/loss analysis conducted", completed: true, required: true },
+    // Strategy (2/3 complete - optional items)
+    { id: "check-19", category: "Strategy", item: "Strategy backtested with historical data", completed: true, required: false },
+    { id: "check-20", category: "Strategy", item: "Multiple timeframes analyzed", completed: true, required: false },
+    { id: "check-21", category: "Strategy", item: "Market condition adaptations planned", completed: false, required: false },
+    // Advanced (1/3 complete - optional items)
+    { id: "check-22", category: "Advanced", item: "Volatility impact understood", completed: true, required: false },
+    { id: "check-23", category: "Advanced", item: "Correlation with market indices tracked", completed: false, required: false },
+    { id: "check-24", category: "Advanced", item: "Tax implications researched", completed: false, required: false },
+  ],
+  checklistScore: 84,
   requiredChecklistScore: 70,
-  isReadyForLiveTrading: false,
+  isReadyForLiveTrading: true,
 };
 
 // ============== AUSTIN FAMILY ==============
