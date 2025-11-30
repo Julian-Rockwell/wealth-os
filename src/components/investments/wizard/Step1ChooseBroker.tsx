@@ -37,16 +37,17 @@ export function Step1ChooseBroker({ selectedStrategy, onNext }: Step1Props) {
       ...brokerSetup,
       chosenBroker: brokerId,
       accountType: brokerSetup?.accountType || null,
-      targetOptionsLevel: requirements.optionsLevelMin,
+      targetOptionsLevel: brokerSetup?.targetOptionsLevel || requirements.optionsLevelMin,
       wizardStep: 1,
       progress: {
-        openAccount: false,
-        funded: false,
-        optionsSubmitted: false,
-        optionsApproved: false,
-        connected: false,
+        openAccount: brokerSetup?.progress?.openAccount || false,
+        funded: brokerSetup?.progress?.funded || false,
+        optionsSubmitted: brokerSetup?.progress?.optionsSubmitted || false,
+        optionsApproved: brokerSetup?.progress?.optionsApproved || false,
+        connected: brokerSetup?.progress?.connected || false,
+        optionsApprovalStatus: brokerSetup?.progress?.optionsApprovalStatus,
       },
-      notes: [],
+      notes: brokerSetup?.notes || [],
     });
     
     onNext();
