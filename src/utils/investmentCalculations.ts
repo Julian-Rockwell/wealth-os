@@ -328,10 +328,24 @@ export function calculateEquityOpportunities(snapshot: FinancialSnapshot) {
     const equity = holding.balance - (liability?.balance || 0);
     
     if (equity > 30000) {
-      const loanAmount = equity * 0.8; // 80% LTV
-      const estimatedAPR = 7.0; // Placeholder rate
+      // HELOC formula: Banks lend up to 80% of total asset value minus existing mortgage
+      // NOT 80% of equity (that would be incorrect)
+      const maxLTV = 0.8; // 80% maximum Loan-to-Value ratio
+      const maxTotalLoan = holding.balance * maxLTV; // Max loan banks allow (80% of home value)
+      const existingLoan = liability?.balance || 0;
+      const availableLoan = Math.max(0, maxTotalLoan - existingLoan); // Available HELOC
+      
+      // Only show opportunity if available loan meets minimum threshold
+      if (availableLoan < 30000) {
+        continue;
+      }
+      
+      const loanAmount = availableLoan; // Use available HELOC amount
+      
+      // PLACEHOLDER VALUES (should be real-time rates in production):
+      const estimatedAPR = 7.0; // Fixed example: 7% HELOC rate
       const monthlyPayment = (loanAmount * (estimatedAPR / 100 / 12)) / (1 - Math.pow(1 + (estimatedAPR / 100 / 12), -360));
-      const targetReturn = 0.25; // 25% annual return target
+      const targetReturn = 0.25; // Fixed example: 25% annual return target
       const annualCost = monthlyPayment * 12;
       const potentialGain = loanAmount * targetReturn - annualCost;
       
