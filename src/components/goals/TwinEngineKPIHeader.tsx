@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, DollarSign, Scale } from "lucide-react";
+import { Calendar, Clock, DollarSign, Landmark } from "lucide-react";
 import type { TwinEngineKPIs } from "@/utils/twinEngineCalculations";
 
 interface TwinEngineKPIHeaderProps {
@@ -83,21 +83,24 @@ export function TwinEngineKPIHeader({ kpis }: TwinEngineKPIHeaderProps) {
         </CardContent>
       </Card>
 
-      {/* Gross Up Tax */}
-      <Card className="bg-gradient-to-br from-muted/50 to-muted/30 border-muted">
+      {/* Legacy Potential (replaces Gross Up Tax) */}
+      <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border-purple-500/20">
         <CardContent className="pt-4 pb-4">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-xs text-muted-foreground font-medium mb-1">Gross Up Tax</p>
-              <p className="text-2xl font-bold text-muted-foreground">
-                {kpis.taxRate}%
+              <p className="text-xs text-muted-foreground font-medium mb-1">Legacy Potential</p>
+              <p className="text-2xl font-bold text-purple-600">
+                {kpis.legacyValue ? formatMoney(kpis.legacyValue) : '-'}
               </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Withdrawals grossed up
-              </p>
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-xs text-muted-foreground">
+                  {kpis.legacyAge ? `Age ${kpis.legacyAge}` : ''}
+                  {kpis.tradLegacyValue ? ` • Trad: ${formatMoney(kpis.tradLegacyValue)}` : ''}
+                </p>
+              </div>
             </div>
-            <div className="p-2 bg-muted rounded-full">
-              <Scale className="w-5 h-5 text-muted-foreground" />
+            <div className="p-2 bg-purple-500/10 rounded-full">
+              <Landmark className="w-5 h-5 text-purple-600" />
             </div>
           </div>
         </CardContent>

@@ -23,11 +23,21 @@ export interface TwinEngineSettings {
   activeCashOutPercent: number;
   taxRate: number;
   
+  // NEW: Ramp Up Settings
+  enableRampUp: boolean;
+  rampUpDuration: number;
+  
+  // NEW: Yield Cap
+  yieldCapPercent: number;
+  
   // Withdrawal Plan
   withdrawalStrategy: 'growth' | 'freedom' | 'custom';
   customWithdrawalYear: number;
   customWithdrawalAmount: number;
   retirementIncome: number;
+  
+  // NEW: Retirement Income Start Age
+  retirementIncomeStartAge: number;
   
   // Benchmark
   tradReturn: number;
@@ -64,6 +74,10 @@ export interface TwinEngineRow {
   netWallet: number;
   tradWithdrawal: number;
   
+  // NEW: Gross Expenses and Gap
+  grossExpenses: number;
+  expenseShortfall: number;
+  
   rpicScore: number;
   
   // Flags
@@ -79,6 +93,15 @@ export interface TwinEngineMilestones {
   activeStoppedYear: number | null;
   wealthOSCapitalNeeded: number;
   tradCapitalNeeded: number;
+  
+  // NEW: Expanded Milestones
+  first25kActiveYear: number | null;
+  first100kActiveYear: number | null;
+  first500kPassiveYear: number | null;
+  first1M_PassiveYear: number | null;
+  first2M_PassiveYear: number | null;
+  first5M_PassiveYear: number | null;
+  first10M_PassiveYear: number | null;
 }
 
 export interface TwinEngineResult {
@@ -103,16 +126,26 @@ export function calculateTwinEngineProjection(settings: TwinEngineSettings): Twi
     activeDuration,
     activeCashOutPercent,
     taxRate,
+    enableRampUp,
+    rampUpDuration,
+    yieldCapPercent,
     withdrawalStrategy,
     customWithdrawalYear,
     customWithdrawalAmount,
     retirementIncome,
+    retirementIncomeStartAge,
     tradReturn,
     startYear
   } = settings;
 
   const data: TwinEngineRow[] = [];
-  const endYear = startYear + 40;
+  
+  // Dynamic duration: Run until Age 106, minimum 10 years
+  const targetAge = 106;
+  const yearsToAge106 = targetAge - currentAge;
+  const projectionYears = Math.max(10, yearsToAge106);
+  const endYear = startYear + projectionYears;
+  
   const stopActiveYear = startYear + activeDuration;
 
   let currentActive = savingsActive;
@@ -126,10 +159,28 @@ export function calculateTwinEngineProjection(settings: TwinEngineSettings): Twi
   let activeStoppedYear: number | null = null;
   let wealthOSCapitalNeeded = 0;
   let tradCapitalNeeded = 0;
+  
+  // Expanded milestones
+  let first25kActiveYear: number | null = null;
+  let first100kActiveYear: number | null = null;
+  let first500kPassiveYear: number | null = null;
+  let first1M_PassiveYear: number | null = null;
+  let first2M_PassiveYear: number | null = null;
+  let first5M_PassiveYear: number | null = null;
+  let first10M_PassiveYear: number | null = null;
 
   for (let year = startYear; year <= endYear; year++) {
     const age = currentAge + (year - startYear);
     const isActivePhase = year < stopActiveYear;
+    const yearsIntoProjection = year - startYear;
+
+    // Calculate effective active return with ramp up
+    let effectiveActiveReturn = activeReturn;
+    if (enableRampUp && yearsIntoProjection < rampUpDuration) {
+      // Start at 50% of target ROI, scale linearly to 100%
+      const rampFactor = 0.5 + (0.5 * (yearsIntoProjection / rampUpDuration));
+      effectiveActiveReturn = activeReturn * rampFactor;
+    }
 
     // 0. Expense Step Down Logic
     if (enableStepDown && age === stepDownAge) {
@@ -141,9 +192,14 @@ export function calculateTwinEngineProjection(settings: TwinEngineSettings): Twi
       currentExpenses = currentExpenses * (1 + inflationRate / 100);
     }
 
+    // Gross expenses (pre-tax equivalent)
+    const grossExpenses = currentExpenses / (1 - (taxRate / 100));
+
     // Contributions & Other Income
     let annualContrib = monthlyContrib * 12;
-    const annualRetirementIncome = retirementIncome * 12;
+    
+    // Retirement income only starts at specified age
+    const annualRetirementIncome = age >= retirementIncomeStartAge ? retirementIncome * 12 : 0;
 
     // Check if we are retired (Withdrawing)
     let isRetired = false;
@@ -209,7 +265,7 @@ export function calculateTwinEngineProjection(settings: TwinEngineSettings): Twi
         contribToPassive = annualContrib;
       }
 
-      activeProfitGross = currentActive * (activeReturn / 100);
+      activeProfitGross = currentActive * (effectiveActiveReturn / 100);
       activeTax = activeProfitGross * (taxRate / 100);
       activeProfitNet = activeProfitGross - activeTax;
 
@@ -220,6 +276,14 @@ export function calculateTwinEngineProjection(settings: TwinEngineSettings): Twi
         if (!capHitYear) capHitYear = year;
       } else {
         currentActive = potentialActiveBalance;
+      }
+      
+      // Track active profit milestones
+      if (!first25kActiveYear && activeProfitNet >= 25000) {
+        first25kActiveYear = year;
+      }
+      if (!first100kActiveYear && activeProfitNet >= 100000) {
+        first100kActiveYear = year;
       }
     } else {
       // After active phase ends
@@ -244,7 +308,7 @@ export function calculateTwinEngineProjection(settings: TwinEngineSettings): Twi
       wealthOSCapitalNeeded = currentActive + currentPassive;
     }
 
-    // C. WITHDRAWAL ENGINE
+    // C. WITHDRAWAL ENGINE with Yield Cap
     let netNeeded = 0;
     if (isRetired || (freedomYear && year >= freedomYear)) {
       if (withdrawalStrategy === 'freedom' || (withdrawalStrategy === 'growth' && freedomYear && year >= freedomYear)) {
@@ -267,6 +331,13 @@ export function calculateTwinEngineProjection(settings: TwinEngineSettings): Twi
       withdrawalAmount = netNeeded / (1 - (taxRate / 100));
       withdrawalTax = withdrawalAmount * (taxRate / 100);
 
+      // Apply Yield Cap - can't withdraw more than yieldCapPercent of passive income
+      const maxWithdrawal = passiveGrowth * (yieldCapPercent / 100);
+      if (withdrawalAmount > maxWithdrawal && maxWithdrawal > 0) {
+        withdrawalAmount = maxWithdrawal;
+        withdrawalTax = withdrawalAmount * (taxRate / 100);
+      }
+
       if (currentPassive < withdrawalAmount) {
         withdrawalAmount = currentPassive;
         withdrawalTax = withdrawalAmount * (taxRate / 100);
@@ -277,10 +348,30 @@ export function calculateTwinEngineProjection(settings: TwinEngineSettings): Twi
     let nextPassiveBalance = currentPassive + passiveGrowth + contribToPassive
       + spilloverNet + surplusIncome - withdrawalAmount;
     if (nextPassiveBalance < 0) nextPassiveBalance = 0;
+    
+    // Track passive balance milestones before updating
+    if (!first500kPassiveYear && nextPassiveBalance >= 500000) {
+      first500kPassiveYear = year;
+    }
+    if (!first1M_PassiveYear && nextPassiveBalance >= 1000000) {
+      first1M_PassiveYear = year;
+    }
+    if (!first2M_PassiveYear && nextPassiveBalance >= 2000000) {
+      first2M_PassiveYear = year;
+    }
+    if (!first5M_PassiveYear && nextPassiveBalance >= 5000000) {
+      first5M_PassiveYear = year;
+    }
+    if (!first10M_PassiveYear && nextPassiveBalance >= 10000000) {
+      first10M_PassiveYear = year;
+    }
 
     // E. RECORD DATA
     const netWalletBase = withdrawalAmount - withdrawalTax;
     const totalWallet = netWalletBase + annualRetirementIncome;
+    
+    // Calculate expense shortfall (gap)
+    const expenseShortfall = Math.max(0, currentExpenses - totalWallet);
 
     data.push({
       year,
@@ -302,6 +393,8 @@ export function calculateTwinEngineProjection(settings: TwinEngineSettings): Twi
       withdrawalTax: Math.round(withdrawalTax),
       netWallet: Math.round(totalWallet + cashOutEventAmount),
       tradWithdrawal: Math.round(tradWithdrawalApplied),
+      grossExpenses: Math.round(grossExpenses),
+      expenseShortfall: Math.round(expenseShortfall),
       rpicScore: parseFloat(rpicScore.toFixed(1)),
       isCapHit: !!capHitYear && year >= capHitYear,
       isFreedom: !!freedomYear && year >= freedomYear,
@@ -320,7 +413,14 @@ export function calculateTwinEngineProjection(settings: TwinEngineSettings): Twi
       tradFreedomYear,
       activeStoppedYear,
       wealthOSCapitalNeeded,
-      tradCapitalNeeded
+      tradCapitalNeeded,
+      first25kActiveYear,
+      first100kActiveYear,
+      first500kPassiveYear,
+      first1M_PassiveYear,
+      first2M_PassiveYear,
+      first5M_PassiveYear,
+      first10M_PassiveYear
     }
   };
 }
@@ -343,10 +443,14 @@ export function getDefaultTwinEngineSettings(): TwinEngineSettings {
     activeDuration: 10,
     activeCashOutPercent: 0,
     taxRate: 25.0,
+    enableRampUp: false,
+    rampUpDuration: 2,
+    yieldCapPercent: 80,
     withdrawalStrategy: 'freedom',
     customWithdrawalYear: currentYear + 10,
     customWithdrawalAmount: 100000,
     retirementIncome: 0,
+    retirementIncomeStartAge: 67,
     tradReturn: 7.0,
     startYear: currentYear
   };
@@ -361,10 +465,14 @@ export interface TwinEngineKPIs {
   tradCapital: number | null;
   capitalSavedPercent: number | null;
   taxRate: number;
+  // NEW: Legacy Potential
+  legacyValue: number | null;
+  legacyAge: number | null;
+  tradLegacyValue: number | null;
 }
 
 export function calculateTwinEngineKPIs(result: TwinEngineResult, settings: TwinEngineSettings): TwinEngineKPIs {
-  const { milestones } = result;
+  const { milestones, rows } = result;
   
   let timeSaved: number | null = null;
   if (milestones.tradFreedomYear && milestones.freedomYear) {
@@ -382,6 +490,12 @@ export function calculateTwinEngineKPIs(result: TwinEngineResult, settings: Twin
     ? settings.currentAge + (milestones.freedomYear - settings.startYear)
     : null;
 
+  // Calculate Legacy Potential (final row values)
+  const finalRow = rows[rows.length - 1];
+  const legacyValue = finalRow ? finalRow.totalWealthOS : null;
+  const legacyAge = finalRow ? finalRow.age : null;
+  const tradLegacyValue = finalRow ? finalRow.tradBalance : null;
+
   return {
     freedomYear: milestones.freedomYear,
     freedomAge,
@@ -389,6 +503,9 @@ export function calculateTwinEngineKPIs(result: TwinEngineResult, settings: Twin
     wealthOSCapital: milestones.wealthOSCapitalNeeded > 0 ? milestones.wealthOSCapitalNeeded : null,
     tradCapital: milestones.tradCapitalNeeded > 0 ? milestones.tradCapitalNeeded : null,
     capitalSavedPercent,
-    taxRate: settings.taxRate
+    taxRate: settings.taxRate,
+    legacyValue,
+    legacyAge,
+    tradLegacyValue
   };
 }
