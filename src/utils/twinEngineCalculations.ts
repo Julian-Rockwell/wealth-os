@@ -301,7 +301,7 @@ export function calculateTwinEngineProjection(settings: TwinEngineSettings): Twi
 
     // B. FREEDOM TRIGGER
     const passiveIncomeGen = passiveGrowth;
-    const rpicScore = currentExpenses > 0 ? (passiveIncomeGen / currentExpenses) * 100 : 0;
+    const rpicScore = grossExpenses > 0 ? (passiveIncomeGen / grossExpenses) * 100 : 0;
 
     if (!freedomYear && rpicScore >= 100) {
       freedomYear = year;
@@ -432,7 +432,7 @@ export function getDefaultTwinEngineSettings(): TwinEngineSettings {
     savingsPassive: 400000,
     savingsActive: 100000,
     monthlyContrib: 2000,
-    annualExpenses: 70000,
+    annualExpenses: 60000,
     inflationRate: 3.0,
     enableStepDown: false,
     stepDownAge: 75,
@@ -442,7 +442,7 @@ export function getDefaultTwinEngineSettings(): TwinEngineSettings {
     passiveYield: 12.0,
     activeDuration: 10,
     activeCashOutPercent: 0,
-    taxRate: 25.0,
+    taxRate: 18.0,
     enableRampUp: false,
     rampUpDuration: 2,
     yieldCapPercent: 80,
