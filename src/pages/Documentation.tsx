@@ -65,14 +65,22 @@ const Documentation = () => {
             <a href="#six-month-plan" className="block text-primary hover:underline ml-4">7.4 UI Component (SixMonthPlanDialog)</a>
             <a href="#six-month-plan" className="block text-primary hover:underline ml-4">7.5 Trigger Button Logic (Smart Navigation)</a>
             <a href="#six-month-plan" className="block text-primary hover:underline ml-4">7.6 Limitations & Future Enhancements</a>
-            <a href="#formulas" className="block text-primary hover:underline">8. Key Calculations and Formulas</a>
-            <a href="#formulas" className="block text-primary hover:underline ml-4">8.1 Transaction Classification (Complete)</a>
-            <a href="#formulas" className="block text-primary hover:underline ml-4">8.2 Readiness Score Factors (Detailed)</a>
-            <a href="#formulas" className="block text-primary hover:underline ml-4">8.3 RPIC Calculations (Complete)</a>
-            <a href="#formulas" className="block text-primary hover:underline ml-4">8.4 Six-Month Plan Formulas (Summary)</a>
-            <a href="#formulas" className="block text-primary hover:underline ml-4">8.5 Capital Allocation Waterfall</a>
-            <a href="#user-flow" className="block text-primary hover:underline">9. Typical User Flow</a>
-            <a href="#glossary" className="block text-primary hover:underline">10. Glossary of Terms</a>
+            <a href="#twin-engine" className="block text-primary hover:underline">8. Twin-Engine Projection Model</a>
+            <a href="#twin-engine" className="block text-primary hover:underline ml-4">8.1 Overview & Conceptual Model</a>
+            <a href="#twin-engine" className="block text-primary hover:underline ml-4">8.2 Input Settings (TwinEngineSettings)</a>
+            <a href="#twin-engine" className="block text-primary hover:underline ml-4">8.3 Calculation Algorithm</a>
+            <a href="#twin-engine" className="block text-primary hover:underline ml-4">8.4 Output Data (TwinEngineRow)</a>
+            <a href="#twin-engine" className="block text-primary hover:underline ml-4">8.5 Milestones Tracking</a>
+            <a href="#twin-engine" className="block text-primary hover:underline ml-4">8.6 KPI Calculations</a>
+            <a href="#twin-engine" className="block text-primary hover:underline ml-4">8.7 Lifestyle Design</a>
+            <a href="#formulas" className="block text-primary hover:underline">9. Key Calculations and Formulas</a>
+            <a href="#formulas" className="block text-primary hover:underline ml-4">9.1 Transaction Classification (Complete)</a>
+            <a href="#formulas" className="block text-primary hover:underline ml-4">9.2 Readiness Score Factors (Detailed)</a>
+            <a href="#formulas" className="block text-primary hover:underline ml-4">9.3 RPIC Calculations (Complete)</a>
+            <a href="#formulas" className="block text-primary hover:underline ml-4">9.4 Six-Month Plan Formulas (Summary)</a>
+            <a href="#formulas" className="block text-primary hover:underline ml-4">9.5 Capital Allocation Waterfall</a>
+            <a href="#user-flow" className="block text-primary hover:underline">10. Typical User Flow</a>
+            <a href="#glossary" className="block text-primary hover:underline">11. Glossary of Terms</a>
           </nav>
         </div>
 
@@ -1862,14 +1870,476 @@ newReadinessScore = recalculateReadiness({
           </div>
         </section>
 
-        {/* 8. Key Calculations */}
+        {/* 8. Twin-Engine Projection Model */}
+        <section id="twin-engine" className="mb-12 page-break-before">
+          <h2 className="text-3xl font-bold mb-6">8. Twin-Engine Projection Model</h2>
+          <p className="mb-4">
+            The Twin-Engine Projection Model is the core calculation engine for long-term financial independence planning. It projects wealth accumulation and passive income generation using two separate "engines" (Active and Passive) compared against a Traditional benchmark.
+          </p>
+
+          <h3 className="text-2xl font-semibold mb-4">8.1 Overview & Conceptual Model</h3>
+          <p className="mb-4">
+            The Twin-Engine model separates capital into two distinct pools with different growth characteristics:
+          </p>
+          <div className="grid md:grid-cols-2 gap-4 mb-6">
+            <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
+              <p className="font-semibold mb-2">🔵 Active Engine (Trading)</p>
+              <ul className="list-disc pl-4 space-y-1 text-sm">
+                <li>High-return active trading (default 30% ROI)</li>
+                <li>Capped at tradingCap (default $200K)</li>
+                <li>Limited duration (default 10 years)</li>
+                <li>Excess profits "spill over" to Passive</li>
+              </ul>
+            </div>
+            <div className="bg-green-50 border-l-4 border-green-500 p-4">
+              <p className="font-semibold mb-2">🟢 Passive Engine (Income)</p>
+              <ul className="list-disc pl-4 space-y-1 text-sm">
+                <li>Dividend/income generation (default 12% yield)</li>
+                <li>Uncapped growth potential</li>
+                <li>Permanent duration</li>
+                <li>Source of retirement withdrawals</li>
+              </ul>
+            </div>
+          </div>
+          <p className="mb-4">
+            <strong>Freedom Trigger:</strong> Financial independence is achieved when passive income ≥ gross living expenses (RPIC Score ≥ 100%).
+          </p>
+          <p className="mb-4">
+            <strong>Dynamic Duration:</strong> Projections run until Age 106 (minimum 10 years) to capture full retirement lifecycle.
+          </p>
+
+          <h3 className="text-2xl font-semibold mb-4">8.2 Input Settings (TwinEngineSettings)</h3>
+          <p className="mb-4">
+            The model accepts 26 configurable parameters organized into 7 categories:
+          </p>
+
+          <h4 className="text-xl font-semibold mb-3">Foundation</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`currentAge: number;        // User's current age (default: 55)
+savingsPassive: number;    // Starting passive account balance (default: $400,000)
+savingsActive: number;     // Starting active trading account (default: $100,000)
+monthlyContrib: number;    // Monthly contribution amount (default: $2,000)`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Lifestyle</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`annualExpenses: number;    // Annual living expenses (default: $60,000)
+inflationRate: number;     // Annual inflation rate % (default: 3.0)
+enableStepDown: boolean;   // Reduce expenses in late life (default: false)
+stepDownAge: number;       // Age to reduce expenses (default: 75)
+stepDownPercent: number;   // Expense reduction % (default: 20)`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Wealth OS Strategy</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`tradingCap: number;           // Max active account size (default: $200,000)
+activeReturn: number;         // Active trading ROI % (default: 30.0)
+passiveYield: number;         // Passive income yield % (default: 12.0)
+activeDuration: number;       // Years of active trading (default: 10)
+activeCashOutPercent: number; // % to cash out when active ends (default: 0)
+taxRate: number;              // Income tax rate % (default: 18.0)`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Advanced Settings</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`enableRampUp: boolean;        // Enable learning curve ROI ramp (default: false)
+rampUpDuration: number;       // Years to reach full ROI (default: 2)
+yieldCapPercent: number;      // Max withdrawal as % of yield (default: 80)
+retirementIncomeStartAge: number; // Age Social Security starts (default: 67)`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Withdrawal Plan</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`withdrawalStrategy: 'growth' | 'freedom' | 'custom';  // When to start withdrawing
+customWithdrawalYear: number;    // Year for custom withdrawal start
+customWithdrawalAmount: number;  // Annual withdrawal for custom strategy
+retirementIncome: number;        // Monthly Social Security/pension (default: 0)`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Benchmark</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`tradReturn: number;   // Traditional market return % (default: 7.0)
+startYear: number;    // Projection start year (default: current year)`}
+            </code>
+          </div>
+
+          <h3 className="text-2xl font-semibold mb-4">8.3 Calculation Algorithm</h3>
+          <p className="mb-4">
+            The main calculation loop iterates year-by-year, applying the following logic:
+          </p>
+
+          <h4 className="text-xl font-semibold mb-3">Step 0: Ramp-Up ROI (if enabled)</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`// Learning curve: ROI starts at 50% and scales to 100% over rampUpDuration
+let effectiveActiveReturn = activeReturn;
+if (enableRampUp && yearsIntoProjection < rampUpDuration) {
+  const rampFactor = 0.5 + (0.5 * (yearsIntoProjection / rampUpDuration));
+  effectiveActiveReturn = activeReturn * rampFactor;
+}
+// Example: Year 1 of 2-year ramp = 75% of target ROI (22.5% if target is 30%)`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Step 1: Expense Adjustments</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`// A. Step-Down (optional late-life expense reduction)
+if (enableStepDown && age === stepDownAge) {
+  currentExpenses = currentExpenses * (1 - stepDownPercent / 100);
+}
+
+// B. Inflation (applied after first year)
+if (year > startYear) {
+  currentExpenses = currentExpenses * (1 + inflationRate / 100);
+}
+
+// C. Gross Expenses (pre-tax equivalent for withdrawal calculations)
+const grossExpenses = currentExpenses / (1 - taxRate / 100);
+// Example: $60,000 net / (1 - 0.18) = $73,171 gross needed`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Step 2: Traditional Path (Benchmark)</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`// Traditional 7% growth with 4% safe withdrawal rate
+const tradGrowth = currentTrad * (tradReturn / 100);
+const tradSafeIncome = (currentTrad + tradGrowth) * 0.04;
+
+// Freedom check for traditional path
+if (!tradFreedomYear && tradSafeIncome >= currentExpenses) {
+  tradFreedomYear = year;
+  tradCapitalNeeded = currentTrad + tradGrowth;
+}
+
+// Update balance (contributions while working, withdrawals when retired)
+if (isTradRetired) {
+  const grossWithdrawalNeeded = currentExpenses / (1 - taxRate / 100);
+  currentTrad = currentTrad + tradGrowth - grossWithdrawalNeeded;
+} else {
+  currentTrad = currentTrad + tradGrowth + (monthlyContrib * 12);
+}`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Step 3: Active Engine</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`if (isActivePhase) {
+  // A. Route contributions (prioritize Active until cap)
+  if (currentActive < tradingCap) {
+    const roomInActive = tradingCap - currentActive;
+    contribToActive = Math.min(annualContrib, roomInActive);
+    contribToPassive = annualContrib - contribToActive;
+  } else {
+    contribToPassive = annualContrib;
+  }
+
+  // B. Calculate profits (with optional ramp-up)
+  activeProfitGross = currentActive * (effectiveActiveReturn / 100);
+  activeTax = activeProfitGross * (taxRate / 100);
+  activeProfitNet = activeProfitGross - activeTax;
+
+  // C. Apply cap and spillover
+  let potentialActiveBalance = currentActive + activeProfitNet + contribToActive;
+  if (potentialActiveBalance > tradingCap) {
+    spilloverNet = potentialActiveBalance - tradingCap;  // Excess to Passive
+    currentActive = tradingCap;
+    if (!capHitYear) capHitYear = year;
+  } else {
+    currentActive = potentialActiveBalance;
+  }
+} else {
+  // Active phase ended - liquidate to Passive
+  if (!activeStoppedYear) {
+    activeStoppedYear = year;
+    const moveToPassive = currentActive * (1 - activeCashOutPercent / 100);
+    currentPassive += moveToPassive;
+    currentActive = 0;
+  }
+}`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Step 4: Freedom Trigger (RPIC Score)</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`// Calculate passive income generation
+const passiveIncomeGen = currentPassive * (passiveYield / 100);
+
+// RPIC Score = Passive Income / Gross Expenses × 100
+const rpicScore = grossExpenses > 0 ? (passiveIncomeGen / grossExpenses) * 100 : 0;
+
+// Freedom achieved when passive income covers gross expenses
+if (!freedomYear && rpicScore >= 100) {
+  freedomYear = year;
+  wealthOSCapitalNeeded = currentActive + currentPassive;
+}
+
+// Example: $87,804 passive income / $73,171 gross expenses = 120% RPIC Score`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Step 5: Withdrawal Engine with Yield Cap</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`// Determine net income needed (expenses minus Social Security)
+let netNeeded = Math.max(0, currentExpenses - annualRetirementIncome);
+
+// Calculate gross withdrawal needed
+let withdrawalAmount = netNeeded / (1 - taxRate / 100);
+
+// YIELD CAP: Cannot withdraw more than yieldCapPercent of passive income
+const maxWithdrawal = passiveGrowth * (yieldCapPercent / 100);
+if (withdrawalAmount > maxWithdrawal && maxWithdrawal > 0) {
+  withdrawalAmount = maxWithdrawal;  // Capped withdrawal
+}
+
+// Ensure we don't withdraw more than balance
+if (currentPassive < withdrawalAmount) {
+  withdrawalAmount = currentPassive;
+}
+
+// Example: Need $60k net, yield cap 80% of $100k yield = $80k max
+// Withdrawal = min($73,171 gross needed, $80,000 cap) = $73,171`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Step 6: Passive Balance Update</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`nextPassiveBalance = currentPassive 
+  + passiveGrowth          // Yield from investments
+  + contribToPassive       // New contributions
+  + spilloverNet           // Excess from Active engine
+  + surplusIncome          // Social Security surplus (if any)
+  - withdrawalAmount;      // Retirement withdrawals
+
+if (nextPassiveBalance < 0) nextPassiveBalance = 0;
+currentPassive = nextPassiveBalance;`}
+            </code>
+          </div>
+
+          <h3 className="text-2xl font-semibold mb-4">8.4 Output Data (TwinEngineRow)</h3>
+          <p className="mb-4">
+            Each year generates a row with the following fields:
+          </p>
+
+          <h4 className="text-xl font-semibold mb-3">Balances</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`year: number;              // Calendar year
+age: number;               // User's age in this year
+activeBalance: number;     // Active trading account balance
+passiveBalance: number;    // Passive income account balance
+totalWealthOS: number;     // Active + Passive total
+tradBalance: number;       // Traditional benchmark balance`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Income Flows</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`activeProfitNet: number;   // Net profit from active trading (after tax)
+passiveIncome: number;     // Passive income generated (yield)
+tradSafeIncome: number;    // Traditional 4% safe withdrawal amount
+expenses: number;          // Current year living expenses (after inflation)
+retirementIncome: number;  // Social Security/pension income`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Ledger Details</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`activeProfitGross: number; // Gross profit before tax
+activeTax: number;         // Tax on active profits
+spilloverNet: number;      // Excess moved from Active to Passive
+passiveGrowth: number;     // Yield from passive investments
+withdrawalAmount: number;  // Gross amount withdrawn
+withdrawalTax: number;     // Tax on withdrawals
+netWallet: number;         // Net spendable income
+tradWithdrawal: number;    // Traditional path withdrawal amount
+grossExpenses: number;     // Pre-tax expense equivalent
+expenseShortfall: number;  // Gap if income < expenses`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Status Flags</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`rpicScore: number;         // Passive Income / Gross Expenses × 100
+isCapHit: boolean;         // Has active account reached cap?
+isFreedom: boolean;        // Has financial freedom been achieved?
+isActivePhase: boolean;    // Is active trading still ongoing?`}
+            </code>
+          </div>
+
+          <h3 className="text-2xl font-semibold mb-4">8.5 Milestones Tracking</h3>
+          <p className="mb-4">
+            The model tracks 13 significant milestones throughout the projection:
+          </p>
+
+          <h4 className="text-xl font-semibold mb-3">Primary Milestones</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`capHitYear: number | null;         // First year Active balance = Trading Cap
+freedomYear: number | null;        // First year RPIC Score ≥ 100%
+tradFreedomYear: number | null;    // First year Traditional Safe Income ≥ Expenses
+activeStoppedYear: number | null;  // Year active trading phase ends
+wealthOSCapitalNeeded: number;     // Capital at Wealth OS freedom
+tradCapitalNeeded: number;         // Capital at Traditional freedom`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Growth Milestones</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`// Active Profit Milestones (single-year profits)
+first25kActiveYear: number | null;    // First $25K annual profit
+first100kActiveYear: number | null;   // First $100K annual profit
+
+// Passive Balance Milestones (cumulative)
+first500kPassiveYear: number | null;  // Passive balance reaches $500K
+first1M_PassiveYear: number | null;   // Passive balance reaches $1M
+first2M_PassiveYear: number | null;   // Passive balance reaches $2M
+first5M_PassiveYear: number | null;   // Passive balance reaches $5M
+first10M_PassiveYear: number | null;  // Passive balance reaches $10M`}
+            </code>
+          </div>
+
+          <h3 className="text-2xl font-semibold mb-4">8.6 KPI Calculations</h3>
+          <p className="mb-4">
+            The header displays 4 key performance indicators calculated from the projection results:
+          </p>
+
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-6">
+            <code className="block whitespace-pre-wrap">
+{`interface TwinEngineKPIs {
+  freedomYear: number | null;      // Year of financial freedom
+  freedomAge: number | null;       // Age at financial freedom
+  timeSaved: number | null;        // Years earlier vs Traditional
+  wealthOSCapital: number | null;  // Capital needed (Wealth OS)
+  tradCapital: number | null;      // Capital needed (Traditional)
+  capitalSavedPercent: number | null; // % less capital needed
+  taxRate: number;                 // Applied tax rate
+  legacyValue: number | null;      // Final Wealth OS balance at Age 106
+  legacyAge: number | null;        // Final projection age
+  tradLegacyValue: number | null;  // Final Traditional balance
+}
+
+// KPI Calculations
+freedomAge = currentAge + (freedomYear - startYear);
+timeSaved = tradFreedomYear - freedomYear;
+capitalSavedPercent = ((tradCapitalNeeded - wealthOSCapitalNeeded) / tradCapitalNeeded) * 100;
+legacyValue = rows[rows.length - 1].totalWealthOS;  // Final balance`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">KPI Display Examples</h4>
+          <div className="grid md:grid-cols-2 gap-4 mb-6">
+            <div className="border p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground mb-1">Freedom Date</p>
+              <p className="text-2xl font-bold">2031 (Age 61)</p>
+            </div>
+            <div className="border p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground mb-1">Time Saved</p>
+              <p className="text-2xl font-bold text-green-600">12 years earlier</p>
+            </div>
+            <div className="border p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground mb-1">Capital Required</p>
+              <p className="text-2xl font-bold">$732K <span className="text-sm text-muted-foreground">(vs $1.5M traditional)</span></p>
+            </div>
+            <div className="border p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground mb-1">Legacy Potential</p>
+              <p className="text-2xl font-bold text-blue-600">$12.4M at Age 106</p>
+            </div>
+          </div>
+
+          <h3 className="text-2xl font-semibold mb-4">8.7 Lifestyle Design</h3>
+          <p className="mb-4">
+            The Lifestyle Roadmap view allows users to adjust target annual spending based on geography and lifestyle tier:
+          </p>
+
+          <h4 className="text-xl font-semibold mb-3">Geography Cost Base</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`const geographyBase = {
+  low: 40000,     // Low-cost regions (Southeast Asia, Latin America, rural US)
+  medium: 60000,  // Medium-cost (mid-tier US cities, Europe)
+  high: 90000     // High-cost (NYC, SF, London, major metros)
+};`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Lifestyle Tier Multiplier</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`const lifestyleMultiplier = {
+  essential: 0.75,  // Basic needs covered, minimal luxuries
+  comfort: 1.0,     // Comfortable living with moderate extras
+  luxury: 1.5       // Premium lifestyle with significant discretionary
+};`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Target Annual Spend Formula</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`targetAnnualSpend = geographyBase[selectedGeography] * lifestyleMultiplier[selectedLifestyle];
+
+// Examples:
+// Low-cost + Essential:  $40,000 × 0.75 = $30,000/year
+// Medium + Comfort:      $60,000 × 1.00 = $60,000/year
+// High-cost + Luxury:    $90,000 × 1.50 = $135,000/year`}
+            </code>
+          </div>
+
+          <h4 className="text-xl font-semibold mb-3">Late-Life Reduction</h4>
+          <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
+            <code className="block whitespace-pre-wrap">
+{`// Optional expense reduction in later years (Step-Down)
+if (enableStepDown && age >= stepDownAge) {
+  adjustedExpenses = targetAnnualSpend * (1 - stepDownPercent / 100);
+}
+
+// Example: $60,000/year reduced by 20% at age 75 = $48,000/year`}
+            </code>
+          </div>
+
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+            <p className="font-semibold mb-2">Default Values (from Chris's Prototype):</p>
+            <ul className="list-disc pl-6 space-y-1 text-sm">
+              <li><strong>Tax Rate:</strong> 18% (corrected from 25%)</li>
+              <li><strong>Annual Expenses:</strong> $60,000 (corrected from $70,000)</li>
+              <li><strong>Active Return:</strong> 30% ROI</li>
+              <li><strong>Passive Yield:</strong> 12%</li>
+              <li><strong>Traditional Return:</strong> 7%</li>
+              <li><strong>Trading Cap:</strong> $200,000</li>
+              <li><strong>Yield Cap:</strong> 80%</li>
+            </ul>
+          </div>
+        </section>
+
+        {/* 9. Key Calculations */}
         <section id="formulas" className="mb-12 page-break-before">
-          <h2 className="text-3xl font-bold mb-6">8. Key Calculations and Formulas</h2>
+          <h2 className="text-3xl font-bold mb-6">9. Key Calculations and Formulas</h2>
           <p className="mb-4">
             This section provides complete, production-ready TypeScript code for all major calculations in the system. Each formula includes detailed comments, edge case handling, and numerical examples.
           </p>
 
-          <h3 className="text-2xl font-semibold mb-4">8.1 Transaction Classification (Complete)</h3>
+          <h3 className="text-2xl font-semibold mb-4">9.1 Transaction Classification (Complete)</h3>
           <p className="mb-4">
             The foundation of budget analysis: filtering operational income/expenses and categorizing into needs/wants/savings.
           </p>
@@ -1996,7 +2466,7 @@ newReadinessScore = recalculateReadiness({
             </code>
           </div>
 
-          <h3 className="text-2xl font-semibold mb-4 mt-8">8.2 Readiness Score Factors (Detailed)</h3>
+          <h3 className="text-2xl font-semibold mb-4 mt-8">9.2 Readiness Score Factors (Detailed)</h3>
           <p className="mb-4">
             Complete implementation of all 5 readiness factors with numerical examples.
           </p>
@@ -2181,7 +2651,7 @@ function calculateCapitalAvailabilityScore(
             </code>
           </div>
 
-          <h3 className="text-2xl font-semibold mb-4 mt-8">8.3 RPIC Calculations (Complete)</h3>
+          <h3 className="text-2xl font-semibold mb-4 mt-8">9.3 RPIC Calculations (Complete)</h3>
           <p className="mb-4">
             Full implementation of retirement passive income capital calculations with timeline projections.
           </p>
@@ -2296,7 +2766,7 @@ export function calculateRequiredMonthlyContribution(
             </code>
           </div>
 
-          <h3 className="text-2xl font-semibold mb-4 mt-8">8.4 Six-Month Plan Formulas (Summary)</h3>
+          <h3 className="text-2xl font-semibold mb-4 mt-8">9.4 Six-Month Plan Formulas (Summary)</h3>
           <p className="mb-4">
             Key calculations used in the Six-Month Plan Generator (see Section 7.3 for full algorithm).
           </p>
@@ -2354,7 +2824,7 @@ Month 4 - Salary Negotiation: $0-$500/month (variable)`}
             </div>
           </div>
 
-          <h3 className="text-2xl font-semibold mb-4 mt-8">8.5 Capital Allocation Waterfall</h3>
+          <h3 className="text-2xl font-semibold mb-4 mt-8">9.5 Capital Allocation Waterfall</h3>
           <p className="mb-4">
             Priority-based capital flow from liquid assets to investment accounts.
           </p>
@@ -2432,9 +2902,9 @@ Month 4 - Salary Negotiation: $0-$500/month (variable)`}
           </div>
         </section>
 
-        {/* 9. User Flow */}
+        {/* 10. User Flow */}
         <section id="user-flow" className="mb-12 page-break-before">
-          <h2 className="text-3xl font-bold mb-6">9. Typical User Flow</h2>
+          <h2 className="text-3xl font-bold mb-6">10. Typical User Flow</h2>
 
           <h3 className="text-2xl font-semibold mb-4">First Time (Onboarding)</h3>
           <ol className="list-decimal pl-6 mb-6 space-y-3">
@@ -2494,9 +2964,9 @@ Month 4 - Salary Negotiation: $0-$500/month (variable)`}
           </ul>
         </section>
 
-        {/* 10. Glossary */}
+        {/* 11. Glossary */}
         <section id="glossary" className="mb-12">
-          <h2 className="text-3xl font-bold mb-6">10. Glossary of Terms</h2>
+          <h2 className="text-3xl font-bold mb-6">11. Glossary of Terms</h2>
 
           <dl className="space-y-4">
             <div>
@@ -2626,6 +3096,20 @@ Month 4 - Salary Negotiation: $0-$500/month (variable)`}
             </div>
 
             <div>
+              <dt className="font-semibold text-lg mb-1">RPIC Score (Twin-Engine)</dt>
+              <dd className="text-muted-foreground">
+                Ratio of passive income to gross expenses. RPIC Score = (Passive Income / Gross Expenses) × 100. Freedom is achieved when RPIC Score ≥ 100%.
+              </dd>
+            </div>
+
+            <div>
+              <dt className="font-semibold text-lg mb-1">Ramp-Up Period</dt>
+              <dd className="text-muted-foreground">
+                Learning curve period in Twin-Engine projection where active trading ROI starts at 50% and scales linearly to 100% over a configurable number of years (default: 2 years).
+              </dd>
+            </div>
+
+            <div>
               <dt className="font-semibold text-lg mb-1">Six-Month Foundation Plan</dt>
               <dd className="text-muted-foreground">
                 Client-side generated 6-month financial improvement plan with specific monthly tasks (expense cuts, debt paydown, income boosts) tailored to the user's snapshot. Includes estimated dollar impacts, KPI tracking, and projected readiness score at completion.
@@ -2640,9 +3124,30 @@ Month 4 - Salary Negotiation: $0-$500/month (variable)`}
             </div>
 
             <div>
+              <dt className="font-semibold text-lg mb-1">Spillover</dt>
+              <dd className="text-muted-foreground">
+                In the Twin-Engine model, excess profits from the Active account that exceed the trading cap automatically "spill over" into the Passive account for income generation.
+              </dd>
+            </div>
+
+            <div>
               <dt className="font-semibold text-lg mb-1">Subcategory</dt>
               <dd className="text-muted-foreground">
                 Detailed transaction classification (groceries, transportation, healthcare, etc.) that maps to main categories (Need/Want/Saving).
+              </dd>
+            </div>
+
+            <div>
+              <dt className="font-semibold text-lg mb-1">Trading Cap</dt>
+              <dd className="text-muted-foreground">
+                Maximum size of the Active trading account in the Twin-Engine model (default: $200,000). When reached, excess profits spill over to the Passive account.
+              </dd>
+            </div>
+
+            <div>
+              <dt className="font-semibold text-lg mb-1">Twin-Engine Model</dt>
+              <dd className="text-muted-foreground">
+                Financial projection model that separates capital into two distinct pools: Active Engine (capped, high-return trading) and Passive Engine (uncapped, income-generating). Compares against a Traditional benchmark.
               </dd>
             </div>
 
@@ -2657,6 +3162,13 @@ Month 4 - Salary Negotiation: $0-$500/month (variable)`}
               <dt className="font-semibold text-lg mb-1">Wealth OS Hybrid Approach</dt>
               <dd className="text-muted-foreground">
                 Strategy combining traditional passive investments with active investments to achieve ~12% annual returns, requiring 67% less capital than traditional approaches.
+              </dd>
+            </div>
+
+            <div>
+              <dt className="font-semibold text-lg mb-1">Yield Cap</dt>
+              <dd className="text-muted-foreground">
+                Maximum percentage of passive income that can be withdrawn annually (default: 80%). Prevents over-withdrawal and ensures capital preservation during retirement.
               </dd>
             </div>
           </dl>
