@@ -1950,7 +1950,7 @@ taxRate: number;              // Income tax rate % (default: 18.0)`}
           <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
             <code className="block whitespace-pre-wrap">
 {`enableRampUp: boolean;        // Enable learning curve ROI ramp (default: false)
-rampUpDuration: number;       // Years to reach full ROI (default: 2)
+rampUpDuration: number;       // Months to reach full ROI (default: 24, step: 6)
 yieldCapPercent: number;      // Max withdrawal as % of yield (default: 80)
 retirementIncomeStartAge: number; // Age Social Security starts (default: 67)`}
             </code>
@@ -1979,16 +1979,35 @@ startYear: number;    // Projection start year (default: current year)`}
             The main calculation loop iterates year-by-year, applying the following logic:
           </p>
 
-          <h4 className="text-xl font-semibold mb-3">Step 0: Ramp-Up ROI (if enabled)</h4>
+          <h4 className="text-xl font-semibold mb-3">Step 0: Ramp-Up ROI with Blended Rate (if enabled)</h4>
           <div className="bg-muted p-4 rounded-lg font-mono text-sm mb-4">
             <code className="block whitespace-pre-wrap">
-{`// Learning curve: ROI starts at 50% and scales to 100% over rampUpDuration
+{`// Blended Rate Algorithm: Uses 6-month increments (rampUpDuration in months)
 let effectiveActiveReturn = activeReturn;
-if (enableRampUp && yearsIntoProjection < rampUpDuration) {
-  const rampFactor = 0.5 + (0.5 * (yearsIntoProjection / rampUpDuration));
-  effectiveActiveReturn = activeReturn * rampFactor;
+if (enableRampUp) {
+  const rampUpYears = rampUpDuration / 12; // Convert months to years
+  const yearStart = yearsIntoProjection;
+  const yearEnd = yearsIntoProjection + 1;
+  
+  if (yearEnd <= rampUpYears) {
+    // Entire year within ramp-up: average efficiency for this year
+    const startEfficiency = 0.5 + (0.5 * (yearStart / rampUpYears));
+    const endEfficiency = 0.5 + (0.5 * (yearEnd / rampUpYears));
+    effectiveActiveReturn = activeReturn * ((startEfficiency + endEfficiency) / 2);
+  } else if (yearStart >= rampUpYears) {
+    // After ramp-up: full ROI
+    effectiveActiveReturn = activeReturn;
+  } else {
+    // Blended year: part in ramp, part at full
+    const monthsInRamp = (rampUpYears - yearStart) * 12;
+    const monthsAtFull = 12 - monthsInRamp;
+    const avgRampEff = (0.5 + (0.5 * (yearStart / rampUpYears)) + 1.0) / 2;
+    effectiveActiveReturn = activeReturn * ((monthsInRamp * avgRampEff + monthsAtFull) / 12);
+  }
 }
-// Example: Year 1 of 2-year ramp = 75% of target ROI (22.5% if target is 30%)`}
+// Example: 18-month ramp with 30% target ROI
+// Year 1: avg efficiency ~62.5% → ~18.75% effective ROI
+// Year 2: blended (6mo ramp + 6mo full) → ~26.25% effective ROI`}
             </code>
           </div>
 

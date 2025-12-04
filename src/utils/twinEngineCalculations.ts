@@ -174,12 +174,37 @@ export function calculateTwinEngineProjection(settings: TwinEngineSettings): Twi
     const isActivePhase = year < stopActiveYear;
     const yearsIntoProjection = year - startYear;
 
-    // Calculate effective active return with ramp up
+    // Calculate effective active return with Blended Rate ramp up (using months)
     let effectiveActiveReturn = activeReturn;
-    if (enableRampUp && yearsIntoProjection < rampUpDuration) {
-      // Start at 50% of target ROI, scale linearly to 100%
-      const rampFactor = 0.5 + (0.5 * (yearsIntoProjection / rampUpDuration));
-      effectiveActiveReturn = activeReturn * rampFactor;
+    if (enableRampUp) {
+      const rampUpYears = rampUpDuration / 12; // Convert months to years
+      const yearStart = yearsIntoProjection;
+      const yearEnd = yearsIntoProjection + 1;
+      
+      if (yearEnd <= rampUpYears) {
+        // Entire year is within ramp-up period
+        // Average efficiency for this year: midpoint of year's ramp range
+        const startEfficiency = 0.5 + (0.5 * (yearStart / rampUpYears));
+        const endEfficiency = 0.5 + (0.5 * (yearEnd / rampUpYears));
+        const avgEfficiency = (startEfficiency + endEfficiency) / 2;
+        effectiveActiveReturn = activeReturn * avgEfficiency;
+      } else if (yearStart >= rampUpYears) {
+        // Entire year is after ramp-up - full ROI
+        effectiveActiveReturn = activeReturn;
+      } else {
+        // Blended year: part in ramp-up, part at full ROI
+        const monthsInRamp = (rampUpYears - yearStart) * 12;
+        const monthsAtFull = 12 - monthsInRamp;
+        
+        // Average efficiency during ramp portion
+        const rampStartEff = 0.5 + (0.5 * (yearStart / rampUpYears));
+        const rampEndEff = 1.0; // End of ramp = 100%
+        const avgRampEff = (rampStartEff + rampEndEff) / 2;
+        
+        // Blended rate: weighted average
+        const blendedEfficiency = (monthsInRamp * avgRampEff + monthsAtFull * 1.0) / 12;
+        effectiveActiveReturn = activeReturn * blendedEfficiency;
+      }
     }
 
     // 0. Expense Step Down Logic
@@ -444,7 +469,7 @@ export function getDefaultTwinEngineSettings(): TwinEngineSettings {
     activeCashOutPercent: 0,
     taxRate: 18.0,
     enableRampUp: false,
-    rampUpDuration: 2,
+    rampUpDuration: 24, // Default 24 months (2 years)
     yieldCapPercent: 80,
     withdrawalStrategy: 'freedom',
     customWithdrawalYear: currentYear + 10,

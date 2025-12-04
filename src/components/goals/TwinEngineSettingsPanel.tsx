@@ -299,11 +299,11 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
               label="Ramp Up Duration"
               value={settings.rampUpDuration}
               onChange={(val) => updateSetting('rampUpDuration', val)}
-              min={1}
-              max={5}
-              step={1}
-              suffix=" Years"
-              tooltip="How many years to reach full ROI target"
+              min={6}
+              max={60}
+              step={6}
+              suffix=" Months"
+              tooltip="How many months to reach full ROI target (6-month increments)"
             />
           )}
 

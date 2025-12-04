@@ -119,7 +119,7 @@ export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
                 <th className={cn(thClass, "text-center")}>Year</th>
                 <th className={cn(thClass, "text-center border-r")}>Age</th>
                 {/* Active Engine */}
-                <th className={cn(thClass, "text-right")}>Profit</th>
+                <th className={cn(thClass, "text-right")}>GROSS PROFIT</th>
                 <th className={cn(thClass, "text-right border-r")}>Spillover</th>
                 {/* Passive Engine */}
                 <th className={cn(thClass, "text-right")}>Balance</th>
