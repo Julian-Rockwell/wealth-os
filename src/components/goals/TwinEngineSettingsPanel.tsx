@@ -9,13 +9,12 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { 
   User, 
   TrendingUp, 
-  PieChart, 
-  LogOut, 
-  ArrowRight,
+  Wallet,
+  Clock,
+  Settings,
   ChevronDown,
   ChevronRight,
-  AlertCircle,
-  Zap
+  AlertCircle
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { TwinEngineSettings } from "@/utils/twinEngineCalculations";
@@ -130,11 +129,10 @@ function CollapsibleSection({ title, icon: Icon, isOpen, onToggle, colorClass = 
 export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngineSettingsPanelProps) {
   const [openSections, setOpenSections] = useState({
     foundation: true,
-    strategy: true,
-    advanced: false,
-    lifestyle: false,
-    withdrawal: false,
-    benchmark: false
+    activeTrading: true,
+    passiveIncome: false,
+    postRetirement: false,
+    advanced: false
   });
 
   const toggleSection = (section: keyof typeof openSections) => {
@@ -176,83 +174,6 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
             </div>
           </div>
 
-          <InputCurrency
-            label="Current Retirement (Passive)"
-            value={settings.savingsPassive}
-            onChange={(val) => updateSetting('savingsPassive', val)}
-          />
-          <InputCurrency
-            label="Initial Trading Alloc (Active)"
-            value={settings.savingsActive}
-            onChange={(val) => updateSetting('savingsActive', val)}
-          />
-          <InputCurrency
-            label="Monthly Contribution"
-            value={settings.monthlyContrib}
-            onChange={(val) => updateSetting('monthlyContrib', val)}
-          />
-        </CollapsibleSection>
-
-        {/* Wealth OS Strategy Section */}
-        <CollapsibleSection
-          title="Wealth OS Strategy"
-          icon={TrendingUp}
-          colorClass="text-green-600"
-          isOpen={openSections.strategy}
-          onToggle={() => toggleSection('strategy')}
-        >
-          <div className="bg-muted/50 p-3 rounded-lg space-y-1">
-            <div className="text-xs text-muted-foreground">Active Trading Strategy</div>
-          </div>
-
-          <InputSlider
-            label="Active Trading Duration"
-            value={settings.activeDuration}
-            onChange={(val) => updateSetting('activeDuration', val)}
-            min={1}
-            max={20}
-            step={1}
-            suffix=" Years"
-            tooltip="How many years you plan to actively trade"
-          />
-
-          <InputSlider
-            label="Active Cash Out %"
-            value={settings.activeCashOutPercent}
-            onChange={(val) => updateSetting('activeCashOutPercent', val)}
-            min={0}
-            max={100}
-            step={5}
-            suffix="%"
-            tooltip="Percentage of active account to cash out when transitioning to passive"
-          />
-
-          <InputCurrency
-            label="Trading Account Cap"
-            value={settings.tradingCap}
-            onChange={(val) => updateSetting('tradingCap', val)}
-          />
-
-          <InputSlider
-            label="Active ROI"
-            value={settings.activeReturn}
-            onChange={(val) => updateSetting('activeReturn', val)}
-            min={5}
-            max={60}
-            step={1}
-            suffix="%"
-          />
-
-          <InputSlider
-            label="Passive Yield"
-            value={settings.passiveYield}
-            onChange={(val) => updateSetting('passiveYield', val)}
-            min={2}
-            max={20}
-            step={0.5}
-            suffix="%"
-          />
-
           <InputSlider
             label="Est. Tax Rate"
             value={settings.taxRate}
@@ -265,18 +186,46 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
           />
         </CollapsibleSection>
 
-        {/* Advanced Settings Section (NEW) */}
+        {/* Active Trading Section */}
         <CollapsibleSection
-          title="Advanced Settings"
-          icon={Zap}
-          colorClass="text-amber-600"
-          isOpen={openSections.advanced}
-          onToggle={() => toggleSection('advanced')}
+          title="Active Trading"
+          icon={TrendingUp}
+          colorClass="text-green-600"
+          isOpen={openSections.activeTrading}
+          onToggle={() => toggleSection('activeTrading')}
         >
-          {/* Ramp Up */}
+          <InputCurrency
+            label="Initial Trading Alloc (Active)"
+            value={settings.savingsActive}
+            onChange={(val) => updateSetting('savingsActive', val)}
+          />
+
+          <InputCurrency
+            label="Trading Account Cap"
+            value={settings.tradingCap}
+            onChange={(val) => updateSetting('tradingCap', val)}
+          />
+
+          <InputCurrency
+            label="Monthly Contribution"
+            value={settings.monthlyContrib}
+            onChange={(val) => updateSetting('monthlyContrib', val)}
+          />
+
+          <InputSlider
+            label="Active ROI"
+            value={settings.activeReturn}
+            onChange={(val) => updateSetting('activeReturn', val)}
+            min={5}
+            max={60}
+            step={1}
+            suffix="%"
+          />
+
+          {/* Simulate Learning Curve (Ramp Up) */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
-              <Label className="text-sm text-muted-foreground">Enable Ramp Up</Label>
+              <Label className="text-sm text-muted-foreground">Simulate Learning Curve</Label>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
@@ -306,22 +255,52 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
               tooltip="How many months to reach full ROI target (6-month increments)"
             />
           )}
+        </CollapsibleSection>
 
-          {/* Yield Cap */}
-          <InputSlider
-            label="Yield Cap %"
-            value={settings.yieldCapPercent}
-            onChange={(val) => updateSetting('yieldCapPercent', val)}
-            min={50}
-            max={100}
-            step={5}
-            suffix="%"
-            tooltip="Maximum percentage of passive yield that can be withdrawn. Protects principal."
+        {/* Passive Income Section */}
+        <CollapsibleSection
+          title="Passive Income"
+          icon={Wallet}
+          colorClass="text-cyan-600"
+          isOpen={openSections.passiveIncome}
+          onToggle={() => toggleSection('passiveIncome')}
+        >
+          <InputCurrency
+            label="Current Retirement (Passive)"
+            value={settings.savingsPassive}
+            onChange={(val) => updateSetting('savingsPassive', val)}
           />
 
-          {/* Retirement Income Start Age */}
           <InputSlider
-            label="Retirement Income Start Age"
+            label="Passive Yield"
+            value={settings.passiveYield}
+            onChange={(val) => updateSetting('passiveYield', val)}
+            min={2}
+            max={20}
+            step={0.5}
+            suffix="%"
+          />
+        </CollapsibleSection>
+
+        {/* Post Retirement Section */}
+        <CollapsibleSection
+          title="Post Retirement"
+          icon={Clock}
+          colorClass="text-orange-600"
+          isOpen={openSections.postRetirement}
+          onToggle={() => toggleSection('postRetirement')}
+        >
+          <InputCurrency
+            label="Post-Retirement Income (Mo)"
+            value={settings.retirementIncome}
+            onChange={(val) => updateSetting('retirementIncome', val)}
+          />
+          <p className="text-xs text-muted-foreground">
+            Social Security, Pension, etc. (Offsets Withdrawal need)
+          </p>
+
+          <InputSlider
+            label="Income Start Age"
             value={settings.retirementIncomeStartAge}
             onChange={(val) => updateSetting('retirementIncomeStartAge', val)}
             min={55}
@@ -332,14 +311,57 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
           />
         </CollapsibleSection>
 
-        {/* Withdrawal Plan Section */}
+        {/* Advanced Settings Section */}
         <CollapsibleSection
-          title="Withdrawal Plan"
-          icon={LogOut}
-          colorClass="text-orange-600"
-          isOpen={openSections.withdrawal}
-          onToggle={() => toggleSection('withdrawal')}
+          title="Advanced Settings"
+          icon={Settings}
+          colorClass="text-muted-foreground"
+          isOpen={openSections.advanced}
+          onToggle={() => toggleSection('advanced')}
         >
+          <InputSlider
+            label="Inflation Assumption"
+            value={settings.inflationRate}
+            onChange={(val) => updateSetting('inflationRate', val)}
+            min={0}
+            max={10}
+            step={0.5}
+            suffix="%"
+          />
+
+          <InputSlider
+            label="Traditional Market Return"
+            value={settings.tradReturn}
+            onChange={(val) => updateSetting('tradReturn', val)}
+            min={2}
+            max={12}
+            step={0.5}
+            suffix="%"
+          />
+
+          <InputSlider
+            label="Active Trading Duration"
+            value={settings.activeDuration}
+            onChange={(val) => updateSetting('activeDuration', val)}
+            min={1}
+            max={20}
+            step={1}
+            suffix=" Years"
+            tooltip="How many years you plan to actively trade"
+          />
+
+          <InputSlider
+            label="Active Cash Out %"
+            value={settings.activeCashOutPercent}
+            onChange={(val) => updateSetting('activeCashOutPercent', val)}
+            min={0}
+            max={100}
+            step={5}
+            suffix="%"
+            tooltip="Percentage of active account to cash out when transitioning to passive"
+          />
+
+          {/* Withdrawal Strategy */}
           <div className="space-y-2">
             <Label className="text-sm text-muted-foreground">Withdrawal Strategy</Label>
             <Select
@@ -375,40 +397,26 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
             </>
           )}
 
-          <InputCurrency
-            label="Post-Retirement Income (Mo)"
-            value={settings.retirementIncome}
-            onChange={(val) => updateSetting('retirementIncome', val)}
+          {/* Yield Cap */}
+          <InputSlider
+            label="Yield Cap %"
+            value={settings.yieldCapPercent}
+            onChange={(val) => updateSetting('yieldCapPercent', val)}
+            min={50}
+            max={100}
+            step={5}
+            suffix="%"
+            tooltip="Maximum percentage of passive yield that can be withdrawn. Protects principal."
           />
-          <p className="text-xs text-muted-foreground">
-            Social Security, Pension, etc. (Offsets Withdrawal need)
-          </p>
-        </CollapsibleSection>
 
-        {/* Goal & Lifestyle Section */}
-        <CollapsibleSection
-          title="Goal & Lifestyle"
-          icon={PieChart}
-          colorClass="text-purple-600"
-          isOpen={openSections.lifestyle}
-          onToggle={() => toggleSection('lifestyle')}
-        >
+          {/* Annual Cost of Living */}
           <InputCurrency
             label="Annual Cost of Living"
             value={settings.annualExpenses}
             onChange={(val) => updateSetting('annualExpenses', val)}
           />
 
-          <InputSlider
-            label="Inflation Assumption"
-            value={settings.inflationRate}
-            onChange={(val) => updateSetting('inflationRate', val)}
-            min={0}
-            max={10}
-            step={0.5}
-            suffix="%"
-          />
-
+          {/* Late Life Step Down */}
           <div className="flex items-center justify-between">
             <Label className="text-sm text-muted-foreground">Late Life Step Down</Label>
             <Switch
@@ -439,25 +447,6 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
               />
             </>
           )}
-        </CollapsibleSection>
-
-        {/* Benchmark Section */}
-        <CollapsibleSection
-          title="Benchmark"
-          icon={ArrowRight}
-          colorClass="text-muted-foreground"
-          isOpen={openSections.benchmark}
-          onToggle={() => toggleSection('benchmark')}
-        >
-          <InputSlider
-            label="Traditional Market Return"
-            value={settings.tradReturn}
-            onChange={(val) => updateSetting('tradReturn', val)}
-            min={2}
-            max={12}
-            step={0.5}
-            suffix="%"
-          />
         </CollapsibleSection>
       </CardContent>
     </Card>

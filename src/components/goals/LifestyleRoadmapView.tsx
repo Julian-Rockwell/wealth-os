@@ -85,7 +85,16 @@ export function LifestyleRoadmapView({ milestones, settings, onSettingsChange }:
   const initial = getInitialSelections();
   const [selectedGeography, setSelectedGeography] = useState<GeographyType>(initial.geo);
   const [selectedLifestyle, setSelectedLifestyle] = useState<LifestyleType>(initial.life);
-  const [lateLifeReduction, setLateLifeReduction] = useState(false);
+  // Initialize from settings.enableStepDown
+  const [lateLifeReduction, setLateLifeReduction] = useState(settings.enableStepDown ?? false);
+  
+  // Handle late life reduction toggle - sync with settings
+  const handleLateLifeChange = (checked: boolean) => {
+    setLateLifeReduction(checked);
+    if (onSettingsChange) {
+      onSettingsChange({ enableStepDown: checked });
+    }
+  };
   
   // Calculate target annual spend based on selections
   const geoOption = geographyOptions.find(g => g.id === selectedGeography)!;
@@ -300,15 +309,51 @@ export function LifestyleRoadmapView({ milestones, settings, onSettingsChange }:
           </div>
 
           {/* Late Life Planning */}
-          <div className="flex items-center space-x-2 p-3 bg-muted/50 rounded-lg">
-            <Checkbox 
-              id="lateLife" 
-              checked={lateLifeReduction}
-              onCheckedChange={(checked) => setLateLifeReduction(checked === true)}
-            />
-            <Label htmlFor="lateLife" className="text-sm cursor-pointer">
-              Reduce Expenses in Late Retirement?
-            </Label>
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2 p-3 bg-muted/50 rounded-lg">
+              <Checkbox 
+                id="lateLife" 
+                checked={lateLifeReduction}
+                onCheckedChange={(checked) => handleLateLifeChange(checked === true)}
+              />
+              <Label htmlFor="lateLife" className="text-sm cursor-pointer">
+                Reduce Expenses in Late Retirement?
+              </Label>
+            </div>
+            
+            {/* Show Step Down controls when enabled */}
+            {lateLifeReduction && (
+              <div className="space-y-4 p-3 bg-muted/30 rounded-lg border border-border/50">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm text-muted-foreground">Step Down Age</Label>
+                    <span className="text-sm font-medium">{settings.stepDownAge} yo</span>
+                  </div>
+                  <Slider
+                    value={[settings.stepDownAge]}
+                    onValueChange={(values) => onSettingsChange?.({ stepDownAge: values[0] })}
+                    min={60}
+                    max={90}
+                    step={1}
+                    className="w-full"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm text-muted-foreground">Expense Reduction</Label>
+                    <span className="text-sm font-medium">{settings.stepDownPercent}%</span>
+                  </div>
+                  <Slider
+                    value={[settings.stepDownPercent]}
+                    onValueChange={(values) => onSettingsChange?.({ stepDownPercent: values[0] })}
+                    min={5}
+                    max={50}
+                    step={5}
+                    className="w-full"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Current Configuration Summary */}
