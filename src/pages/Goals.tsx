@@ -411,6 +411,7 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
                     <LifestyleRoadmapView 
                       milestones={twinEngineResult.milestones}
                       settings={projectionSettings}
+                      onSettingsChange={(updates) => setProjectionSettings({ ...projectionSettings, ...updates })}
                     />
                   )}
                   
