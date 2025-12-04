@@ -346,49 +346,52 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
               {/* KPI Header */}
               <TwinEngineKPIHeader kpis={twinEngineKPIs} />
 
-              {/* Settings + Content */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Settings Panel - Always visible */}
-                <div className="lg:col-span-1">
-                  <TwinEngineSettingsPanel
-                    settings={projectionSettings}
-                    onSettingsChange={setProjectionSettings}
-                  />
-                </div>
+              {/* Toggle Buttons - Reordered: Dashboard, Data Grid, Lifestyle Roadmap */}
+              <div className="flex justify-start">
+                <ToggleGroup 
+                  type="single" 
+                  value={projectionView} 
+                  onValueChange={(v) => v && setProjectionView(v as 'dashboard' | 'roadmap' | 'datagrid')}
+                  className="bg-muted p-1 rounded-lg"
+                >
+                  <ToggleGroupItem 
+                    value="dashboard" 
+                    className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-4 py-2 rounded-md"
+                  >
+                    <LayoutDashboard className="w-4 h-4 mr-2" />
+                    Dashboard
+                  </ToggleGroupItem>
+                  <ToggleGroupItem 
+                    value="datagrid" 
+                    className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-4 py-2 rounded-md"
+                  >
+                    <Table2 className="w-4 h-4 mr-2" />
+                    Data Grid
+                  </ToggleGroupItem>
+                  <ToggleGroupItem 
+                    value="roadmap" 
+                    className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-4 py-2 rounded-md"
+                  >
+                    <MapPinned className="w-4 h-4 mr-2" />
+                    Lifestyle Roadmap
+                  </ToggleGroupItem>
+                </ToggleGroup>
+              </div>
 
-                {/* Right Column - Toggle between Dashboard, Roadmap, and Data Grid */}
-                <div className="lg:col-span-2 space-y-6">
-                  {/* Toggle Buttons - Now with 3 options */}
-                  <div className="flex justify-start">
-                    <ToggleGroup 
-                      type="single" 
-                      value={projectionView} 
-                      onValueChange={(v) => v && setProjectionView(v as 'dashboard' | 'roadmap' | 'datagrid')}
-                      className="bg-muted p-1 rounded-lg"
-                    >
-                      <ToggleGroupItem 
-                        value="dashboard" 
-                        className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-4 py-2 rounded-md"
-                      >
-                        <LayoutDashboard className="w-4 h-4 mr-2" />
-                        Dashboard
-                      </ToggleGroupItem>
-                      <ToggleGroupItem 
-                        value="roadmap" 
-                        className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-4 py-2 rounded-md"
-                      >
-                        <MapPinned className="w-4 h-4 mr-2" />
-                        Lifestyle Roadmap
-                      </ToggleGroupItem>
-                      <ToggleGroupItem 
-                        value="datagrid" 
-                        className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-4 py-2 rounded-md"
-                      >
-                        <Table2 className="w-4 h-4 mr-2" />
-                        Data Grid
-                      </ToggleGroupItem>
-                    </ToggleGroup>
+              {/* Settings + Content - Conditional layout based on view */}
+              <div className={`grid grid-cols-1 ${projectionView !== 'roadmap' ? 'lg:grid-cols-3' : ''} gap-6`}>
+                {/* Settings Panel - Hidden in roadmap view */}
+                {projectionView !== 'roadmap' && (
+                  <div className="lg:col-span-1">
+                    <TwinEngineSettingsPanel
+                      settings={projectionSettings}
+                      onSettingsChange={setProjectionSettings}
+                    />
                   </div>
+                )}
+
+                {/* Content Column - Full width in roadmap, 2/3 otherwise */}
+                <div className={`${projectionView !== 'roadmap' ? 'lg:col-span-2' : ''} space-y-6`}>
 
                   {/* Conditional Content */}
                   {projectionView === 'dashboard' && (
@@ -407,18 +410,18 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
                     </>
                   )}
                   
+                  {projectionView === 'datagrid' && (
+                    <TwinEngineTable 
+                      data={twinEngineResult.rows}
+                      settings={projectionSettings}
+                    />
+                  )}
+
                   {projectionView === 'roadmap' && (
                     <LifestyleRoadmapView 
                       milestones={twinEngineResult.milestones}
                       settings={projectionSettings}
                       onSettingsChange={(updates) => setProjectionSettings({ ...projectionSettings, ...updates })}
-                    />
-                  )}
-                  
-                  {projectionView === 'datagrid' && (
-                    <TwinEngineTable 
-                      data={twinEngineResult.rows}
-                      settings={projectionSettings}
                     />
                   )}
                 </div>
