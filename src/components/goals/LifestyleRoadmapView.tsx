@@ -1,19 +1,28 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { 
   MapPin, 
   Home, 
+  Building2,
   Plane, 
   DollarSign,
   CheckCircle2,
   Circle,
-  Milestone
+  Milestone,
+  Sparkles,
+  Crown,
+  Wallet
 } from "lucide-react";
 import type { TwinEngineMilestones, TwinEngineSettings } from "@/utils/twinEngineCalculations";
 
 interface LifestyleRoadmapViewProps {
   milestones: TwinEngineMilestones;
   settings: TwinEngineSettings;
+  onSettingsChange?: (updates: Partial<TwinEngineSettings>) => void;
 }
 
 const formatMoney = (value: number) => {
@@ -22,45 +31,22 @@ const formatMoney = (value: number) => {
   return `$${value.toFixed(0)}`;
 };
 
-interface LifestylePreset {
-  id: string;
-  name: string;
-  icon: React.ElementType;
-  description: string;
-  geographyCost: number;
-  lifestyleTier: string;
-  annualExpenses: number;
-}
+// Geography Cost options
+const geographyOptions = [
+  { id: 'low', label: 'Low Cost', icon: Home, baseAmount: 40000, description: 'LCOL areas' },
+  { id: 'medium', label: 'Medium', icon: Building2, baseAmount: 60000, description: 'MCOL areas' },
+  { id: 'high', label: 'High Cost', icon: Plane, baseAmount: 90000, description: 'HCOL areas' }
+] as const;
 
-const lifestylePresets: LifestylePreset[] = [
-  {
-    id: 'frugal_lcol',
-    name: 'Frugal in LCOL',
-    icon: Home,
-    description: 'Low cost of living area, minimal expenses',
-    geographyCost: 0.7,
-    lifestyleTier: 'Basic',
-    annualExpenses: 36000
-  },
-  {
-    id: 'comfortable_mcol',
-    name: 'Comfortable in MCOL',
-    icon: MapPin,
-    description: 'Mid-cost area with balanced lifestyle',
-    geographyCost: 1.0,
-    lifestyleTier: 'Comfortable',
-    annualExpenses: 60000
-  },
-  {
-    id: 'premium_hcol',
-    name: 'Premium in HCOL',
-    icon: Plane,
-    description: 'High cost area with premium lifestyle',
-    geographyCost: 1.5,
-    lifestyleTier: 'Premium',
-    annualExpenses: 120000
-  }
-];
+// Lifestyle Tier options
+const lifestyleOptions = [
+  { id: 'essential', label: 'Essential', icon: Wallet, multiplier: 0.75, description: 'Basic needs' },
+  { id: 'comfort', label: 'Comfort', icon: Sparkles, multiplier: 1.0, description: 'Balanced life' },
+  { id: 'luxury', label: 'Luxury', icon: Crown, multiplier: 1.5, description: 'Premium living' }
+] as const;
+
+type GeographyType = typeof geographyOptions[number]['id'];
+type LifestyleType = typeof lifestyleOptions[number]['id'];
 
 interface MilestoneItem {
   year: number | null;
@@ -72,8 +58,54 @@ interface MilestoneItem {
   achieved: boolean;
 }
 
-export function LifestyleRoadmapView({ milestones, settings }: LifestyleRoadmapViewProps) {
+export function LifestyleRoadmapView({ milestones, settings, onSettingsChange }: LifestyleRoadmapViewProps) {
   const currentYear = new Date().getFullYear();
+  
+  // Determine initial selections based on current annualExpenses
+  const getInitialSelections = () => {
+    const currentExpenses = settings.annualExpenses;
+    let bestGeo: GeographyType = 'medium';
+    let bestLife: LifestyleType = 'comfort';
+    let minDiff = Infinity;
+    
+    for (const geo of geographyOptions) {
+      for (const life of lifestyleOptions) {
+        const calculated = geo.baseAmount * life.multiplier;
+        const diff = Math.abs(calculated - currentExpenses);
+        if (diff < minDiff) {
+          minDiff = diff;
+          bestGeo = geo.id;
+          bestLife = life.id;
+        }
+      }
+    }
+    return { geo: bestGeo, life: bestLife };
+  };
+  
+  const initial = getInitialSelections();
+  const [selectedGeography, setSelectedGeography] = useState<GeographyType>(initial.geo);
+  const [selectedLifestyle, setSelectedLifestyle] = useState<LifestyleType>(initial.life);
+  const [lateLifeReduction, setLateLifeReduction] = useState(false);
+  
+  // Calculate target annual spend based on selections
+  const geoOption = geographyOptions.find(g => g.id === selectedGeography)!;
+  const lifeOption = lifestyleOptions.find(l => l.id === selectedLifestyle)!;
+  const calculatedExpenses = Math.round(geoOption.baseAmount * lifeOption.multiplier);
+  
+  const [targetAnnualSpend, setTargetAnnualSpend] = useState(calculatedExpenses);
+  
+  // Update target when selections change
+  useEffect(() => {
+    const newCalculated = Math.round(geoOption.baseAmount * lifeOption.multiplier);
+    setTargetAnnualSpend(newCalculated);
+  }, [selectedGeography, selectedLifestyle, geoOption.baseAmount, lifeOption.multiplier]);
+  
+  // Propagate changes to parent
+  useEffect(() => {
+    if (onSettingsChange && targetAnnualSpend !== settings.annualExpenses) {
+      onSettingsChange({ annualExpenses: targetAnnualSpend });
+    }
+  }, [targetAnnualSpend, onSettingsChange, settings.annualExpenses]);
   
   // Build milestone timeline items
   const milestoneItems: MilestoneItem[] = [
@@ -179,72 +211,127 @@ export function LifestyleRoadmapView({ milestones, settings }: LifestyleRoadmapV
             Lifestyle Design
           </CardTitle>
           <CardDescription>
-            Choose a lifestyle preset to see how it affects your projection
+            Select your geography cost and lifestyle tier
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Current Settings Display */}
-          <div className="bg-muted/50 p-4 rounded-lg space-y-3">
-            <div className="text-sm font-medium">Current Configuration</div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-muted-foreground">Annual Expenses</p>
-                <p className="text-lg font-semibold">{formatMoney(settings.annualExpenses)}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Monthly Need</p>
-                <p className="text-lg font-semibold">{formatMoney(settings.annualExpenses / 12)}</p>
-              </div>
+        <CardContent className="space-y-6">
+          {/* Geography Cost */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">GEOGRAPHY COST</Label>
+            <div className="grid grid-cols-3 gap-2">
+              {geographyOptions.map((option) => {
+                const Icon = option.icon;
+                const isSelected = selectedGeography === option.id;
+                
+                return (
+                  <button
+                    key={option.id}
+                    onClick={() => setSelectedGeography(option.id)}
+                    className={`p-3 rounded-lg border-2 transition-all text-center ${
+                      isSelected 
+                        ? 'border-primary bg-primary/10' 
+                        : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                    }`}
+                  >
+                    <Icon className={`w-5 h-5 mx-auto mb-1 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <div className={`text-sm font-medium ${isSelected ? 'text-primary' : ''}`}>
+                      {option.label}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {formatMoney(option.baseAmount)}/yr
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Lifestyle Presets */}
+          {/* Lifestyle Tier */}
           <div className="space-y-3">
-            <div className="text-sm font-medium">Quick Presets</div>
-            {lifestylePresets.map((preset) => {
-              const Icon = preset.icon;
-              const isActive = Math.abs(settings.annualExpenses - preset.annualExpenses) < 1000;
-              
-              return (
-                <div
-                  key={preset.id}
-                  className={`p-4 rounded-lg border-2 transition-colors cursor-pointer ${
-                    isActive 
-                      ? 'border-primary bg-primary/5' 
-                      : 'border-border hover:border-primary/50'
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className={`p-2 rounded-full ${isActive ? 'bg-primary/20' : 'bg-muted'}`}>
-                      <Icon className={`w-4 h-4 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
+            <Label className="text-sm font-medium">LIFESTYLE TIER</Label>
+            <div className="grid grid-cols-3 gap-2">
+              {lifestyleOptions.map((option) => {
+                const Icon = option.icon;
+                const isSelected = selectedLifestyle === option.id;
+                
+                return (
+                  <button
+                    key={option.id}
+                    onClick={() => setSelectedLifestyle(option.id)}
+                    className={`p-3 rounded-lg border-2 transition-all text-center ${
+                      isSelected 
+                        ? 'border-primary bg-primary/10' 
+                        : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                    }`}
+                  >
+                    <Icon className={`w-5 h-5 mx-auto mb-1 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <div className={`text-sm font-medium ${isSelected ? 'text-primary' : ''}`}>
+                      {option.label}
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">{preset.name}</span>
-                        <Badge variant={isActive ? "default" : "secondary"}>
-                          {formatMoney(preset.annualExpenses)}/yr
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">{preset.description}</p>
-                      <div className="flex gap-2 mt-2">
-                        <Badge variant="outline" className="text-xs">
-                          {preset.lifestyleTier}
-                        </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          {preset.geographyCost}x cost
-                        </Badge>
-                      </div>
+                    <div className="text-xs text-muted-foreground">
+                      {option.multiplier}x
                     </div>
-                  </div>
-                </div>
-              );
-            })}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Geography Info */}
-          <div className="text-xs text-muted-foreground mt-4 p-3 bg-muted/30 rounded-lg">
-            <strong>Tip:</strong> Adjust your annual expenses in the Settings panel to match your target lifestyle. 
-            Consider geographic arbitrage for faster financial freedom.
+          {/* Target Annual Spend Slider */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium">TARGET ANNUAL SPEND</Label>
+              <span className="text-lg font-semibold text-primary">
+                {formatMoney(targetAnnualSpend)}
+              </span>
+            </div>
+            <Slider
+              value={[targetAnnualSpend]}
+              onValueChange={(values) => setTargetAnnualSpend(values[0])}
+              min={20000}
+              max={200000}
+              step={5000}
+              className="w-full"
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>$20k</span>
+              <span>$200k</span>
+            </div>
+          </div>
+
+          {/* Late Life Planning */}
+          <div className="flex items-center space-x-2 p-3 bg-muted/50 rounded-lg">
+            <Checkbox 
+              id="lateLife" 
+              checked={lateLifeReduction}
+              onCheckedChange={(checked) => setLateLifeReduction(checked === true)}
+            />
+            <Label htmlFor="lateLife" className="text-sm cursor-pointer">
+              Reduce Expenses in Late Retirement?
+            </Label>
+          </div>
+
+          {/* Current Configuration Summary */}
+          <div className="bg-primary/5 border border-primary/20 p-4 rounded-lg space-y-2">
+            <div className="text-sm font-medium text-primary">Your Configuration</div>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="text-xs text-muted-foreground">Geography</p>
+                <p className="font-medium">{geoOption.label}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Lifestyle</p>
+                <p className="font-medium">{lifeOption.label}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Annual</p>
+                <p className="font-medium">{formatMoney(targetAnnualSpend)}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Monthly</p>
+                <p className="font-medium">{formatMoney(targetAnnualSpend / 12)}</p>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
