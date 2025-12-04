@@ -415,38 +415,6 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
             value={settings.annualExpenses}
             onChange={(val) => updateSetting('annualExpenses', val)}
           />
-
-          {/* Late Life Step Down */}
-          <div className="flex items-center justify-between">
-            <Label className="text-sm text-muted-foreground">Late Life Step Down</Label>
-            <Switch
-              checked={settings.enableStepDown}
-              onCheckedChange={(val) => updateSetting('enableStepDown', val)}
-            />
-          </div>
-
-          {settings.enableStepDown && (
-            <>
-              <InputSlider
-                label="Step Down Age"
-                value={settings.stepDownAge}
-                onChange={(val) => updateSetting('stepDownAge', val)}
-                min={60}
-                max={90}
-                step={1}
-                suffix=" yo"
-              />
-              <InputSlider
-                label="Expense Reduction"
-                value={settings.stepDownPercent}
-                onChange={(val) => updateSetting('stepDownPercent', val)}
-                min={5}
-                max={50}
-                step={5}
-                suffix="%"
-              />
-            </>
-          )}
         </CollapsibleSection>
       </CardContent>
     </Card>
