@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useFinancialData } from "@/contexts/FinancialDataContext";
-import { Target, LayoutDashboard, Table2 } from "lucide-react";
+import { Target, LayoutDashboard, Table2, MapPinned } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { ExpenseBaselineCard } from "@/components/goals/ExpenseBaselineCard";
 import { GoalQuestionsCard } from "@/components/goals/GoalQuestionsCard";
@@ -14,6 +14,7 @@ import { TwinEngineKPIHeader } from "@/components/goals/TwinEngineKPIHeader";
 import { TwinEngineChart } from "@/components/goals/TwinEngineChart";
 import { TwinEngineTable } from "@/components/goals/TwinEngineTable";
 import { StrategicRoadmap } from "@/components/goals/StrategicRoadmap";
+import { LifestyleRoadmapView } from "@/components/goals/LifestyleRoadmapView";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -126,8 +127,8 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
     setInflation(3);
   };
 
-  // Projection view toggle state
-  const [projectionView, setProjectionView] = useState<'dashboard' | 'datagrid'>('dashboard');
+  // Projection view toggle state - now includes 'roadmap'
+  const [projectionView, setProjectionView] = useState<'dashboard' | 'roadmap' | 'datagrid'>('dashboard');
 
   // Twin-Engine projection calculations
   const twinEngineResult = useMemo(() => {
@@ -355,14 +356,14 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
                   />
                 </div>
 
-                {/* Right Column - Toggle between Dashboard and Data Grid */}
+                {/* Right Column - Toggle between Dashboard, Roadmap, and Data Grid */}
                 <div className="lg:col-span-2 space-y-6">
-                  {/* Toggle Buttons */}
+                  {/* Toggle Buttons - Now with 3 options */}
                   <div className="flex justify-start">
                     <ToggleGroup 
                       type="single" 
                       value={projectionView} 
-                      onValueChange={(v) => v && setProjectionView(v as 'dashboard' | 'datagrid')}
+                      onValueChange={(v) => v && setProjectionView(v as 'dashboard' | 'roadmap' | 'datagrid')}
                       className="bg-muted p-1 rounded-lg"
                     >
                       <ToggleGroupItem 
@@ -371,6 +372,13 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
                       >
                         <LayoutDashboard className="w-4 h-4 mr-2" />
                         Dashboard
+                      </ToggleGroupItem>
+                      <ToggleGroupItem 
+                        value="roadmap" 
+                        className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-4 py-2 rounded-md"
+                      >
+                        <MapPinned className="w-4 h-4 mr-2" />
+                        Lifestyle Roadmap
                       </ToggleGroupItem>
                       <ToggleGroupItem 
                         value="datagrid" 
@@ -383,7 +391,7 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
                   </div>
 
                   {/* Conditional Content */}
-                  {projectionView === 'dashboard' ? (
+                  {projectionView === 'dashboard' && (
                     <>
                       {/* Chart */}
                       <TwinEngineChart 
@@ -397,8 +405,16 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
                         settings={projectionSettings}
                       />
                     </>
-                  ) : (
-                    /* Detailed Table */
+                  )}
+                  
+                  {projectionView === 'roadmap' && (
+                    <LifestyleRoadmapView 
+                      milestones={twinEngineResult.milestones}
+                      settings={projectionSettings}
+                    />
+                  )}
+                  
+                  {projectionView === 'datagrid' && (
                     <TwinEngineTable 
                       data={twinEngineResult.rows}
                       settings={projectionSettings}

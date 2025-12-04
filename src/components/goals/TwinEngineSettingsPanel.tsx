@@ -14,7 +14,8 @@ import {
   ArrowRight,
   ChevronDown,
   ChevronRight,
-  AlertCircle
+  AlertCircle,
+  Zap
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { TwinEngineSettings } from "@/utils/twinEngineCalculations";
@@ -130,6 +131,7 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
   const [openSections, setOpenSections] = useState({
     foundation: true,
     strategy: true,
+    advanced: false,
     lifestyle: false,
     withdrawal: false,
     benchmark: false
@@ -260,6 +262,73 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
             step={1}
             suffix="%"
             tooltip="Estimated tax rate on trading profits and withdrawals"
+          />
+        </CollapsibleSection>
+
+        {/* Advanced Settings Section (NEW) */}
+        <CollapsibleSection
+          title="Advanced Settings"
+          icon={Zap}
+          colorClass="text-amber-600"
+          isOpen={openSections.advanced}
+          onToggle={() => toggleSection('advanced')}
+        >
+          {/* Ramp Up */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1">
+              <Label className="text-sm text-muted-foreground">Enable Ramp Up</Label>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <AlertCircle className="w-3 h-3 text-muted-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs text-xs">Start at 50% ROI and scale up linearly over the ramp-up period</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            <Switch
+              checked={settings.enableRampUp}
+              onCheckedChange={(val) => updateSetting('enableRampUp', val)}
+            />
+          </div>
+
+          {settings.enableRampUp && (
+            <InputSlider
+              label="Ramp Up Duration"
+              value={settings.rampUpDuration}
+              onChange={(val) => updateSetting('rampUpDuration', val)}
+              min={1}
+              max={5}
+              step={1}
+              suffix=" Years"
+              tooltip="How many years to reach full ROI target"
+            />
+          )}
+
+          {/* Yield Cap */}
+          <InputSlider
+            label="Yield Cap %"
+            value={settings.yieldCapPercent}
+            onChange={(val) => updateSetting('yieldCapPercent', val)}
+            min={50}
+            max={100}
+            step={5}
+            suffix="%"
+            tooltip="Maximum percentage of passive yield that can be withdrawn. Protects principal."
+          />
+
+          {/* Retirement Income Start Age */}
+          <InputSlider
+            label="Retirement Income Start Age"
+            value={settings.retirementIncomeStartAge}
+            onChange={(val) => updateSetting('retirementIncomeStartAge', val)}
+            min={55}
+            max={75}
+            step={1}
+            suffix=" yo"
+            tooltip="Age when Social Security or pension income begins"
           />
         </CollapsibleSection>
 
