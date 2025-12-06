@@ -8,14 +8,12 @@ interface TwinEngineTableProps {
   settings: TwinEngineSettings;
 }
 
-const formatMoney = (value: number) => {
+// Condensed money format: $20,000 -> $20k, $1,186,229 -> $1.19M
+const formatMoneyCondensed = (value: number) => {
   if (value === 0) return '-';
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(value);
+  if (value >= 1000000) return `$${(value / 1000000).toFixed(2)}M`;
+  if (value >= 1000) return `$${Math.round(value / 1000)}k`;
+  return `$${Math.round(value)}`;
 };
 
 export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
@@ -72,10 +70,8 @@ export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
     }
   }, []);
 
-  // Table styles
-  const thClass = "h-10 px-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap text-xs";
-  const thGroupClass = "h-8 px-3 text-center align-middle font-semibold whitespace-nowrap text-xs border-b-2";
-  const tdClass = "p-3 align-middle whitespace-nowrap text-sm";
+  // Sticky column width
+  const stickyColWidth = 55;
 
   return (
     <Card>
@@ -85,12 +81,12 @@ export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
           Tax Rate: {settings.taxRate}% (Grossed Up for W/D) • Projection to Age {data[data.length - 1]?.age || 106}
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0">
         {/* Top scrollbar */}
         {tableWidth > 0 && (
           <div 
             ref={topScrollRef}
-            className="overflow-x-auto mb-2"
+            className="overflow-x-auto mx-6 mb-2"
             onScroll={handleTopScroll}
             style={{ height: 12 }}
           >
@@ -98,45 +94,67 @@ export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
           </div>
         )}
 
-        {/* Table with bottom scrollbar - using native elements */}
+        {/* Table container with sticky headers and columns */}
         <div 
           ref={bottomScrollRef}
-          className="overflow-x-auto"
+          className="overflow-x-auto overflow-y-auto max-h-[600px] mx-6 mb-6"
           onScroll={handleBottomScroll}
         >
-          <table className="w-full caption-bottom text-sm">
-            {/* Group Headers */}
-            <thead className="[&_tr]:border-b">
+          <table className="w-full caption-bottom text-sm border-collapse">
+            {/* Group Headers - Sticky */}
+            <thead className="sticky top-0 z-20 bg-background">
               <tr className="border-b bg-muted/30">
-                <th className={cn(thGroupClass, "border-r")} colSpan={2}>Base</th>
-                <th className={cn(thGroupClass, "border-r bg-primary/5")} colSpan={2}>Active Engine</th>
-                <th className={cn(thGroupClass, "border-r bg-green-500/5")} colSpan={3}>Passive Engine</th>
-                <th className={cn(thGroupClass, "border-r bg-amber-500/5")} colSpan={5}>Wallet & Lifestyle</th>
-                <th className={cn(thGroupClass, "bg-muted/50")} colSpan={2}>Traditional</th>
+                <th 
+                  className="h-8 px-2 text-center align-middle font-semibold whitespace-nowrap text-xs border-b-2 sticky left-0 z-30 bg-muted/30"
+                  style={{ width: stickyColWidth, minWidth: stickyColWidth }}
+                >
+                  Year
+                </th>
+                <th 
+                  className="h-8 px-2 text-center align-middle font-semibold whitespace-nowrap text-xs border-b-2 border-r sticky z-30 bg-muted/30"
+                  style={{ left: stickyColWidth, width: stickyColWidth, minWidth: stickyColWidth }}
+                >
+                  Age
+                </th>
+                <th className="h-8 px-2 text-center align-middle font-semibold whitespace-nowrap text-xs border-b-2 border-r bg-primary/5" colSpan={2}>Active Engine</th>
+                <th className="h-8 px-2 text-center align-middle font-semibold whitespace-nowrap text-xs border-b-2 border-r bg-green-500/5" colSpan={3}>Passive Engine</th>
+                <th className="h-8 px-2 text-center align-middle font-semibold whitespace-nowrap text-xs border-b-2 border-r bg-amber-500/5" colSpan={5}>Wallet & Lifestyle</th>
+                <th className="h-8 px-2 text-center align-middle font-semibold whitespace-nowrap text-xs border-b-2 bg-muted/50" colSpan={2}>Traditional</th>
               </tr>
-              <tr className="border-b">
-                {/* Base */}
-                <th className={cn(thClass, "text-center")}>Year</th>
-                <th className={cn(thClass, "text-center border-r")}>Age</th>
+              <tr className="border-b bg-background">
+                {/* Sticky Year column header */}
+                <th 
+                  className="h-10 px-2 text-center align-middle font-medium text-muted-foreground whitespace-nowrap text-xs sticky left-0 z-30 bg-background"
+                  style={{ width: stickyColWidth, minWidth: stickyColWidth }}
+                >
+                  
+                </th>
+                {/* Sticky Age column header */}
+                <th 
+                  className="h-10 px-2 text-center align-middle font-medium text-muted-foreground whitespace-nowrap text-xs border-r sticky z-30 bg-background"
+                  style={{ left: stickyColWidth, width: stickyColWidth, minWidth: stickyColWidth }}
+                >
+                  
+                </th>
                 {/* Active Engine */}
-                <th className={cn(thClass, "text-right")}>GROSS PROFIT</th>
-                <th className={cn(thClass, "text-right border-r")}>Spillover</th>
+                <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">GROSS</th>
+                <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs border-r">Spill</th>
                 {/* Passive Engine */}
-                <th className={cn(thClass, "text-right")}>Balance</th>
-                <th className={cn(thClass, "text-right")}>Growth</th>
-                <th className={cn(thClass, "text-center border-r")}>RPIC %</th>
+                <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">Balance</th>
+                <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">Growth</th>
+                <th className="h-10 px-2 text-center align-middle font-medium text-muted-foreground whitespace-nowrap text-xs border-r">RPIC</th>
                 {/* Wallet & Lifestyle */}
-                <th className={cn(thClass, "text-right")}>Other Inc.</th>
-                <th className={cn(thClass, "text-right")}>Gross W/D</th>
-                <th className={cn(thClass, "text-right")}>Net Wallet</th>
-                <th className={cn(thClass, "text-right")}>Gap</th>
-                <th className={cn(thClass, "text-right border-r")}>Gross Exp.</th>
+                <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">Other</th>
+                <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">W/D</th>
+                <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">Net</th>
+                <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">Gap</th>
+                <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs border-r">Exp</th>
                 {/* Traditional */}
-                <th className={cn(thClass, "text-right")}>Balance</th>
-                <th className={cn(thClass, "text-right")}>W/D</th>
+                <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">Bal</th>
+                <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">W/D</th>
               </tr>
             </thead>
-            <tbody className="[&_tr:last-child]:border-0">
+            <tbody>
               {data.map((row) => (
                 <tr 
                   key={row.year}
@@ -146,57 +164,78 @@ export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
                     row.isCapHit && !row.isFreedom && "bg-blue-50 dark:bg-blue-950/20"
                   )}
                 >
-                  {/* Base */}
-                  <td className={cn(tdClass, "text-center font-medium")}>{row.year}</td>
-                  <td className={cn(tdClass, "text-center border-r")}>{row.age}</td>
-                  {/* Active Engine */}
-                  <td className={cn(tdClass, "text-right")}>
-                    {row.activeBalance > 0 ? formatMoney(row.activeProfitGross) : '-'}
+                  {/* Sticky Year */}
+                  <td 
+                    className={cn(
+                      "p-2 align-middle whitespace-nowrap text-sm text-center font-medium sticky left-0 z-10",
+                      row.isFreedom && "bg-green-50 dark:bg-green-950/20",
+                      row.isCapHit && !row.isFreedom && "bg-blue-50 dark:bg-blue-950/20",
+                      !row.isFreedom && !row.isCapHit && "bg-background"
+                    )}
+                    style={{ width: stickyColWidth, minWidth: stickyColWidth }}
+                  >
+                    {row.year}
                   </td>
-                  <td className={cn(tdClass, "text-right border-r")}>
-                    {row.spilloverNet > 0 ? formatMoney(row.spilloverNet) : '-'}
+                  {/* Sticky Age */}
+                  <td 
+                    className={cn(
+                      "p-2 align-middle whitespace-nowrap text-sm text-center border-r sticky z-10",
+                      row.isFreedom && "bg-green-50 dark:bg-green-950/20",
+                      row.isCapHit && !row.isFreedom && "bg-blue-50 dark:bg-blue-950/20",
+                      !row.isFreedom && !row.isCapHit && "bg-background"
+                    )}
+                    style={{ left: stickyColWidth, width: stickyColWidth, minWidth: stickyColWidth }}
+                  >
+                    {row.age}
+                  </td>
+                  {/* Active Engine */}
+                  <td className="p-2 align-middle whitespace-nowrap text-sm text-right">
+                    {row.activeBalance > 0 ? formatMoneyCondensed(row.activeProfitGross) : '-'}
+                  </td>
+                  <td className="p-2 align-middle whitespace-nowrap text-sm text-right border-r">
+                    {row.spilloverNet > 0 ? formatMoneyCondensed(row.spilloverNet) : '-'}
                   </td>
                   {/* Passive Engine */}
-                  <td className={cn(tdClass, "text-right font-medium")}>
-                    {formatMoney(row.passiveBalance)}
+                  <td className="p-2 align-middle whitespace-nowrap text-sm text-right font-medium">
+                    {formatMoneyCondensed(row.passiveBalance)}
                   </td>
-                  <td className={cn(tdClass, "text-right")}>
-                    {formatMoney(row.passiveGrowth)}
+                  <td className="p-2 align-middle whitespace-nowrap text-sm text-right">
+                    {formatMoneyCondensed(row.passiveGrowth)}
                   </td>
-                  <td className={cn(tdClass, "text-center border-r")}>
+                  <td className="p-2 align-middle whitespace-nowrap text-sm text-center border-r">
                     <span className={cn(
                       "font-medium",
                       row.rpicScore >= 100 ? "text-green-600" : "text-muted-foreground"
                     )}>
-                      {row.rpicScore.toFixed(1)}%
+                      {row.rpicScore.toFixed(0)}%
                     </span>
                   </td>
                   {/* Wallet & Lifestyle */}
-                  <td className={cn(tdClass, "text-right")}>
-                    {row.retirementIncome > 0 ? formatMoney(row.retirementIncome) : '-'}
+                  <td className="p-2 align-middle whitespace-nowrap text-sm text-right">
+                    {row.retirementIncome > 0 ? formatMoneyCondensed(row.retirementIncome) : '-'}
                   </td>
-                  <td className={cn(tdClass, "text-right")}>
-                    {row.withdrawalAmount > 0 ? formatMoney(row.withdrawalAmount) : '-'}
+                  <td className="p-2 align-middle whitespace-nowrap text-sm text-right">
+                    {row.withdrawalAmount > 0 ? formatMoneyCondensed(row.withdrawalAmount) : '-'}
                   </td>
-                  <td className={cn(tdClass, "text-right font-medium")}>
-                    {row.netWallet > 0 ? formatMoney(row.netWallet) : '-'}
+                  <td className="p-2 align-middle whitespace-nowrap text-sm text-right font-medium">
+                    {row.netWallet > 0 ? formatMoneyCondensed(row.netWallet) : '-'}
                   </td>
-                  <td className={cn(tdClass, "text-right")}>
+                  <td className="p-2 align-middle whitespace-nowrap text-sm text-right">
                     <span className={cn(
                       row.expenseShortfall > 0 ? "text-destructive font-medium" : "text-muted-foreground"
                     )}>
-                      {row.expenseShortfall > 0 ? formatMoney(row.expenseShortfall) : '-'}
+                      {row.expenseShortfall > 0 ? formatMoneyCondensed(row.expenseShortfall) : '-'}
                     </span>
                   </td>
-                  <td className={cn(tdClass, "text-right border-r")}>
-                    {formatMoney(row.grossExpenses)}
+                  <td className="p-2 align-middle whitespace-nowrap text-sm text-right border-r">
+                    {formatMoneyCondensed(row.grossExpenses)}
                   </td>
                   {/* Traditional */}
-                  <td className={cn(tdClass, "text-right text-muted-foreground")}>
-                    {formatMoney(row.tradBalance)}
+                  <td className="p-2 align-middle whitespace-nowrap text-sm text-right text-muted-foreground">
+                    {formatMoneyCondensed(row.tradBalance)}
                   </td>
-                  <td className={cn(tdClass, "text-right text-muted-foreground")}>
-                    {row.tradWithdrawal > 0 ? formatMoney(row.tradWithdrawal) : '-'}
+                  <td className="p-2 align-middle whitespace-nowrap text-sm text-right text-muted-foreground">
+                    {row.tradWithdrawal > 0 ? formatMoneyCondensed(row.tradWithdrawal) : '-'}
                   </td>
                 </tr>
               ))}
