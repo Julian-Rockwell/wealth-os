@@ -13,7 +13,7 @@ import { TwinEngineSettingsPanel } from "@/components/goals/TwinEngineSettingsPa
 import { TwinEngineKPIHeader } from "@/components/goals/TwinEngineKPIHeader";
 import { TwinEngineChart } from "@/components/goals/TwinEngineChart";
 import { TwinEngineTable } from "@/components/goals/TwinEngineTable";
-import { StrategicRoadmap } from "@/components/goals/StrategicRoadmap";
+
 import { LifestyleRoadmapView } from "@/components/goals/LifestyleRoadmapView";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -395,19 +395,11 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
 
                   {/* Conditional Content */}
                   {projectionView === 'dashboard' && (
-                    <>
-                      {/* Chart */}
-                      <TwinEngineChart 
-                        data={twinEngineResult.rows}
-                        milestones={twinEngineResult.milestones}
-                        settings={projectionSettings}
-                      />
-                      {/* Strategic Roadmap */}
-                      <StrategicRoadmap 
-                        milestones={twinEngineResult.milestones}
-                        settings={projectionSettings}
-                      />
-                    </>
+                    <TwinEngineChart 
+                      data={twinEngineResult.rows}
+                      milestones={twinEngineResult.milestones}
+                      settings={projectionSettings}
+                    />
                   )}
                   
                   {projectionView === 'datagrid' && (
