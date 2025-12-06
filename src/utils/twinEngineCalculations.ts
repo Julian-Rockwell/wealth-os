@@ -15,6 +15,10 @@ export interface TwinEngineSettings {
   stepDownAge: number;
   stepDownPercent: number;
   
+  // Lifestyle Design Persistence
+  selectedGeography: 'low' | 'medium' | 'high';
+  selectedLifestyle: 'essential' | 'comfort' | 'luxury';
+  
   // Wealth OS Strategy
   tradingCap: number;
   activeReturn: number;
@@ -462,6 +466,8 @@ export function getDefaultTwinEngineSettings(): TwinEngineSettings {
     enableStepDown: false,
     stepDownAge: 75,
     stepDownPercent: 20,
+    selectedGeography: 'medium',
+    selectedLifestyle: 'comfort',
     tradingCap: 200000,
     activeReturn: 30.0,
     passiveYield: 12.0,

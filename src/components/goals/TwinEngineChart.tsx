@@ -12,7 +12,8 @@ import {
   Tooltip, 
   Legend, 
   ResponsiveContainer,
-  ReferenceLine
+  ReferenceLine,
+  Brush
 } from "recharts";
 import type { TwinEngineRow, TwinEngineMilestones, TwinEngineSettings } from "@/utils/twinEngineCalculations";
 
@@ -110,8 +111,8 @@ export function TwinEngineChart({ data, milestones, settings }: TwinEngineChartP
         </div>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={400}>
-          <ComposedChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 20 }}>
+        <ResponsiveContainer width="100%" height={450}>
+          <ComposedChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 50 }}>
             <defs>
               <linearGradient id="activeGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4}/>
@@ -271,6 +272,15 @@ export function TwinEngineChart({ data, milestones, settings }: TwinEngineChartP
                 />
               </>
             )}
+
+            {/* Brush for timeline zooming/panning */}
+            <Brush 
+              dataKey="year" 
+              height={30} 
+              stroke="#3b82f6" 
+              travellerWidth={10}
+              tickFormatter={(value) => value}
+            />
           </ComposedChart>
         </ResponsiveContainer>
       </CardContent>

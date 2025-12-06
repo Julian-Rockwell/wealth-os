@@ -61,34 +61,52 @@ interface MilestoneItem {
 export function LifestyleRoadmapView({ milestones, settings, onSettingsChange }: LifestyleRoadmapViewProps) {
   const currentYear = new Date().getFullYear();
   
-  // Determine initial selections based on current annualExpenses
-  const getInitialSelections = () => {
-    const currentExpenses = settings.annualExpenses;
-    let bestGeo: GeographyType = 'medium';
-    let bestLife: LifestyleType = 'comfort';
-    let minDiff = Infinity;
-    
-    for (const geo of geographyOptions) {
-      for (const life of lifestyleOptions) {
-        const calculated = geo.baseAmount * life.multiplier;
-        const diff = Math.abs(calculated - currentExpenses);
-        if (diff < minDiff) {
-          minDiff = diff;
-          bestGeo = geo.id;
-          bestLife = life.id;
-        }
-      }
-    }
-    return { geo: bestGeo, life: bestLife };
-  };
-  
-  const initial = getInitialSelections();
-  const [selectedGeography, setSelectedGeography] = useState<GeographyType>(initial.geo);
-  const [selectedLifestyle, setSelectedLifestyle] = useState<LifestyleType>(initial.life);
-  // Initialize from settings.enableStepDown
+  // Initialize from persisted settings
+  const [selectedGeography, setSelectedGeography] = useState<GeographyType>(settings.selectedGeography || 'medium');
+  const [selectedLifestyle, setSelectedLifestyle] = useState<LifestyleType>(settings.selectedLifestyle || 'comfort');
   const [lateLifeReduction, setLateLifeReduction] = useState(settings.enableStepDown ?? false);
   
-  // Handle late life reduction toggle - sync with settings
+  // Sync from settings when they change externally
+  useEffect(() => {
+    if (settings.selectedGeography && settings.selectedGeography !== selectedGeography) {
+      setSelectedGeography(settings.selectedGeography);
+    }
+    if (settings.selectedLifestyle && settings.selectedLifestyle !== selectedLifestyle) {
+      setSelectedLifestyle(settings.selectedLifestyle);
+    }
+  }, [settings.selectedGeography, settings.selectedLifestyle]);
+  
+  // Handle geography change
+  const handleGeographyChange = (geo: GeographyType) => {
+    setSelectedGeography(geo);
+    const geoOption = geographyOptions.find(g => g.id === geo)!;
+    const lifeOption = lifestyleOptions.find(l => l.id === selectedLifestyle)!;
+    const newExpenses = Math.round(geoOption.baseAmount * lifeOption.multiplier);
+    
+    if (onSettingsChange) {
+      onSettingsChange({ 
+        selectedGeography: geo,
+        annualExpenses: newExpenses
+      });
+    }
+  };
+  
+  // Handle lifestyle change
+  const handleLifestyleChange = (life: LifestyleType) => {
+    setSelectedLifestyle(life);
+    const geoOption = geographyOptions.find(g => g.id === selectedGeography)!;
+    const lifeOption = lifestyleOptions.find(l => l.id === life)!;
+    const newExpenses = Math.round(geoOption.baseAmount * lifeOption.multiplier);
+    
+    if (onSettingsChange) {
+      onSettingsChange({ 
+        selectedLifestyle: life,
+        annualExpenses: newExpenses
+      });
+    }
+  };
+  
+  // Handle late life reduction toggle
   const handleLateLifeChange = (checked: boolean) => {
     setLateLifeReduction(checked);
     if (onSettingsChange) {
@@ -101,7 +119,7 @@ export function LifestyleRoadmapView({ milestones, settings, onSettingsChange }:
   const lifeOption = lifestyleOptions.find(l => l.id === selectedLifestyle)!;
   const calculatedExpenses = Math.round(geoOption.baseAmount * lifeOption.multiplier);
   
-  const [targetAnnualSpend, setTargetAnnualSpend] = useState(calculatedExpenses);
+  const [targetAnnualSpend, setTargetAnnualSpend] = useState(settings.annualExpenses || calculatedExpenses);
   
   // Update target when selections change
   useEffect(() => {
@@ -109,12 +127,13 @@ export function LifestyleRoadmapView({ milestones, settings, onSettingsChange }:
     setTargetAnnualSpend(newCalculated);
   }, [selectedGeography, selectedLifestyle, geoOption.baseAmount, lifeOption.multiplier]);
   
-  // Propagate changes to parent
-  useEffect(() => {
-    if (onSettingsChange && targetAnnualSpend !== settings.annualExpenses) {
-      onSettingsChange({ annualExpenses: targetAnnualSpend });
+  // Propagate slider changes to parent
+  const handleSliderChange = (values: number[]) => {
+    setTargetAnnualSpend(values[0]);
+    if (onSettingsChange) {
+      onSettingsChange({ annualExpenses: values[0] });
     }
-  }, [targetAnnualSpend, onSettingsChange, settings.annualExpenses]);
+  };
   
   // Build milestone timeline items
   const milestoneItems: MilestoneItem[] = [
@@ -235,7 +254,7 @@ export function LifestyleRoadmapView({ milestones, settings, onSettingsChange }:
                 return (
                   <button
                     key={option.id}
-                    onClick={() => setSelectedGeography(option.id)}
+                    onClick={() => handleGeographyChange(option.id)}
                     className={`p-3 rounded-lg border-2 transition-all text-center ${
                       isSelected 
                         ? 'border-primary bg-primary/10' 
@@ -266,7 +285,7 @@ export function LifestyleRoadmapView({ milestones, settings, onSettingsChange }:
                 return (
                   <button
                     key={option.id}
-                    onClick={() => setSelectedLifestyle(option.id)}
+                    onClick={() => handleLifestyleChange(option.id)}
                     className={`p-3 rounded-lg border-2 transition-all text-center ${
                       isSelected 
                         ? 'border-primary bg-primary/10' 
@@ -296,7 +315,7 @@ export function LifestyleRoadmapView({ milestones, settings, onSettingsChange }:
             </div>
             <Slider
               value={[targetAnnualSpend]}
-              onValueChange={(values) => setTargetAnnualSpend(values[0])}
+              onValueChange={handleSliderChange}
               min={20000}
               max={200000}
               step={5000}
@@ -381,7 +400,7 @@ export function LifestyleRoadmapView({ milestones, settings, onSettingsChange }:
         </CardContent>
       </Card>
 
-      {/* Right Panel: Wealth Journey Timeline */}
+      {/* Right Panel: Wealth Journey - Horizontal Layout */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -394,70 +413,79 @@ export function LifestyleRoadmapView({ milestones, settings, onSettingsChange }:
         </CardHeader>
         <CardContent>
           {milestoneItems.length > 0 ? (
-            <div className="relative">
-              {/* Timeline line */}
-              <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-border" />
+            <div className="space-y-2">
+              {/* Header row */}
+              <div className="grid grid-cols-[auto_60px_50px_1fr] gap-3 px-2 pb-2 border-b text-xs font-medium text-muted-foreground">
+                <div className="w-5" />
+                <div>Year</div>
+                <div>Age</div>
+                <div>Milestone</div>
+              </div>
               
-              {/* Milestone items */}
-              <div className="space-y-6">
-                {milestoneItems.map((item, index) => {
-                  const Icon = item.icon;
-                  const isPast = item.year && item.year <= currentYear;
-                  
-                  return (
-                    <div key={index} className="relative flex gap-4 pl-2">
-                      {/* Timeline dot */}
-                      <div className={`relative z-10 flex items-center justify-center w-5 h-5 rounded-full ${
-                        isPast ? 'bg-green-500' : 'bg-muted border-2 border-border'
-                      }`}>
-                        {isPast ? (
-                          <CheckCircle2 className="w-3 h-3 text-white" />
-                        ) : (
-                          <Circle className="w-2 h-2 text-muted-foreground" />
-                        )}
-                      </div>
-                      
-                      {/* Content */}
-                      <div className="flex-1 pb-2">
-                        <div className="flex items-center gap-2">
-                          <Icon className={`w-4 h-4 ${item.color}`} />
-                          <span className="font-medium">{item.label}</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-0.5">
+              {/* Milestone rows */}
+              {milestoneItems.map((item, index) => {
+                const Icon = item.icon;
+                const isPast = item.year && item.year <= currentYear;
+                
+                return (
+                  <div 
+                    key={index} 
+                    className={`grid grid-cols-[auto_60px_50px_1fr] gap-3 items-center px-2 py-2 rounded-lg transition-colors ${
+                      isPast ? 'bg-green-50 dark:bg-green-950/20' : 'hover:bg-muted/50'
+                    }`}
+                  >
+                    {/* Status icon */}
+                    <div className={`flex items-center justify-center w-5 h-5 rounded-full ${
+                      isPast ? 'bg-green-500' : 'bg-muted border-2 border-border'
+                    }`}>
+                      {isPast ? (
+                        <CheckCircle2 className="w-3 h-3 text-white" />
+                      ) : (
+                        <Circle className="w-2 h-2 text-muted-foreground" />
+                      )}
+                    </div>
+                    
+                    {/* Year */}
+                    <Badge variant="outline" className="text-xs justify-center">
+                      {item.year}
+                    </Badge>
+                    
+                    {/* Age */}
+                    <span className="text-sm text-muted-foreground">
+                      {item.age} yo
+                    </span>
+                    
+                    {/* Milestone info */}
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Icon className={`w-4 h-4 flex-shrink-0 ${item.color}`} />
+                      <div className="min-w-0">
+                        <span className="font-medium text-sm">{item.label}</span>
+                        <span className="text-xs text-muted-foreground ml-2 hidden sm:inline">
                           {item.description}
-                        </p>
-                        <div className="flex gap-2 mt-2">
-                          <Badge variant="outline" className="text-xs">
-                            Year {item.year}
-                          </Badge>
-                          <Badge variant="secondary" className="text-xs">
-                            Age {item.age}
-                          </Badge>
-                        </div>
+                        </span>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-8 text-muted-foreground">
-              <Milestone className="w-12 h-12 mx-auto mb-3 opacity-20" />
-              <p>No milestones projected yet.</p>
-              <p className="text-xs mt-1">Adjust your settings to see your wealth journey.</p>
+              <Milestone className="w-12 h-12 mx-auto mb-3 opacity-30" />
+              <p>No milestones projected yet</p>
+              <p className="text-sm">Adjust your settings to see your wealth journey</p>
             </div>
           )}
 
-          {/* Traditional Comparison */}
-          {milestones.tradFreedomYear && milestones.freedomYear && (
-            <div className="mt-6 p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-900">
-              <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
-                <CheckCircle2 className="w-4 h-4" />
-                <span className="font-medium">Wealth OS Advantage</span>
+          {/* Wealth OS Advantage */}
+          {milestones.freedomYear && milestones.tradFreedomYear && milestones.tradFreedomYear > milestones.freedomYear && (
+            <div className="mt-6 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 p-4 rounded-lg">
+              <div className="text-sm font-medium text-green-700 dark:text-green-400 mb-1">
+                Wealth OS Advantage
               </div>
-              <p className="text-sm text-green-600 dark:text-green-500 mt-1">
-                You'll reach freedom <strong>{milestones.tradFreedomYear - milestones.freedomYear} years earlier</strong> than 
-                the traditional path (Year {milestones.freedomYear} vs {milestones.tradFreedomYear}).
+              <p className="text-sm text-green-600 dark:text-green-500">
+                Reach freedom <strong>{milestones.tradFreedomYear - milestones.freedomYear} years earlier</strong> than the traditional path 
+                (Year {milestones.freedomYear} vs {milestones.tradFreedomYear})
               </p>
             </div>
           )}

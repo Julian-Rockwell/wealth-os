@@ -161,16 +161,23 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
             label="Current Age"
             value={settings.currentAge}
             onChange={(val) => updateSetting('currentAge', val)}
-            min={30}
+            min={20}
             max={95}
             step={1}
             suffix=" yo"
           />
           
           <div className="bg-muted/50 p-3 rounded-lg">
-            <div className="text-xs text-muted-foreground mb-1">Starting Balances</div>
-            <div className="text-lg font-semibold">
-              {formatMoney(settings.savingsPassive + settings.savingsActive)}
+            <div className="text-xs text-muted-foreground mb-2">Starting Balances</div>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-blue-500" />
+                <span className="text-sm font-medium text-blue-600">{formatMoney(settings.savingsActive)}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-green-500" />
+                <span className="text-sm font-medium text-green-600">{formatMoney(settings.savingsPassive)}</span>
+              </div>
             </div>
           </div>
 
@@ -190,7 +197,7 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
         <CollapsibleSection
           title="Active Trading"
           icon={TrendingUp}
-          colorClass="text-green-600"
+          colorClass="text-blue-600"
           isOpen={openSections.activeTrading}
           onToggle={() => toggleSection('activeTrading')}
         >
@@ -261,7 +268,7 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
         <CollapsibleSection
           title="Passive Income"
           icon={Wallet}
-          colorClass="text-cyan-600"
+          colorClass="text-green-600"
           isOpen={openSections.passiveIncome}
           onToggle={() => toggleSection('passiveIncome')}
         >
