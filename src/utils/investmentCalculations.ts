@@ -316,13 +316,13 @@ export function calculateReadinessScore(
 }
 
 export function calculateEquityOpportunities(snapshot: FinancialSnapshot) {
-  // Calculate equity from real estate and vehicles
+  // Only real estate holdings - vehicles excluded per business decision
+  // (vehicle value needs to be at least $60k to be worthwhile, focusing on real estate only)
   const realEstateHoldings = snapshot.holdings.filter(h => h.assetClass === "real_estate");
-  const vehicleHoldings = snapshot.holdings.filter(h => h.accountType === "vehicle");
   
   const opportunities = [];
   
-  for (const holding of [...realEstateHoldings, ...vehicleHoldings]) {
+  for (const holding of realEstateHoldings) {
     // Find associated liability
     const liability = snapshot.liabilities.find(l => l.accountId === holding.accountId);
     const equity = holding.balance - (liability?.balance || 0);
@@ -369,17 +369,56 @@ export function calculateDebtPayoffScenarios(liabilities: Liability[]) {
   const highInterestDebts = liabilities.filter(l => l.apr > 18);
   
   return highInterestDebts.map(debt => {
-    const currentMonths = debt.remainingTermMonths;
+    const monthlyRate = debt.apr / 100 / 12;
+    
+    // Calculate current months dynamically if remainingTermMonths is 0 or invalid
+    // This is common for credit cards which don't have fixed terms
+    let currentMonths: number;
+    
+    if (debt.remainingTermMonths > 0) {
+      currentMonths = debt.remainingTermMonths;
+    } else if (debt.monthlyPayment > 0 && debt.balance > 0 && monthlyRate > 0) {
+      // Amortization formula: n = -log(1 - (P*r)/A) / log(1+r)
+      // Where P = balance, r = monthly rate, A = monthly payment
+      const interestPortion = debt.balance * monthlyRate;
+      
+      if (debt.monthlyPayment <= interestPortion) {
+        // Payment doesn't cover interest - debt will never be paid off at current rate
+        // This indicates a critical debt situation
+        currentMonths = 999; // Indicate perpetual debt
+      } else {
+        currentMonths = Math.ceil(
+          -Math.log(1 - (debt.balance * monthlyRate) / debt.monthlyPayment) / 
+          Math.log(1 + monthlyRate)
+        );
+      }
+    } else {
+      // Insufficient data - use balance / payment as rough estimate
+      currentMonths = debt.monthlyPayment > 0 ? Math.ceil(debt.balance / debt.monthlyPayment) : 0;
+    }
+    
+    // Calculate total cost with interest
     const totalCurrentCost = debt.monthlyPayment * currentMonths;
     
     // Accelerated scenario: 1.5x payment
     const acceleratedPayment = debt.monthlyPayment * 1.5;
-    const monthlyRate = debt.apr / 100 / 12;
-    const acceleratedMonths = Math.log(acceleratedPayment / (acceleratedPayment - debt.balance * monthlyRate)) / Math.log(1 + monthlyRate);
+    let acceleratedMonths = 0;
+    
+    if (acceleratedPayment > debt.balance * monthlyRate) {
+      acceleratedMonths = Math.ceil(
+        -Math.log(1 - (debt.balance * monthlyRate) / acceleratedPayment) / 
+        Math.log(1 + monthlyRate)
+      );
+    }
+    
     const totalAcceleratedCost = acceleratedPayment * acceleratedMonths;
     
     // Lump sum payoff
     const lumpSumCost = debt.balance;
+    
+    // Calculate savings (ensure non-negative for display purposes)
+    const acceleratedSavings = Math.max(0, totalCurrentCost - totalAcceleratedCost);
+    const lumpSumSavings = Math.max(0, totalCurrentCost - lumpSumCost);
     
     return {
       name: debt.name,
@@ -387,11 +426,11 @@ export function calculateDebtPayoffScenarios(liabilities: Liability[]) {
       apr: debt.apr,
       currentMonths,
       currentTotalCost: totalCurrentCost,
-      acceleratedMonths: Math.ceil(acceleratedMonths),
+      acceleratedMonths,
       acceleratedPayment,
-      acceleratedSavings: totalCurrentCost - totalAcceleratedCost,
-      lumpSumSavings: totalCurrentCost - lumpSumCost,
-      recommendation: lumpSumCost < totalCurrentCost - lumpSumCost ? "immediate" : "accelerated"
+      acceleratedSavings,
+      lumpSumSavings,
+      recommendation: lumpSumCost < acceleratedSavings ? "immediate" : "accelerated"
     };
   });
 }
