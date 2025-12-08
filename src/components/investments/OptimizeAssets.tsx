@@ -49,7 +49,7 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
         <div className="space-y-4">
           <h4 className="font-semibold flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-green-600" />
-            Equity Liquidation Opportunities
+            Real Estate Equity Opportunities (HELOC)
           </h4>
           
           {equityOpportunities.map((opp, index) => (
@@ -152,7 +152,7 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
           {debtPayoffScenarios.map((scenario, index) => (
             <Card key={index} className="border-2 border-red-200">
               <CardHeader>
-                <CardTitle>{scenario.name} <span className="text-xs text-muted-foreground font-normal">(strange calculation - fixed examples)</span></CardTitle>
+                <CardTitle>{scenario.name} <span className="text-xs text-muted-foreground font-normal">(calculated from liabilities)</span></CardTitle>
                 <CardDescription>
                   Current balance: {scenario.balance.toLocaleString("en-US", { style: "currency", currency: "USD" })} at {scenario.apr}% APR
                 </CardDescription>
