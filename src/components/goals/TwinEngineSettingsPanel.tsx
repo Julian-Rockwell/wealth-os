@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { 
@@ -149,7 +150,7 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
         <CardTitle className="text-lg">Projection Settings</CardTitle>
       </CardHeader>
       <CardContent className="space-y-1 p-2">
-        {/* Foundation Section */}
+        {/* Foundation Section - Tax Rate moved to Advanced */}
         <CollapsibleSection
           title="Foundation"
           icon={User}
@@ -166,34 +167,9 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
             step={1}
             suffix=" yo"
           />
-          
-          <div className="bg-muted/50 p-3 rounded-lg">
-            <div className="text-xs text-muted-foreground mb-2">Starting Balances</div>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-blue-500" />
-                <span className="text-sm font-medium text-blue-600">{formatMoney(settings.savingsActive)}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-green-500" />
-                <span className="text-sm font-medium text-green-600">{formatMoney(settings.savingsPassive)}</span>
-              </div>
-            </div>
-          </div>
-
-          <InputSlider
-            label="Est. Tax Rate"
-            value={settings.taxRate}
-            onChange={(val) => updateSetting('taxRate', val)}
-            min={0}
-            max={50}
-            step={1}
-            suffix="%"
-            tooltip="Estimated tax rate on trading profits and withdrawals"
-          />
         </CollapsibleSection>
 
-        {/* Active Trading Section */}
+        {/* Active Trading Section - Renamed labels */}
         <CollapsibleSection
           title="Active Trading"
           icon={TrendingUp}
@@ -202,19 +178,26 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
           onToggle={() => toggleSection('activeTrading')}
         >
           <InputCurrency
-            label="Initial Trading Alloc (Active)"
+            label="Initial Trading Account"
             value={settings.savingsActive}
             onChange={(val) => updateSetting('savingsActive', val)}
           />
 
-          <InputCurrency
-            label="Trading Account Cap"
-            value={settings.tradingCap}
-            onChange={(val) => updateSetting('tradingCap', val)}
-          />
+          <div className="space-y-2">
+            <Label className="text-sm text-muted-foreground uppercase tracking-wide">Account Size Comfortable Trading</Label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+              <Input
+                type="number"
+                value={settings.tradingCap}
+                onChange={(e) => updateSetting('tradingCap', parseFloat(e.target.value) || 0)}
+                className="pl-7"
+              />
+            </div>
+          </div>
 
           <InputCurrency
-            label="Monthly Contribution"
+            label="Monthly Contribution (Optional)"
             value={settings.monthlyContrib}
             onChange={(val) => updateSetting('monthlyContrib', val)}
           />
@@ -318,7 +301,7 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
           />
         </CollapsibleSection>
 
-        {/* Advanced Settings Section */}
+        {/* Advanced Settings Section - Tax Rate moved here + new controls */}
         <CollapsibleSection
           title="Advanced Settings"
           icon={Settings}
@@ -326,6 +309,30 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
           isOpen={openSections.advanced}
           onToggle={() => toggleSection('advanced')}
         >
+          {/* Est. Tax Rate - moved from Foundation */}
+          <InputSlider
+            label="Est. Tax Rate"
+            value={settings.taxRate}
+            onChange={(val) => updateSetting('taxRate', val)}
+            min={0}
+            max={50}
+            step={1}
+            suffix="%"
+            tooltip="Estimated tax rate on trading profits and withdrawals"
+          />
+
+          {/* Planning Horizon - NEW */}
+          <InputSlider
+            label="Planning Horizon (Age)"
+            value={settings.targetAge}
+            onChange={(val) => updateSetting('targetAge', val)}
+            min={75}
+            max={120}
+            step={1}
+            suffix=" yo"
+            tooltip="The age until which projections are calculated"
+          />
+
           <InputSlider
             label="Inflation Assumption"
             value={settings.inflationRate}
@@ -346,27 +353,44 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
             suffix="%"
           />
 
-          <InputSlider
-            label="Active Trading Duration"
-            value={settings.activeDuration}
-            onChange={(val) => updateSetting('activeDuration', val)}
-            min={1}
-            max={20}
-            step={1}
-            suffix=" Years"
-            tooltip="How many years you plan to actively trade"
-          />
+          {/* Trade Indefinitely Checkbox - NEW */}
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="tradeIndefinitely"
+              checked={settings.tradeIndefinitely}
+              onCheckedChange={(checked) => updateSetting('tradeIndefinitely', !!checked)}
+            />
+            <Label htmlFor="tradeIndefinitely" className="text-sm text-muted-foreground cursor-pointer">
+              Trade Indefinitely?
+            </Label>
+          </div>
 
-          <InputSlider
-            label="Active Cash Out %"
-            value={settings.activeCashOutPercent}
-            onChange={(val) => updateSetting('activeCashOutPercent', val)}
-            min={0}
-            max={100}
-            step={5}
-            suffix="%"
-            tooltip="Percentage of active account to cash out when transitioning to passive"
-          />
+          {/* Only show duration/cash-out if NOT trading indefinitely */}
+          {!settings.tradeIndefinitely && (
+            <>
+              <InputSlider
+                label="Active Trading Duration"
+                value={settings.activeDuration}
+                onChange={(val) => updateSetting('activeDuration', val)}
+                min={1}
+                max={20}
+                step={1}
+                suffix=" Years"
+                tooltip="How many years you plan to actively trade"
+              />
+
+              <InputSlider
+                label="Active Cash Out %"
+                value={settings.activeCashOutPercent}
+                onChange={(val) => updateSetting('activeCashOutPercent', val)}
+                min={0}
+                max={100}
+                step={5}
+                suffix="%"
+                tooltip="Percentage of active account to cash out when transitioning to passive"
+              />
+            </>
+          )}
 
           {/* Withdrawal Strategy */}
           <div className="space-y-2">

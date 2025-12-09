@@ -48,6 +48,10 @@ export interface TwinEngineSettings {
   
   // System
   startYear: number;
+  
+  // NEW v4.2: Planning Horizon & Trade Indefinitely
+  targetAge: number;
+  tradeIndefinitely: boolean;
 }
 
 export interface TwinEngineRow {
@@ -144,13 +148,14 @@ export function calculateTwinEngineProjection(settings: TwinEngineSettings): Twi
 
   const data: TwinEngineRow[] = [];
   
-  // Dynamic duration: Run until Age 106, minimum 10 years
-  const targetAge = 106;
-  const yearsToAge106 = targetAge - currentAge;
-  const projectionYears = Math.max(10, yearsToAge106);
+  // Dynamic duration: Run until targetAge (default 106), minimum 10 years
+  const planningTargetAge = settings.targetAge || 106;
+  const yearsToTargetAge = planningTargetAge - currentAge;
+  const projectionYears = Math.max(10, yearsToTargetAge);
   const endYear = startYear + projectionYears;
   
-  const stopActiveYear = startYear + activeDuration;
+  // Trade Indefinitely logic: if true, never stop; else use activeDuration
+  const stopActiveYear = settings.tradeIndefinitely ? endYear + 1 : startYear + activeDuration;
 
   let currentActive = savingsActive;
   let currentPassive = savingsPassive;
@@ -473,9 +478,9 @@ export function getDefaultTwinEngineSettings(): TwinEngineSettings {
     passiveYield: 12.0,
     activeDuration: 10,
     activeCashOutPercent: 0,
-    taxRate: 18.0,
+    taxRate: 0, // v4.2: Default 0%
     enableRampUp: false,
-    rampUpDuration: 24, // Default 24 months (2 years)
+    rampUpDuration: 24,
     yieldCapPercent: 80,
     withdrawalStrategy: 'freedom',
     customWithdrawalYear: currentYear + 10,
@@ -483,7 +488,10 @@ export function getDefaultTwinEngineSettings(): TwinEngineSettings {
     retirementIncome: 0,
     retirementIncomeStartAge: 67,
     tradReturn: 7.0,
-    startYear: currentYear
+    startYear: currentYear,
+    // v4.2: New settings
+    targetAge: 106,
+    tradeIndefinitely: true
   };
 }
 
