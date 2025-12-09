@@ -370,66 +370,96 @@ export function calculateDebtPayoffScenarios(liabilities: Liability[]) {
   
   return highInterestDebts.map(debt => {
     const monthlyRate = debt.apr / 100 / 12;
+    const currentPayment = debt.monthlyPayment;
     
-    // Calculate current months dynamically if remainingTermMonths is 0 or invalid
-    // This is common for credit cards which don't have fixed terms
+    // Calculate current months dynamically using amortization formula:
+    // n = -ln(1 - (P*r)/A) / ln(1+r)
+    // Where P = balance, r = monthly rate, A = monthly payment
     let currentMonths: number;
     
-    if (debt.remainingTermMonths > 0) {
-      currentMonths = debt.remainingTermMonths;
-    } else if (debt.monthlyPayment > 0 && debt.balance > 0 && monthlyRate > 0) {
-      // Amortization formula: n = -log(1 - (P*r)/A) / log(1+r)
-      // Where P = balance, r = monthly rate, A = monthly payment
+    if (currentPayment > 0 && debt.balance > 0 && monthlyRate > 0) {
       const interestPortion = debt.balance * monthlyRate;
       
-      if (debt.monthlyPayment <= interestPortion) {
-        // Payment doesn't cover interest - debt will never be paid off at current rate
-        // This indicates a critical debt situation
-        currentMonths = 999; // Indicate perpetual debt
+      if (currentPayment <= interestPortion) {
+        // Payment doesn't cover interest - perpetual debt
+        currentMonths = 999;
       } else {
         currentMonths = Math.ceil(
-          -Math.log(1 - (debt.balance * monthlyRate) / debt.monthlyPayment) / 
+          -Math.log(1 - (debt.balance * monthlyRate) / currentPayment) / 
           Math.log(1 + monthlyRate)
         );
       }
+    } else if (debt.remainingTermMonths > 0) {
+      currentMonths = debt.remainingTermMonths;
     } else {
-      // Insufficient data - use balance / payment as rough estimate
-      currentMonths = debt.monthlyPayment > 0 ? Math.ceil(debt.balance / debt.monthlyPayment) : 0;
+      currentMonths = currentPayment > 0 ? Math.ceil(debt.balance / currentPayment) : 0;
     }
     
-    // Calculate total cost with interest
-    const totalCurrentCost = debt.monthlyPayment * currentMonths;
+    // Calculate total cost with PRECISE amortization (not simple multiplication)
+    // Total cost = sum of all payments with compound interest
+    let currentTotalCost = 0;
+    let remainingBalance = debt.balance;
+    for (let i = 0; i < currentMonths && remainingBalance > 0; i++) {
+      const interest = remainingBalance * monthlyRate;
+      const principal = Math.min(currentPayment - interest, remainingBalance);
+      currentTotalCost += currentPayment;
+      remainingBalance -= principal;
+    }
+    // Add any remaining balance if loop didn't cover it
+    if (remainingBalance > 0) {
+      currentTotalCost += remainingBalance;
+    }
     
     // Accelerated scenario: 1.5x payment
-    const acceleratedPayment = debt.monthlyPayment * 1.5;
+    const acceleratedPayment = Math.round(currentPayment * 1.5);
     let acceleratedMonths = 0;
+    let acceleratedTotalCost = 0;
     
     if (acceleratedPayment > debt.balance * monthlyRate) {
       acceleratedMonths = Math.ceil(
         -Math.log(1 - (debt.balance * monthlyRate) / acceleratedPayment) / 
         Math.log(1 + monthlyRate)
       );
+      
+      // Calculate accelerated total cost with precise amortization
+      remainingBalance = debt.balance;
+      for (let i = 0; i < acceleratedMonths && remainingBalance > 0; i++) {
+        const interest = remainingBalance * monthlyRate;
+        const principal = Math.min(acceleratedPayment - interest, remainingBalance);
+        acceleratedTotalCost += acceleratedPayment;
+        remainingBalance -= principal;
+      }
+      if (remainingBalance > 0) {
+        acceleratedTotalCost += remainingBalance;
+      }
     }
     
-    const totalAcceleratedCost = acceleratedPayment * acceleratedMonths;
-    
-    // Lump sum payoff
+    // Lump sum payoff - just the balance, no interest
     const lumpSumCost = debt.balance;
     
-    // Calculate savings (ensure non-negative for display purposes)
-    const acceleratedSavings = Math.max(0, totalCurrentCost - totalAcceleratedCost);
-    const lumpSumSavings = Math.max(0, totalCurrentCost - lumpSumCost);
+    // Interest avoided for lump sum = total interest that would have been paid
+    const currentInterestTotal = currentTotalCost - debt.balance;
+    const acceleratedInterestTotal = acceleratedTotalCost - debt.balance;
+    
+    // Calculate savings
+    const acceleratedSavings = Math.max(0, currentTotalCost - acceleratedTotalCost);
+    const lumpSumSavings = Math.max(0, currentTotalCost - lumpSumCost);
+    const interestAvoided = Math.max(0, currentInterestTotal);
     
     return {
       name: debt.name,
       balance: debt.balance,
       apr: debt.apr,
+      currentPayment,
       currentMonths,
-      currentTotalCost: totalCurrentCost,
+      currentTotalCost,
       acceleratedMonths,
       acceleratedPayment,
+      acceleratedTotalCost,
       acceleratedSavings,
+      lumpSumCost,
       lumpSumSavings,
+      interestAvoided,
       recommendation: lumpSumCost < acceleratedSavings ? "immediate" : "accelerated"
     };
   });

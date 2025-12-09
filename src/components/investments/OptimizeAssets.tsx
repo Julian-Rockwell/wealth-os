@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { TrendingUp, AlertTriangle, DollarSign, Calendar } from "lucide-react";
+import { TrendingUp, AlertTriangle, DollarSign, Calendar, Zap } from "lucide-react";
 import { toast } from "sonner";
 import type { FinancialSnapshot } from "@/types/financial";
 import { calculateEquityOpportunities, calculateDebtPayoffScenarios } from "@/utils/investmentCalculations";
@@ -10,6 +10,9 @@ import { calculateEquityOpportunities, calculateDebtPayoffScenarios } from "@/ut
 interface OptimizeAssetsProps {
   snapshot: FinancialSnapshot;
 }
+
+const formatCurrency = (value: number) => 
+  value.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 });
 
 export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
   const equityOpportunities = calculateEquityOpportunities(snapshot);
@@ -141,110 +144,117 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
         </div>
       )}
 
-      {/* High-Interest Debt Payoff */}
+      {/* High-Interest Debt Payoff - REDESIGNED */}
       {debtPayoffScenarios.length > 0 && (
         <div className="space-y-4">
           <h4 className="font-semibold flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-red-600" />
-            High-Interest Debt Payoff Optimization ⭐
+            <Zap className="w-5 h-5 text-amber-500" />
+            Eliminate Toxic Debt to Maximize Cash Flow
           </h4>
 
           {debtPayoffScenarios.map((scenario, index) => (
-            <Card key={index} className="border-2 border-red-200">
-              <CardHeader>
-                <CardTitle>{scenario.name} <span className="text-xs text-muted-foreground font-normal">(calculated from liabilities)</span></CardTitle>
-                <CardDescription>
-                  Current balance: {scenario.balance.toLocaleString("en-US", { style: "currency", currency: "USD" })} at {scenario.apr}% APR
+            <Card key={index} className="border-2 border-amber-200">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2">
+                  {scenario.name}
+                  <span className="text-xs text-muted-foreground font-normal">(calculated from liabilities)</span>
+                </CardTitle>
+                <CardDescription className="text-base">
+                  Balance: <span className="font-semibold text-foreground">{formatCurrency(scenario.balance)}</span> at <span className="font-semibold text-destructive">{scenario.apr}% APR</span>
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Current Path */}
-                  <div className="p-4 bg-muted/50 rounded-lg">
-                    <div className="font-medium mb-2">Current Payment Schedule</div>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <div className="text-muted-foreground">Time to Payoff</div>
-                        <div className="font-semibold">{scenario.currentMonths} months</div>
-                      </div>
-                      <div>
-                        <div className="text-muted-foreground">Total Cost</div>
-                        <div className="font-semibold">
-                          {scenario.currentTotalCost.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-                        </div>
-                      </div>
+              <CardContent className="space-y-4">
+                
+                {/* Current Payment Schedule - Red/Pink background */}
+                <div className="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-lg">
+                  <div className="font-medium mb-3 text-red-700 dark:text-red-400 flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4" />
+                    Current Payment Schedule
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="text-center">
+                      <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Payment</div>
+                      <div className="font-semibold text-lg">{formatCurrency(scenario.currentPayment)}</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Timeline</div>
+                      <div className="font-semibold text-lg">{scenario.currentMonths} months</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">You Spend</div>
+                      <div className="font-semibold text-lg text-red-600 dark:text-red-400">{formatCurrency(scenario.currentTotalCost)}</div>
                     </div>
                   </div>
+                </div>
 
-                  {/* Accelerated Path */}
-                  <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <div className="font-medium mb-2 flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      Accelerated Payment (1.5x)
+                {/* Accelerated Payment Schedule - Yellow background */}
+                <div className="p-4 bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-900 rounded-lg">
+                  <div className="font-medium mb-3 text-yellow-700 dark:text-yellow-400 flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    Accelerated Payment Schedule (1.5x)
+                  </div>
+                  <div className="grid grid-cols-4 gap-4">
+                    <div className="text-center">
+                      <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Payment</div>
+                      <div className="font-semibold text-lg">{formatCurrency(scenario.acceleratedPayment)}</div>
                     </div>
-                    <div className="grid grid-cols-3 gap-4 text-sm mb-3">
-                      <div>
-                        <div className="text-muted-foreground">New Payment</div>
-                        <div className="font-semibold">
-                          {scenario.acceleratedPayment.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-muted-foreground">New Timeline</div>
-                        <div className="font-semibold">{scenario.acceleratedMonths} months</div>
-                      </div>
-                      <div>
-                        <div className="text-muted-foreground">You Save</div>
-                        <div className="font-semibold text-green-600">
-                          {scenario.acceleratedSavings.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-                        </div>
-                      </div>
+                    <div className="text-center">
+                      <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Timeline</div>
+                      <div className="font-semibold text-lg">{scenario.acceleratedMonths} months</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">You Spend</div>
+                      <div className="font-semibold text-lg">{formatCurrency(scenario.acceleratedTotalCost)}</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">You Save</div>
+                      <div className="font-semibold text-lg text-green-600 dark:text-green-400">{formatCurrency(scenario.acceleratedSavings)}</div>
                     </div>
                   </div>
+                </div>
 
-                  {/* Lump Sum */}
-                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="font-medium mb-2 flex items-center gap-2">
-                      <DollarSign className="w-4 h-4" />
-                      Lump Sum Payoff
+                {/* Lump Sum Payoff - Green background */}
+                <div className="p-4 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900 rounded-lg">
+                  <div className="font-medium mb-3 text-green-700 dark:text-green-400 flex items-center gap-2">
+                    <DollarSign className="w-4 h-4" />
+                    Lump Sum Payoff
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="text-center">
+                      <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Timeline</div>
+                      <div className="font-semibold text-lg">Immediate</div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4 text-sm mb-3">
-                      <div>
-                        <div className="text-muted-foreground">Total Savings</div>
-                        <div className="font-semibold text-green-600 text-lg">
-                          {scenario.lumpSumSavings.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-muted-foreground">Interest Avoided</div>
-                        <div className="font-semibold">
-                          {(scenario.currentTotalCost - scenario.balance).toLocaleString("en-US", { style: "currency", currency: "USD" })}
-                        </div>
-                      </div>
+                    <div className="text-center">
+                      <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">You Spend</div>
+                      <div className="font-semibold text-lg">{formatCurrency(scenario.lumpSumCost)}</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Interest Avoided</div>
+                      <div className="font-semibold text-lg text-green-600 dark:text-green-400">{formatCurrency(scenario.interestAvoided)}</div>
                     </div>
                   </div>
+                </div>
 
-                  <Alert>
-                    <AlertDescription>
-                      <strong>Recommendation:</strong> {
-                        scenario.recommendation === "immediate" 
-                          ? "Pay off immediately if you have the funds available. The interest savings are substantial."
-                          : "Consider accelerating payments to save time and money."
-                      }
-                    </AlertDescription>
-                  </Alert>
+                <Alert>
+                  <AlertDescription>
+                    <strong>Recommendation:</strong> {
+                      scenario.recommendation === "immediate" 
+                        ? "Pay off immediately if you have the funds available. The interest savings are substantial."
+                        : "Consider accelerating payments to save time and money."
+                    }
+                  </AlertDescription>
+                </Alert>
 
-                  <div className="flex gap-3">
-                    <Button onClick={handleCreatePayoffPlan}>
-                      Create Payoff Plan
+                <div className="flex gap-3">
+                  <Button onClick={handleCreatePayoffPlan}>
+                    Create Payoff Plan
+                  </Button>
+                  {scenario.recommendation === "immediate" && (
+                    <Button variant="outline" onClick={handlePayOffImmediately}>
+                      Pay Off Immediately
                     </Button>
-                    {scenario.recommendation === "immediate" && (
-                      <Button variant="outline" onClick={handlePayOffImmediately}>
-                        Pay Off Immediately
-                      </Button>
-                    )}
-                    <Button variant="ghost">Learn More</Button>
-                  </div>
+                  )}
+                  <Button variant="ghost">Learn More</Button>
                 </div>
               </CardContent>
             </Card>
