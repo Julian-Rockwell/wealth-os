@@ -171,7 +171,7 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
                     <AlertTriangle className="w-4 h-4" />
                     Current Payment Schedule
                   </div>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-4 gap-4">
                     <div className="text-center">
                       <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Payment</div>
                       <div className="font-semibold text-lg">{formatCurrency(scenario.currentPayment)}</div>
@@ -183,6 +183,9 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
                     <div className="text-center">
                       <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">You Spend</div>
                       <div className="font-semibold text-lg text-red-600 dark:text-red-400">{formatCurrency(scenario.currentTotalCost)}</div>
+                    </div>
+                    <div className="text-center">
+                      {/* Empty placeholder for alignment */}
                     </div>
                   </div>
                 </div>
@@ -219,7 +222,10 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
                     <DollarSign className="w-4 h-4" />
                     Lump Sum Payoff
                   </div>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-4 gap-4">
+                    <div className="text-center">
+                      {/* Empty placeholder for alignment */}
+                    </div>
                     <div className="text-center">
                       <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Timeline</div>
                       <div className="font-semibold text-lg">Immediate</div>
