@@ -283,6 +283,25 @@ export function TwinEngineChart({ data, milestones, settings }: TwinEngineChartP
             />
           </ComposedChart>
         </ResponsiveContainer>
+
+        {/* Starting Balances - moved below chart */}
+        <div className="bg-muted/50 p-3 rounded-lg mt-4">
+          <div className="text-xs text-muted-foreground mb-2">
+            Starting Point: {settings.startYear} | Age {settings.currentAge}
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-blue-500" />
+              <span className="text-sm font-medium text-blue-600">{formatMoney(settings.savingsActive)}</span>
+              <span className="text-xs text-muted-foreground">Active</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-green-500" />
+              <span className="text-sm font-medium text-green-600">{formatMoney(settings.savingsPassive)}</span>
+              <span className="text-xs text-muted-foreground">Passive</span>
+            </div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

@@ -78,7 +78,7 @@ export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
       <CardHeader>
         <CardTitle>Detailed Cash Flow Ledger</CardTitle>
         <CardDescription>
-          Tax Rate: {settings.taxRate}% (Grossed Up for W/D) • Projection to Age {data[data.length - 1]?.age || 106}
+          Tax Rate: {settings.taxRate}% (Grossed Up for W/D) • Projection to Age {data[data.length - 1]?.age || settings.targetAge || 106}
         </CardDescription>
       </CardHeader>
       <CardContent className="p-0">
@@ -116,8 +116,10 @@ export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
                 >
                   Age
                 </th>
-                <th className="h-8 px-2 text-center align-middle font-semibold whitespace-nowrap text-xs border-b-2 border-r bg-primary/5" colSpan={2}>Active Engine</th>
-                <th className="h-8 px-2 text-center align-middle font-semibold whitespace-nowrap text-xs border-b-2 border-r bg-green-500/5" colSpan={3}>Passive Engine</th>
+                {/* Renamed: Active Engine -> Active Trading */}
+                <th className="h-8 px-2 text-center align-middle font-semibold whitespace-nowrap text-xs border-b-2 border-r bg-primary/5" colSpan={3}>Active Trading</th>
+                {/* Renamed: Passive Engine -> Passive Income */}
+                <th className="h-8 px-2 text-center align-middle font-semibold whitespace-nowrap text-xs border-b-2 border-r bg-green-500/5" colSpan={3}>Passive Income</th>
                 <th className="h-8 px-2 text-center align-middle font-semibold whitespace-nowrap text-xs border-b-2 border-r bg-amber-500/5" colSpan={5}>Wallet & Lifestyle</th>
                 <th className="h-8 px-2 text-center align-middle font-semibold whitespace-nowrap text-xs border-b-2 bg-muted/50" colSpan={2}>Traditional</th>
               </tr>
@@ -136,22 +138,23 @@ export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
                 >
                   
                 </th>
-                {/* Active Engine */}
-                <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">GROSS</th>
-                <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs border-r">Spill</th>
-                {/* Passive Engine */}
+                {/* Active Trading - Added Balance column, renamed headers */}
+                <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">Balance</th>
+                <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">Profit</th>
+                <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs border-r">Excess</th>
+                {/* Passive Income */}
                 <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">Balance</th>
                 <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">Growth</th>
                 <th className="h-10 px-2 text-center align-middle font-medium text-muted-foreground whitespace-nowrap text-xs border-r">RPIC</th>
-                {/* Wallet & Lifestyle */}
+                {/* Wallet & Lifestyle - renamed W/D to DISTRIB. */}
                 <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">Other</th>
-                <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">W/D</th>
+                <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">DISTRIB.</th>
                 <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">Net</th>
                 <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">Gap</th>
                 <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs border-r">Exp</th>
-                {/* Traditional */}
+                {/* Traditional - renamed W/D to DISTRIB. */}
                 <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">Bal</th>
-                <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">W/D</th>
+                <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">DISTRIB.</th>
               </tr>
             </thead>
             <tbody>
@@ -188,14 +191,17 @@ export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
                   >
                     {row.age}
                   </td>
-                  {/* Active Engine */}
+                  {/* Active Trading - Added Balance column */}
+                  <td className="p-2 align-middle whitespace-nowrap text-sm text-right font-medium">
+                    {formatMoneyCondensed(row.activeBalance)}
+                  </td>
                   <td className="p-2 align-middle whitespace-nowrap text-sm text-right">
                     {row.activeBalance > 0 ? formatMoneyCondensed(row.activeProfitGross) : '-'}
                   </td>
                   <td className="p-2 align-middle whitespace-nowrap text-sm text-right border-r">
                     {row.spilloverNet > 0 ? formatMoneyCondensed(row.spilloverNet) : '-'}
                   </td>
-                  {/* Passive Engine */}
+                  {/* Passive Income */}
                   <td className="p-2 align-middle whitespace-nowrap text-sm text-right font-medium">
                     {formatMoneyCondensed(row.passiveBalance)}
                   </td>
