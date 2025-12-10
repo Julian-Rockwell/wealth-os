@@ -47,104 +47,7 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
         </p>
       </div>
 
-      {/* Equity Liquidation Opportunities */}
-      {equityOpportunities.length > 0 && (
-        <div className="space-y-4">
-          <h4 className="font-semibold flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-green-600" />
-            Real Estate Equity Opportunities (HELOC)
-          </h4>
-          
-          {equityOpportunities.map((opp, index) => (
-            <Card key={index} className="border-2 border-green-200">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-green-700">
-                      SMART MONEY OPPORTUNITY DETECTED
-                    </CardTitle>
-                    <CardDescription>
-                      {opp.assetName} - {opp.assetType}
-                    </CardDescription>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-green-600">
-                      {opp.netGainYear1.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-                    </div>
-                    <div className="text-xs text-muted-foreground">Potential Year 1 Net Gain</div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                  <div>
-                    <div className="text-sm text-muted-foreground">Available Equity</div>
-                    <div className="font-semibold">
-                      {opp.equity.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground">Loan Amount (80% LTV)</div>
-                    <div className="font-semibold">
-                      {opp.loanAmount.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground">Est. APR</div>
-                    <div className="font-semibold">{opp.estimatedAPR}%</div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground">Monthly Payment</div>
-                    <div className="font-semibold">
-                      {opp.monthlyPayment.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-                    </div>
-                  </div>
-                </div>
-
-                <Separator className="my-4" />
-
-                <div className="bg-muted/50 p-4 rounded-lg mb-4">
-                  <div className="flex items-start gap-2 mb-2">
-                    <TrendingUp className="w-4 h-4 text-green-600 mt-0.5" />
-                    <div>
-                      <div className="font-medium">Target Return: {opp.targetReturn}% annually</div>
-                      <div className="text-sm text-muted-foreground mt-1">
-                        Break-even after loan costs: {opp.estimatedAPR + 2}% | Safety margin included
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <Alert className="mb-4">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription className="text-xs">
-                    <strong>Risk Disclaimer:</strong> Active trading involves substantial risk. 
-                    Consider paper trading first. Past performance doesn't guarantee future results.
-                  </AlertDescription>
-                </Alert>
-
-                <div className="text-xs text-muted-foreground mb-4">
-                  Rates last updated: {new Date().toLocaleDateString()} (Placeholder - not live rates)
-                </div>
-
-                <div className="flex gap-3">
-                  <Button onClick={handleSeeAnalysis}>
-                    See Detailed Analysis
-                  </Button>
-                  <Button variant="outline" onClick={handleAddToPlan}>
-                    Add to Action Plan
-                  </Button>
-                  <Button variant="ghost" onClick={handleNotInterested}>
-                    Not Interested
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {/* High-Interest Debt Payoff - REDESIGNED */}
+      {/* High-Interest Debt Payoff - SHOWN FIRST */}
       {debtPayoffScenarios.length > 0 && (
         <div className="space-y-4">
           <h4 className="font-semibold flex items-center gap-2">
@@ -261,6 +164,103 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
                     </Button>
                   )}
                   <Button variant="ghost">Learn More</Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Equity Liquidation Opportunities - SHOWN SECOND */}
+      {equityOpportunities.length > 0 && (
+        <div className="space-y-4">
+          <h4 className="font-semibold flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-green-600" />
+            Real Estate Equity Opportunities (HELOC)
+          </h4>
+          
+          {equityOpportunities.map((opp, index) => (
+            <Card key={index} className="border-2 border-green-200">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="text-green-700">
+                      SMART MONEY OPPORTUNITY DETECTED
+                    </CardTitle>
+                    <CardDescription>
+                      {opp.assetName} - {opp.assetType}
+                    </CardDescription>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-green-600">
+                      {opp.netGainYear1.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Potential Year 1 Net Gain</div>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                  <div>
+                    <div className="text-sm text-muted-foreground">Available Equity</div>
+                    <div className="font-semibold">
+                      {opp.equity.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Loan Amount (80% LTV)</div>
+                    <div className="font-semibold">
+                      {opp.loanAmount.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Est. APR</div>
+                    <div className="font-semibold">{opp.estimatedAPR}%</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Monthly Payment</div>
+                    <div className="font-semibold">
+                      {opp.monthlyPayment.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                    </div>
+                  </div>
+                </div>
+
+                <Separator className="my-4" />
+
+                <div className="bg-muted/50 p-4 rounded-lg mb-4">
+                  <div className="flex items-start gap-2 mb-2">
+                    <TrendingUp className="w-4 h-4 text-green-600 mt-0.5" />
+                    <div>
+                      <div className="font-medium">Target Return: {opp.targetReturn}% annually</div>
+                      <div className="text-sm text-muted-foreground mt-1">
+                        Break-even after loan costs: {opp.estimatedAPR + 2}% | Safety margin included
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <Alert className="mb-4">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription className="text-xs">
+                    <strong>Risk Disclaimer:</strong> Active trading involves substantial risk. 
+                    Consider paper trading first. Past performance doesn't guarantee future results.
+                  </AlertDescription>
+                </Alert>
+
+                <div className="text-xs text-muted-foreground mb-4">
+                  Rates last updated: {new Date().toLocaleDateString()} (Placeholder - not live rates)
+                </div>
+
+                <div className="flex gap-3">
+                  <Button onClick={handleSeeAnalysis}>
+                    See Detailed Analysis
+                  </Button>
+                  <Button variant="outline" onClick={handleAddToPlan}>
+                    Add to Action Plan
+                  </Button>
+                  <Button variant="ghost" onClick={handleNotInterested}>
+                    Not Interested
+                  </Button>
                 </div>
               </CardContent>
             </Card>

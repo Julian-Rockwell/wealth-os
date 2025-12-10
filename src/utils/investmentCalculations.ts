@@ -344,8 +344,10 @@ export function calculateEquityOpportunities(snapshot: FinancialSnapshot) {
       
       // PLACEHOLDER VALUES (should be real-time rates in production):
       const estimatedAPR = 7.0; // Fixed example: 7% HELOC rate
-      const monthlyPayment = (loanAmount * (estimatedAPR / 100 / 12)) / (1 - Math.pow(1 + (estimatedAPR / 100 / 12), -360));
+      // Interest-only formula: (Principal × APR) / 12
+      const monthlyPayment = (loanAmount * (estimatedAPR / 100)) / 12;
       const targetReturn = 0.25; // Fixed example: 25% annual return target
+      // Annual interest cost = Loan Amount × APR (since interest-only)
       const annualCost = monthlyPayment * 12;
       const potentialGain = loanAmount * targetReturn - annualCost;
       
