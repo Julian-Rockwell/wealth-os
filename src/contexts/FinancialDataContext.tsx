@@ -147,6 +147,10 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
     if (stored) {
       // Merge stored with defaults to handle new fields
       const parsed = JSON.parse(stored);
+      // Migration: Force taxRate to 0 if it was the legacy default of 18
+      if (parsed.taxRate === 18) {
+        parsed.taxRate = 0;
+      }
       return { ...getDefaultTwinEngineSettings(), ...parsed };
     }
     return getDefaultTwinEngineSettings();

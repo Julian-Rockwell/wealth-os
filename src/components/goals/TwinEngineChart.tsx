@@ -173,23 +173,33 @@ export function TwinEngineChart({ data, milestones, settings }: TwinEngineChartP
               />
             )}
             
-            {/* 2. Comfort Level (Level 2 - Offset 35) */}
+            {/* 2. Trad Freedom (Level 2 - Offset 35) */}
+            {milestones.tradFreedomYear && (
+              <ReferenceLine 
+                x={milestones.tradFreedomYear} 
+                stroke="#9ca3af" 
+                strokeDasharray="3 3"
+                label={<MultiLineLabel value={["Trad.", "Freedom"]} fill="#9ca3af" yOffset={35} />}
+              />
+            )}
+
+            {/* 3. Comfort Level (Level 3 - Offset 70) */}
             {milestones.capHitYear && (
               <ReferenceLine 
                 x={milestones.capHitYear} 
                 stroke="#3b82f6" 
                 strokeDasharray="3 3"
-                label={<MultiLineLabel value={["Comfort", "Level"]} fill="#3b82f6" yOffset={35} />}
+                label={<MultiLineLabel value={["Comfort", "Level"]} fill="#3b82f6" yOffset={70} />}
               />
             )}
 
-            {/* 3. Stop Trading (Level 3 - Offset 70) - CONDITIONAL */}
+            {/* 4. Stop Trading (Level 4 - Offset 105) - CONDITIONAL */}
             {!settings.tradeIndefinitely && milestones.activeStoppedYear && (
               <ReferenceLine 
                 x={milestones.activeStoppedYear} 
                 stroke="#3b82f6" 
                 strokeDasharray="3 3"
-                label={<MultiLineLabel value={["Stop", "Trading"]} fill="#3b82f6" yOffset={70} />}
+                label={<MultiLineLabel value={["Stop", "Trading"]} fill="#3b82f6" yOffset={105} />}
               />
             )}
 
