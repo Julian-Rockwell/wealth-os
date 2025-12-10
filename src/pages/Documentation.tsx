@@ -81,6 +81,7 @@ const Documentation = () => {
             <a href="#formulas" className="block text-primary hover:underline ml-4">9.5 Capital Allocation Waterfall</a>
             <a href="#user-flow" className="block text-primary hover:underline">10. Typical User Flow</a>
             <a href="#glossary" className="block text-primary hover:underline">11. Glossary of Terms</a>
+            <a href="/angular-migration" className="block text-primary hover:underline font-semibold mt-4">📄 Angular Migration Guide (Separate Document)</a>
           </nav>
         </div>
 
