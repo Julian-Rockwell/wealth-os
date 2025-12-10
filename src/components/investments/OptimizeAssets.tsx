@@ -11,7 +11,7 @@ interface OptimizeAssetsProps {
   snapshot: FinancialSnapshot;
 }
 
-const formatCurrency = (value: number) => 
+const formatCurrency = (value: number) =>
   value.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 });
 
 export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
@@ -41,7 +41,12 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-2">Asset Optimization Opportunities <span className="text-xs text-muted-foreground font-normal ml-2">(calculated from holdings and liabilities)</span></h3>
+        <h3 className="text-lg font-semibold mb-2">
+          Asset Optimization Opportunities{" "}
+          <span className="text-xs text-muted-foreground font-normal ml-2">
+            (calculated from holdings and liabilities)
+          </span>
+        </h3>
         <p className="text-sm text-muted-foreground">
           Prescriptive recommendations to maximize your financial position
         </p>
@@ -63,11 +68,11 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
                   <span className="text-xs text-muted-foreground font-normal">(calculated from liabilities)</span>
                 </CardTitle>
                 <CardDescription className="text-base">
-                  Balance: <span className="font-semibold text-foreground">{formatCurrency(scenario.balance)}</span> at <span className="font-semibold text-destructive">{scenario.apr}% APR</span>
+                  Balance: <span className="font-semibold text-foreground">{formatCurrency(scenario.balance)}</span> at{" "}
+                  <span className="font-semibold text-destructive">{scenario.apr}% APR</span>
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                
                 {/* Current Payment Schedule - Red/Pink background */}
                 <div className="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-lg">
                   <div className="font-medium mb-3 text-red-700 dark:text-red-400 flex items-center gap-2">
@@ -85,11 +90,11 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
                     </div>
                     <div className="text-center">
                       <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">You Spend</div>
-                      <div className="font-semibold text-lg text-red-600 dark:text-red-400">{formatCurrency(scenario.currentTotalCost)}</div>
+                      <div className="font-semibold text-lg text-red-600 dark:text-red-400">
+                        {formatCurrency(scenario.currentTotalCost)}
+                      </div>
                     </div>
-                    <div className="text-center">
-                      {/* Empty placeholder for alignment */}
-                    </div>
+                    <div className="text-center">{/* Empty placeholder for alignment */}</div>
                   </div>
                 </div>
 
@@ -114,7 +119,9 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
                     </div>
                     <div className="text-center">
                       <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">You Save</div>
-                      <div className="font-semibold text-lg text-green-600 dark:text-green-400">{formatCurrency(scenario.acceleratedSavings)}</div>
+                      <div className="font-semibold text-lg text-green-600 dark:text-green-400">
+                        {formatCurrency(scenario.acceleratedSavings)}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -126,9 +133,7 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
                     Lump Sum Payoff
                   </div>
                   <div className="grid grid-cols-4 gap-4">
-                    <div className="text-center">
-                      {/* Empty placeholder for alignment */}
-                    </div>
+                    <div className="text-center">{/* Empty placeholder for alignment */}</div>
                     <div className="text-center">
                       <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Timeline</div>
                       <div className="font-semibold text-lg">Immediate</div>
@@ -139,25 +144,24 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
                     </div>
                     <div className="text-center">
                       <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Interest Avoided</div>
-                      <div className="font-semibold text-lg text-green-600 dark:text-green-400">{formatCurrency(scenario.interestAvoided)}</div>
+                      <div className="font-semibold text-lg text-green-600 dark:text-green-400">
+                        {formatCurrency(scenario.interestAvoided)}
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 <Alert>
                   <AlertDescription>
-                    <strong>Recommendation:</strong> {
-                      scenario.recommendation === "immediate" 
-                        ? "Pay off immediately if you have the funds available. The interest savings are substantial."
-                        : "Consider accelerating payments to save time and money."
-                    }
+                    <strong>Recommendation:</strong>{" "}
+                    {scenario.recommendation === "immediate"
+                      ? "Pay off immediately if you have the funds available. The interest savings are substantial."
+                      : "Consider accelerating payments to save time and money."}
                   </AlertDescription>
                 </Alert>
 
                 <div className="flex gap-3">
-                  <Button onClick={handleCreatePayoffPlan}>
-                    Create Payoff Plan
-                  </Button>
+                  <Button onClick={handleCreatePayoffPlan}>Create Payoff Plan</Button>
                   {scenario.recommendation === "immediate" && (
                     <Button variant="outline" onClick={handlePayOffImmediately}>
                       Pay Off Immediately
@@ -176,17 +180,15 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
         <div className="space-y-4">
           <h4 className="font-semibold flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-green-600" />
-            Real Estate Equity Opportunities (HELOC)
+            Unlock Home Equity for Growth
           </h4>
-          
+
           {equityOpportunities.map((opp, index) => (
             <Card key={index} className="border-2 border-green-200">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div>
-                    <CardTitle className="text-green-700">
-                      SMART MONEY OPPORTUNITY DETECTED
-                    </CardTitle>
+                    <CardTitle className="text-green-700">SMART MONEY OPPORTUNITY DETECTED</CardTitle>
                     <CardDescription>
                       {opp.assetName} - {opp.assetType}
                     </CardDescription>
@@ -242,8 +244,8 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
                 <Alert className="mb-4">
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription className="text-xs">
-                    <strong>Risk Disclaimer:</strong> Active trading involves substantial risk. 
-                    Consider paper trading first. Past performance doesn't guarantee future results.
+                    <strong>Risk Disclaimer:</strong> Active trading involves substantial risk. Consider paper trading
+                    first. Past performance doesn't guarantee future results.
                   </AlertDescription>
                 </Alert>
 
@@ -252,9 +254,7 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
                 </div>
 
                 <div className="flex gap-3">
-                  <Button onClick={handleSeeAnalysis}>
-                    See Detailed Analysis
-                  </Button>
+                  <Button onClick={handleSeeAnalysis}>See Detailed Analysis</Button>
                   <Button variant="outline" onClick={handleAddToPlan}>
                     Add to Action Plan
                   </Button>
@@ -272,9 +272,7 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
       {equityOpportunities.length === 0 && debtPayoffScenarios.length === 0 && (
         <Card>
           <CardContent className="py-12 text-center">
-            <div className="text-muted-foreground mb-4">
-              No optimization opportunities detected at this time.
-            </div>
+            <div className="text-muted-foreground mb-4">No optimization opportunities detected at this time.</div>
             <p className="text-sm text-muted-foreground">
               Your assets are well-structured and you don't have high-interest debt requiring immediate attention.
             </p>
