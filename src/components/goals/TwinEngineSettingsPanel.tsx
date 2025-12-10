@@ -184,7 +184,7 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
           />
 
           <div className="space-y-2">
-            <Label className="text-sm text-muted-foreground uppercase tracking-wide">Account Size Comfortable Trading</Label>
+            <Label className="text-sm text-muted-foreground tracking-wide">Account Size Comfortable Trading</Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
               <Input
