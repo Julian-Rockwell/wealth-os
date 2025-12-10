@@ -78,7 +78,7 @@ export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
       <CardHeader>
         <CardTitle>Detailed Cash Flow Ledger</CardTitle>
         <CardDescription>
-          Tax Rate: {settings.taxRate}% (Grossed Up for W/D) • Projection to Age {data[data.length - 1]?.age || settings.targetAge || 106}
+          Gross expenses = Cost of Living + {settings.taxRate}% tax • Projection to Age {data[data.length - 1]?.age || settings.targetAge || 106}
         </CardDescription>
       </CardHeader>
       <CardContent className="p-0">

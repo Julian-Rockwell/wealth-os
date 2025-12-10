@@ -439,13 +439,6 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
             suffix="%"
             tooltip="Maximum percentage of passive yield that can be withdrawn. Protects principal."
           />
-
-          {/* Annual Cost of Living */}
-          <InputCurrency
-            label="Annual Cost of Living"
-            value={settings.annualExpenses}
-            onChange={(val) => updateSetting('annualExpenses', val)}
-          />
         </CollapsibleSection>
       </CardContent>
     </Card>

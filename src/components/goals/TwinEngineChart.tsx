@@ -38,6 +38,22 @@ const formatMoneyFull = (value: number) => {
   }).format(value);
 };
 
+const MultiLineLabel = ({ viewBox, value, fill, fontSize = 10, fontWeight = 'bold', yOffset = 0 }: any) => {
+  const lines = Array.isArray(value) ? value : [value];
+  const { x, y } = viewBox;
+  const baseY = y + yOffset;
+
+  return (
+    <text x={x} y={baseY} textAnchor="middle" fill={fill} fontSize={fontSize} fontWeight={fontWeight}>
+      {lines.map((line: string, i: number) => (
+        <tspan x={x} dy={i === 0 ? 10 : 12} key={i}>
+          {line}
+        </tspan>
+      ))}
+    </text>
+  );
+};
+
 export function TwinEngineChart({ data, milestones, settings }: TwinEngineChartProps) {
   const [chartView, setChartView] = useState<'netWorth' | 'income'>('netWorth');
 
@@ -146,49 +162,34 @@ export function TwinEngineChart({ data, milestones, settings }: TwinEngineChartP
             <Tooltip content={<CustomTooltip />} />
             <Legend wrapperStyle={{ paddingTop: '20px' }} />
 
-            {/* Milestone Reference Lines */}
+            {/* Milestone Reference Lines - Staggered with yOffset */}
+            {/* 1. Wealth OS Freedom (Top Level - Offset 0) */}
             {milestones.freedomYear && (
               <ReferenceLine 
                 x={milestones.freedomYear} 
-                stroke="hsl(142, 76%, 36%)" 
-                strokeDasharray="5 5"
-                strokeWidth={2}
-                label={{ 
-                  value: 'Freedom', 
-                  position: 'top', 
-                  fill: 'hsl(142, 76%, 36%)',
-                  fontSize: 11,
-                  fontWeight: 'bold'
-                }}
+                stroke="#10b981" 
+                strokeDasharray="3 3"
+                label={<MultiLineLabel value={["Wealth OS", "Freedom"]} fill="#10b981" yOffset={0} />}
               />
             )}
-            {milestones.capHitYear && chartView === 'netWorth' && (
+            
+            {/* 2. Comfort Level (Level 2 - Offset 35) */}
+            {milestones.capHitYear && (
               <ReferenceLine 
                 x={milestones.capHitYear} 
-                stroke="hsl(var(--primary))" 
-                strokeDasharray="5 5"
-                label={{ 
-                  value: 'Cap Hit', 
-                  position: 'top', 
-                  fill: 'hsl(var(--primary))',
-                  fontSize: 11,
-                  offset: milestones.freedomYear && Math.abs(milestones.capHitYear - milestones.freedomYear) < 3 ? 15 : 0
-                }}
+                stroke="#3b82f6" 
+                strokeDasharray="3 3"
+                label={<MultiLineLabel value={["Comfort", "Level"]} fill="#3b82f6" yOffset={35} />}
               />
             )}
-            {milestones.activeStoppedYear && (
+
+            {/* 3. Stop Trading (Level 3 - Offset 70) - CONDITIONAL */}
+            {!settings.tradeIndefinitely && milestones.activeStoppedYear && (
               <ReferenceLine 
                 x={milestones.activeStoppedYear} 
-                stroke="hsl(var(--warning))" 
-                strokeDasharray="5 5"
-                label={{ 
-                  value: 'Stop Trading', 
-                  position: 'top', 
-                  fill: 'hsl(var(--warning))',
-                  fontSize: 11,
-                  offset: ((milestones.freedomYear && Math.abs(milestones.activeStoppedYear - milestones.freedomYear) < 3) ||
-                    (milestones.capHitYear && Math.abs(milestones.activeStoppedYear - milestones.capHitYear) < 3)) ? 30 : 0
-                }}
+                stroke="#3b82f6" 
+                strokeDasharray="3 3"
+                label={<MultiLineLabel value={["Stop", "Trading"]} fill="#3b82f6" yOffset={70} />}
               />
             )}
 
