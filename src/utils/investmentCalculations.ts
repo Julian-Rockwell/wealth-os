@@ -354,10 +354,13 @@ export function calculateEquityOpportunities(snapshot: FinancialSnapshot) {
       opportunities.push({
         assetName: holding.name,
         assetType: holding.assetClass,
+        homeValue: holding.balance,
+        existingMortgage: existingLoan,
         equity,
         loanAmount,
         estimatedAPR,
         monthlyPayment,
+        annualInterestCost: annualCost,
         targetReturn: targetReturn * 100,
         netGainYear1: potentialGain
       });

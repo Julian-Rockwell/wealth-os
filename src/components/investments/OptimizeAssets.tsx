@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -6,6 +7,7 @@ import { TrendingUp, AlertTriangle, DollarSign, Calendar, Zap } from "lucide-rea
 import { toast } from "sonner";
 import type { FinancialSnapshot } from "@/types/financial";
 import { calculateEquityOpportunities, calculateDebtPayoffScenarios } from "@/utils/investmentCalculations";
+import { HELOCAnalysisDialog } from "./HELOCAnalysisDialog";
 
 interface OptimizeAssetsProps {
   snapshot: FinancialSnapshot;
@@ -17,9 +19,13 @@ const formatCurrency = (value: number) =>
 export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
   const equityOpportunities = calculateEquityOpportunities(snapshot);
   const debtPayoffScenarios = calculateDebtPayoffScenarios(snapshot.liabilities);
+  
+  const [analysisDialogOpen, setAnalysisDialogOpen] = useState(false);
+  const [selectedOpportunity, setSelectedOpportunity] = useState<typeof equityOpportunities[0] | null>(null);
 
-  const handleSeeAnalysis = () => {
-    toast.info("Opening detailed analysis...");
+  const handleSeeAnalysis = (opportunity: typeof equityOpportunities[0]) => {
+    setSelectedOpportunity(opportunity);
+    setAnalysisDialogOpen(true);
   };
 
   const handleAddToPlan = () => {
@@ -257,7 +263,7 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
                     </div>
 
                     <div className="flex gap-3">
-                      <Button onClick={handleSeeAnalysis}>See Detailed Analysis</Button>
+                      <Button onClick={() => handleSeeAnalysis(opp)}>See Detailed Analysis</Button>
                       <Button variant="outline" onClick={handleAddToPlan}>
                         Add to Action Plan
                       </Button>
@@ -302,6 +308,13 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
           </CardContent>
         </Card>
       )}
+
+      {/* HELOC Analysis Dialog */}
+      <HELOCAnalysisDialog
+        open={analysisDialogOpen}
+        onOpenChange={setAnalysisDialogOpen}
+        opportunity={selectedOpportunity}
+      />
     </div>
   );
 }
