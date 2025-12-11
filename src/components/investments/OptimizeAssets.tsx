@@ -167,7 +167,6 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
                       Pay Off Immediately
                     </Button>
                   )}
-                  <Button variant="ghost">Learn More</Button>
                 </div>
               </CardContent>
             </Card>
@@ -241,26 +240,50 @@ export function OptimizeAssets({ snapshot }: OptimizeAssetsProps) {
                   </div>
                 </div>
 
-                <Alert className="mb-4">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription className="text-xs">
-                    <strong>Risk Disclaimer:</strong> Active trading involves substantial risk. Consider paper trading
-                    first. Past performance doesn't guarantee future results.
-                  </AlertDescription>
-                </Alert>
+                {/* Two-column layout: Risk Disclaimer & Buttons (2/3) + Assumptions (1/3) */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Left column - Risk Disclaimer & Buttons (2/3) */}
+                  <div className="md:col-span-2 space-y-4">
+                    <Alert>
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertDescription className="text-xs">
+                        <strong>Risk Disclaimer:</strong> Active trading involves substantial risk. Consider paper trading
+                        first. Past performance doesn't guarantee future results.
+                      </AlertDescription>
+                    </Alert>
 
-                <div className="text-xs text-muted-foreground mb-4">
-                  Rates last updated: {new Date().toLocaleDateString()} (Placeholder - not live rates)
-                </div>
+                    <div className="text-xs text-muted-foreground">
+                      Rates last updated: {new Date().toLocaleDateString()} (Placeholder - not live rates)
+                    </div>
 
-                <div className="flex gap-3">
-                  <Button onClick={handleSeeAnalysis}>See Detailed Analysis</Button>
-                  <Button variant="outline" onClick={handleAddToPlan}>
-                    Add to Action Plan
-                  </Button>
-                  <Button variant="ghost" onClick={handleNotInterested}>
-                    Not Interested
-                  </Button>
+                    <div className="flex gap-3">
+                      <Button onClick={handleSeeAnalysis}>See Detailed Analysis</Button>
+                      <Button variant="outline" onClick={handleAddToPlan}>
+                        Add to Action Plan
+                      </Button>
+                      <Button variant="ghost" onClick={handleNotInterested}>
+                        Not Interested
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Right column - Assumptions Card (1/3) */}
+                  <div className="md:col-span-1">
+                    <Card className="bg-muted/30 h-full">
+                      <CardContent className="p-4">
+                        <div className="font-semibold text-sm mb-2">Assumptions:</div>
+                        <ul className="text-xs space-y-1 text-muted-foreground mb-3">
+                          <li>• Standard HELOC-type loan</li>
+                          <li>• Loan Amount = 80% Current Value minus Mortgage balance</li>
+                          <li>• Interest-only payments</li>
+                          <li>• Payback full loan within 10 years</li>
+                        </ul>
+                        <div className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                          For Illustration & Education Purposes Only
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
               </CardContent>
             </Card>
