@@ -34,6 +34,55 @@ const formatMoney = (value: number) => {
   }).format(value);
 };
 
+// Dual Range Slider Component
+interface DualRangeSliderProps {
+  min: number;
+  max: number;
+  valueMin: number;
+  valueMax: number;
+  onChange: (newMin: number, newMax: number) => void;
+  label: string;
+  minGap?: number;
+}
+
+function DualRangeSlider({ min, max, valueMin, valueMax, onChange, label, minGap = 10 }: DualRangeSliderProps) {
+  const handleChange = (values: number[]) => {
+    let [newMin, newMax] = values;
+    // Ensure minGap is maintained
+    if (newMax - newMin < minGap) {
+      if (newMin !== valueMin) {
+        // User moved the min thumb
+        newMax = newMin + minGap;
+      } else {
+        // User moved the max thumb
+        newMin = newMax - minGap;
+      }
+    }
+    // Clamp to boundaries
+    newMin = Math.max(min, Math.min(newMin, max - minGap));
+    newMax = Math.min(max, Math.max(newMax, min + minGap));
+    onChange(newMin, newMax);
+  };
+
+  return (
+    <div className="space-y-3">
+      <Label className="text-sm text-muted-foreground">{label}</Label>
+      <Slider
+        value={[valueMin, valueMax]}
+        onValueChange={handleChange}
+        min={min}
+        max={max}
+        step={1}
+        className="w-full"
+      />
+      <div className="flex justify-between text-xs text-muted-foreground">
+        <span className="font-medium text-foreground">{valueMin} yo</span>
+        <span className="font-medium text-foreground">{valueMax} yo</span>
+      </div>
+    </div>
+  );
+}
+
 interface InputSliderProps {
   label: string;
   value: number;
@@ -150,22 +199,25 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
         <CardTitle className="text-lg">Projection Settings</CardTitle>
       </CardHeader>
       <CardContent className="space-y-1 p-2">
-        {/* Foundation Section - Tax Rate moved to Advanced */}
+        {/* Timeline & Profile Section - Dual Slider for Age Range */}
         <CollapsibleSection
-          title="Foundation"
+          title="Timeline & Profile"
           icon={User}
           colorClass="text-primary"
           isOpen={openSections.foundation}
           onToggle={() => toggleSection('foundation')}
         >
-          <InputSlider
-            label="Current Age"
-            value={settings.currentAge}
-            onChange={(val) => updateSetting('currentAge', val)}
+          <DualRangeSlider
+            label="Current Age → Planning Horizon"
             min={20}
-            max={95}
-            step={1}
-            suffix=" yo"
+            max={120}
+            valueMin={settings.currentAge}
+            valueMax={settings.targetAge}
+            onChange={(newMin, newMax) => {
+              updateSetting('currentAge', newMin);
+              updateSetting('targetAge', newMax);
+            }}
+            minGap={10}
           />
         </CollapsibleSection>
 
@@ -256,7 +308,7 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
           onToggle={() => toggleSection('passiveIncome')}
         >
           <InputCurrency
-            label="Current Retirement (Passive)"
+            label="Current Retirement Savings"
             value={settings.savingsPassive}
             onChange={(val) => updateSetting('savingsPassive', val)}
           />
@@ -321,20 +373,8 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
             tooltip="Estimated tax rate on trading profits and withdrawals"
           />
 
-          {/* Planning Horizon - NEW */}
           <InputSlider
-            label="Planning Horizon (Age)"
-            value={settings.targetAge}
-            onChange={(val) => updateSetting('targetAge', val)}
-            min={75}
-            max={120}
-            step={1}
-            suffix=" yo"
-            tooltip="The age until which projections are calculated"
-          />
-
-          <InputSlider
-            label="Inflation Assumption"
+            label="Est. Annual Inflation"
             value={settings.inflationRate}
             onChange={(val) => updateSetting('inflationRate', val)}
             min={0}
@@ -380,7 +420,7 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
               />
 
               <InputSlider
-                label="Active Cash Out %"
+                label="One-Time Spend at Stop (%)"
                 value={settings.activeCashOutPercent}
                 onChange={(val) => updateSetting('activeCashOutPercent', val)}
                 min={0}
@@ -430,7 +470,7 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
 
           {/* Yield Cap */}
           <InputSlider
-            label="Yield Cap %"
+            label="Max % of Passive Income to Distribute"
             value={settings.yieldCapPercent}
             onChange={(val) => updateSetting('yieldCapPercent', val)}
             min={50}

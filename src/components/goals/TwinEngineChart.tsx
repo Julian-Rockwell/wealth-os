@@ -169,7 +169,7 @@ export function TwinEngineChart({ data, milestones, settings }: TwinEngineChartP
                 x={milestones.freedomYear} 
                 stroke="#10b981" 
                 strokeDasharray="3 3"
-                label={<MultiLineLabel value={["Wealth OS", "Freedom"]} fill="#10b981" yOffset={0} />}
+                label={<MultiLineLabel value={["Wealth OS Freedom", "Passive Income", "> Gross Exp"]} fill="#10b981" yOffset={0} />}
               />
             )}
             
@@ -179,7 +179,7 @@ export function TwinEngineChart({ data, milestones, settings }: TwinEngineChartP
                 x={milestones.tradFreedomYear} 
                 stroke="#9ca3af" 
                 strokeDasharray="3 3"
-                label={<MultiLineLabel value={["Trad.", "Freedom"]} fill="#9ca3af" yOffset={35} />}
+                label={<MultiLineLabel value={["Trad. Freedom", "4% of Portfolio", "> Gross Exp"]} fill="#9ca3af" yOffset={35} />}
               />
             )}
 
@@ -189,7 +189,7 @@ export function TwinEngineChart({ data, milestones, settings }: TwinEngineChartP
                 x={milestones.capHitYear} 
                 stroke="#3b82f6" 
                 strokeDasharray="3 3"
-                label={<MultiLineLabel value={["Comfort", "Level"]} fill="#3b82f6" yOffset={70} />}
+                label={<MultiLineLabel value={["Trading Acct", "reaches comfort", "level"]} fill="#3b82f6" yOffset={70} />}
               />
             )}
 
