@@ -1,6 +1,5 @@
 import * as React from "react";
-import RangeSlider from "react-range-slider-input";
-import "react-range-slider-input/dist/style.css";
+import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 
 interface DualRangeSliderProps {
@@ -22,19 +21,24 @@ export function DualRangeSlider({
   minGap = 10,
   className
 }: DualRangeSliderProps) {
+  const handleValueChange = (newValue: number[]) => {
+    if (newValue.length === 2) {
+      const [left, right] = newValue;
+      // Enforce minimum gap
+      if (right - left >= minGap) {
+        onValueChange([left, right] as [number, number]);
+      }
+    }
+  };
+
   return (
     <div className={cn("w-full", className)}>
-      <RangeSlider
+      <Slider
         min={min}
         max={max}
         step={step}
         value={value}
-        onInput={(newValue: [number, number]) => {
-          if (newValue[1] - newValue[0] >= minGap) {
-            onValueChange(newValue);
-          }
-        }}
-        className="range-slider-primary"
+        onValueChange={handleValueChange}
       />
     </div>
   );
