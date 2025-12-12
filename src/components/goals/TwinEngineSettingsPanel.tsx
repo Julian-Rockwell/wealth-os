@@ -47,20 +47,13 @@ interface DualRangeSliderProps {
 
 function DualRangeSlider({ min, max, valueMin, valueMax, onChange, label, minGap = 10 }: DualRangeSliderProps) {
   const handleChange = (values: number[]) => {
-    let [newMin, newMax] = values;
-    // Ensure minGap is maintained
+    const [newMin, newMax] = values;
+    
+    // If gap is violated, don't update
     if (newMax - newMin < minGap) {
-      if (newMin !== valueMin) {
-        // User moved the min thumb
-        newMax = newMin + minGap;
-      } else {
-        // User moved the max thumb
-        newMin = newMax - minGap;
-      }
+      return;
     }
-    // Clamp to boundaries
-    newMin = Math.max(min, Math.min(newMin, max - minGap));
-    newMax = Math.min(max, Math.max(newMax, min + minGap));
+    
     onChange(newMin, newMax);
   };
 
