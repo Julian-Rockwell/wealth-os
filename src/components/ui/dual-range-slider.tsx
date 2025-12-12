@@ -23,11 +23,8 @@ export function DualRangeSlider({
 }: DualRangeSliderProps) {
   const handleValueChange = (newValue: number[]) => {
     if (newValue.length === 2) {
-      const [left, right] = newValue;
-      // Enforce minimum gap
-      if (right - left >= minGap) {
-        onValueChange([left, right] as [number, number]);
-      }
+      // SIN restricción - pasar valores directamente para diagnóstico
+      onValueChange([newValue[0], newValue[1]] as [number, number]);
     }
   };
 
