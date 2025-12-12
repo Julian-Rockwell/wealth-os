@@ -18,6 +18,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { DualRangeSlider } from "@/components/ui/dual-range-slider";
 import type { TwinEngineSettings } from "@/utils/twinEngineCalculations";
 
 interface TwinEngineSettingsPanelProps {
@@ -33,48 +34,6 @@ const formatMoney = (value: number) => {
     maximumFractionDigits: 0
   }).format(value);
 };
-
-// Dual Range Slider Component
-interface DualRangeSliderProps {
-  min: number;
-  max: number;
-  valueMin: number;
-  valueMax: number;
-  onChange: (newMin: number, newMax: number) => void;
-  label: string;
-  minGap?: number;
-}
-
-function DualRangeSlider({ min, max, valueMin, valueMax, onChange, label, minGap = 10 }: DualRangeSliderProps) {
-  const handleChange = (values: number[]) => {
-    const [newMin, newMax] = values;
-    
-    // If gap is violated, don't update
-    if (newMax - newMin < minGap) {
-      return;
-    }
-    
-    onChange(newMin, newMax);
-  };
-
-  return (
-    <div className="space-y-3">
-      <Label className="text-sm text-muted-foreground">{label}</Label>
-      <Slider
-        value={[valueMin, valueMax]}
-        onValueChange={handleChange}
-        min={min}
-        max={max}
-        step={1}
-        className="w-full"
-      />
-      <div className="flex justify-between text-xs text-muted-foreground">
-        <span className="font-medium text-foreground">{valueMin} yo</span>
-        <span className="font-medium text-foreground">{valueMax} yo</span>
-      </div>
-    </div>
-  );
-}
 
 interface InputSliderProps {
   label: string;
@@ -200,18 +159,23 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
           isOpen={openSections.foundation}
           onToggle={() => toggleSection('foundation')}
         >
-          <DualRangeSlider
-            label="Current Age → Planning Horizon"
-            min={20}
-            max={120}
-            valueMin={settings.currentAge}
-            valueMax={settings.targetAge}
-            onChange={(newMin, newMax) => {
-              updateSetting('currentAge', newMin);
-              updateSetting('targetAge', newMax);
-            }}
-            minGap={10}
-          />
+          <div className="space-y-3">
+            <Label className="text-sm text-muted-foreground">Current Age → Planning Horizon</Label>
+            <DualRangeSlider
+              min={20}
+              max={120}
+              value={[settings.currentAge, settings.targetAge]}
+              onValueChange={([newMin, newMax]) => {
+                updateSetting('currentAge', newMin);
+                updateSetting('targetAge', newMax);
+              }}
+              minGap={10}
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span className="font-medium text-foreground">{settings.currentAge} yo</span>
+              <span className="font-medium text-foreground">{settings.targetAge} yo</span>
+            </div>
+          </div>
         </CollapsibleSection>
 
         {/* Active Trading Section - Renamed labels */}
