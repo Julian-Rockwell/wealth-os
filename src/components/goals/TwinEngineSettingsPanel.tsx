@@ -166,6 +166,7 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
               max={120}
               value={[settings.currentAge, settings.targetAge]}
               onValueChange={([newMin, newMax]) => {
+                console.log('DualRangeSlider changed:', { newMin, newMax, prevCurrent: settings.currentAge, prevTarget: settings.targetAge });
                 updateSetting('currentAge', newMin);
                 updateSetting('targetAge', newMax);
               }}
