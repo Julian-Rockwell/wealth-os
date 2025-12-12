@@ -344,7 +344,7 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
           {projectionSettings && twinEngineResult && twinEngineKPIs && (
             <>
               {/* KPI Header */}
-              <TwinEngineKPIHeader kpis={twinEngineKPIs} />
+              <TwinEngineKPIHeader kpis={twinEngineKPIs} milestones={twinEngineResult.milestones} />
 
               {/* Toggle Buttons - Reordered: Dashboard, Data Grid, Lifestyle Roadmap */}
               <div className="flex justify-start">
