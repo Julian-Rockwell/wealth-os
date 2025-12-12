@@ -196,6 +196,13 @@ All colors MUST be HSL.
 }
 
 .range-slider-primary .range-slider__thumb {
+  /* Propiedades críticas para funcionamiento */
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  
+  /* Estilos visuales */
   width: 20px;
   height: 20px;
   background: hsl(var(--background));
