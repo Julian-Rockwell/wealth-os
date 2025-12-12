@@ -143,22 +143,20 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
   });
 
   const [projectionSettings, setProjectionSettingsState] = useState<ProjectionSettings | null>(() => {
-    try {
-      const stored = localStorage.getItem("projectionSettings");
-      if (stored) {
-        // Merge stored with defaults to handle new fields
-        const parsed = JSON.parse(stored);
-        // Migration: Force taxRate to 0 if it was the legacy default of 18
-        if (parsed.taxRate === 18) {
-          parsed.taxRate = 0;
-        }
-        return { ...getDefaultTwinEngineSettings(), ...parsed };
+    const stored = localStorage.getItem("projectionSettings");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Migration: Force taxRate to 0 if it was the legacy default of 18
+      if (parsed.taxRate === 18) {
+        parsed.taxRate = 0;
       }
-      return getDefaultTwinEngineSettings();
-    } catch (err) {
-      console.error("Error initializing projectionSettings:", err);
-      return null;
+      // Migration: Force currentAge to 55 if it was the old default of 20
+      if (parsed.currentAge === 20) {
+        parsed.currentAge = 55;
+      }
+      return { ...getDefaultTwinEngineSettings(), ...parsed };
     }
+    return getDefaultTwinEngineSettings();
   });
 
   const setSnapshot = (newSnapshot: FinancialSnapshot | null) => {
