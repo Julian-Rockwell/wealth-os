@@ -150,9 +150,9 @@ export const FinancialDataProvider = ({ children }: { children: ReactNode }) => 
       if (parsed.taxRate === 18) {
         parsed.taxRate = 0;
       }
-      // Migration: Force currentAge to 55 if it was the old default of 20
-      if (parsed.currentAge === 20) {
-        parsed.currentAge = 55;
+      // Migration: Force currentAge to 45 if it was an old default (20 or 55)
+      if (parsed.currentAge === 20 || parsed.currentAge === 55) {
+        parsed.currentAge = 45;
       }
       return { ...getDefaultTwinEngineSettings(), ...parsed };
     }

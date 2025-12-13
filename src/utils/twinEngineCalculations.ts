@@ -462,7 +462,7 @@ export function calculateTwinEngineProjection(settings: TwinEngineSettings): Twi
 export function getDefaultTwinEngineSettings(): TwinEngineSettings {
   const currentYear = new Date().getFullYear();
   return {
-    currentAge: 55,
+    currentAge: 45,
     savingsPassive: 400000,
     savingsActive: 100000,
     monthlyContrib: 2000,
