@@ -344,7 +344,7 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
           {projectionSettings && twinEngineResult && twinEngineKPIs && (
             <>
               {/* KPI Header */}
-              <TwinEngineKPIHeader kpis={twinEngineKPIs} milestones={twinEngineResult.milestones} />
+              <TwinEngineKPIHeader kpis={twinEngineKPIs} milestones={twinEngineResult.milestones} settings={projectionSettings} />
 
               {/* Toggle Buttons - Reordered: Dashboard, Data Grid, Lifestyle Roadmap */}
               <div className="flex justify-start">
@@ -373,7 +373,7 @@ export default function Goals({ onNavigateToTab }: GoalsProps) {
                     className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-4 py-2 rounded-md"
                   >
                     <MapPinned className="w-4 h-4 mr-2" />
-                    Lifestyle Roadmap
+                    Lifestyle Roadmap (${projectionSettings.annualExpenses.toLocaleString()}/yr)
                   </ToggleGroupItem>
                 </ToggleGroup>
               </div>

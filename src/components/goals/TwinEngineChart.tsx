@@ -38,15 +38,16 @@ const formatMoneyFull = (value: number) => {
   }).format(value);
 };
 
+// v4.5: Right-aligned labels with dx offset
 const MultiLineLabel = ({ viewBox, value, fill, fontSize = 10, fontWeight = 'bold', yOffset = 0 }: any) => {
   const lines = Array.isArray(value) ? value : [value];
   const { x, y } = viewBox;
   const baseY = y + yOffset;
 
   return (
-    <text x={x} y={baseY} textAnchor="middle" fill={fill} fontSize={fontSize} fontWeight={fontWeight}>
+    <text x={x + 10} y={baseY} textAnchor="start" fill={fill} fontSize={fontSize} fontWeight={fontWeight}>
       {lines.map((line: string, i: number) => (
-        <tspan x={x} dy={i === 0 ? 10 : 12} key={i}>
+        <tspan x={x + 10} dy={i === 0 ? 10 : 12} key={i}>
           {line}
         </tspan>
       ))}
@@ -106,7 +107,7 @@ export function TwinEngineChart({ data, milestones, settings }: TwinEngineChartP
             <CardDescription>
               {chartView === 'netWorth' 
                 ? 'Total Account Balances vs. Inflation' 
-                : 'Realized income (start of year) vs. Cost of Living'}
+                : 'All figures are Pre-Tax (Gross) for fair comparison'}
             </CardDescription>
           </div>
           <ToggleGroup 
@@ -162,34 +163,34 @@ export function TwinEngineChart({ data, milestones, settings }: TwinEngineChartP
             <Tooltip content={<CustomTooltip />} />
             <Legend wrapperStyle={{ paddingTop: '20px' }} />
 
-            {/* Milestone Reference Lines - Staggered with yOffset */}
-            {/* 1. Wealth OS Freedom (Top Level - Offset 0) */}
+            {/* v4.5: Milestone Reference Lines - Right-aligned, Staggered with yOffset */}
+            {/* 1. WealthOS Freedom (Top Level - Offset 0) */}
             {milestones.freedomYear && (
               <ReferenceLine 
                 x={milestones.freedomYear} 
                 stroke="#10b981" 
                 strokeDasharray="3 3"
-                label={<MultiLineLabel value={["Wealth OS Freedom", "Passive Income", "> Gross Exp"]} fill="#10b981" yOffset={0} />}
+                label={<MultiLineLabel value={["WealthOS Freedom", "Living on Passive Income"]} fill="#10b981" yOffset={0} />}
               />
             )}
             
-            {/* 2. Trad Freedom (Level 2 - Offset 35) */}
+            {/* 2. Traditional Retirement (Level 2 - Offset 35) */}
             {milestones.tradFreedomYear && (
               <ReferenceLine 
                 x={milestones.tradFreedomYear} 
                 stroke="#9ca3af" 
                 strokeDasharray="3 3"
-                label={<MultiLineLabel value={["Trad. Freedom", "4% of Portfolio", "> Gross Exp"]} fill="#9ca3af" yOffset={35} />}
+                label={<MultiLineLabel value={["Traditional Retirement", "Living on 4% Withdrawals"]} fill="#9ca3af" yOffset={35} />}
               />
             )}
 
-            {/* 3. Comfort Level (Level 3 - Offset 70) */}
+            {/* 3. Excess Profit Sweep (Level 3 - Offset 70) */}
             {milestones.capHitYear && (
               <ReferenceLine 
                 x={milestones.capHitYear} 
                 stroke="#3b82f6" 
                 strokeDasharray="3 3"
-                label={<MultiLineLabel value={["Trading Acct", "reaches comfort", "level"]} fill="#3b82f6" yOffset={70} />}
+                label={<MultiLineLabel value={["Excess Profit Sweep", "Threshold Reached"]} fill="#3b82f6" yOffset={70} />}
               />
             )}
 
@@ -236,11 +237,11 @@ export function TwinEngineChart({ data, milestones, settings }: TwinEngineChartP
               </>
             ) : (
               <>
-                {/* Income View */}
+                {/* v4.5: Income View - All figures are Pre-Tax (Gross) */}
                 <Area 
                   type="monotone" 
-                  dataKey="activeProfitNet" 
-                  name="Active Profit (Net)"
+                  dataKey="activeProfitGross" 
+                  name="Active Profit (Gross)"
                   stroke="hsl(var(--primary))" 
                   fill="url(#activeGradient)"
                   strokeWidth={2}
@@ -249,7 +250,7 @@ export function TwinEngineChart({ data, milestones, settings }: TwinEngineChartP
                 <Area 
                   type="monotone" 
                   dataKey="passiveIncome" 
-                  name="Passive Income"
+                  name="Passive Income (Gross)"
                   stroke="hsl(142, 76%, 36%)" 
                   fill="url(#passiveGradient)"
                   strokeWidth={2}
@@ -275,8 +276,8 @@ export function TwinEngineChart({ data, milestones, settings }: TwinEngineChartP
                 />
                 <Line 
                   type="monotone" 
-                  dataKey="expenses" 
-                  name="Cost of Living"
+                  dataKey="grossExpenses" 
+                  name="Gross Expenses"
                   stroke="hsl(var(--warning))" 
                   strokeWidth={2}
                   dot={false}

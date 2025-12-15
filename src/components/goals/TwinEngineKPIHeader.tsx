@@ -1,11 +1,12 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, Clock, Landmark, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import type { TwinEngineKPIs, TwinEngineMilestones } from "@/utils/twinEngineCalculations";
+import type { TwinEngineKPIs, TwinEngineMilestones, TwinEngineSettings } from "@/utils/twinEngineCalculations";
 
 interface TwinEngineKPIHeaderProps {
   kpis: TwinEngineKPIs;
   milestones: TwinEngineMilestones;
+  settings: TwinEngineSettings;
 }
 
 const formatMoney = (value: number) => {
@@ -14,9 +15,15 @@ const formatMoney = (value: number) => {
   return `$${value.toFixed(0)}`;
 };
 
-export function TwinEngineKPIHeader({ kpis, milestones }: TwinEngineKPIHeaderProps) {
+export function TwinEngineKPIHeader({ kpis, milestones, settings }: TwinEngineKPIHeaderProps) {
   // Determine if traditional strategy failed but Wealth OS succeeded
   const tradFailed = !milestones.tradFreedomYear && milestones.freedomYear;
+
+  // Calculate ages for tooltip
+  const wealthOSFreedomAge = kpis.freedomAge;
+  const tradFreedomAge = milestones.tradFreedomYear 
+    ? settings.currentAge + (milestones.tradFreedomYear - settings.startYear)
+    : null;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -40,7 +47,7 @@ export function TwinEngineKPIHeader({ kpis, milestones }: TwinEngineKPIHeaderPro
         </CardContent>
       </Card>
 
-      {/* Time Saved - with conditional logic */}
+      {/* WealthOS Advantage (renamed from Time Saved) */}
       <Card className={`bg-gradient-to-br border ${
         tradFailed 
           ? "from-orange-500/10 to-orange-500/5 border-orange-500/20" 
@@ -50,7 +57,7 @@ export function TwinEngineKPIHeader({ kpis, milestones }: TwinEngineKPIHeaderPro
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-1 mb-1">
-                <p className="text-xs text-muted-foreground font-medium">Time Saved</p>
+                <p className="text-xs text-muted-foreground font-medium">WealthOS Advantage</p>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
@@ -58,8 +65,12 @@ export function TwinEngineKPIHeader({ kpis, milestones }: TwinEngineKPIHeaderPro
                     </TooltipTrigger>
                     <TooltipContent>
                       <p className="max-w-xs text-xs">
-                        The traditional withdrawal rate (4%) of your traditional portfolio 
-                        never satisfies your annual gross expenses.
+                        {tradFailed 
+                          ? "The standard 4% withdrawal rule isn't enough to cover your target lifestyle. WealthOS's higher returns are required to achieve financial freedom."
+                          : wealthOSFreedomAge && tradFreedomAge
+                            ? `WealthOS achieves freedom at age ${wealthOSFreedomAge} vs. Traditional at age ${tradFreedomAge}.`
+                            : "Comparison between WealthOS and Traditional retirement strategies."
+                        }
                       </p>
                     </TooltipContent>
                   </Tooltip>
@@ -67,15 +78,15 @@ export function TwinEngineKPIHeader({ kpis, milestones }: TwinEngineKPIHeaderPro
               </div>
               {tradFailed ? (
                 <>
-                  <p className="text-2xl font-bold text-orange-500">Unattainable</p>
-                  <p className="text-xs text-muted-foreground mt-1">Trad. Strategy Failed</p>
+                  <p className="text-2xl font-bold text-orange-500">Traditional Strategy Failed</p>
+                  <p className="text-xs text-muted-foreground mt-1">WealthOS is required</p>
                 </>
               ) : (
                 <>
                   <p className="text-2xl font-bold text-green-600">
-                    {kpis.timeSaved !== null ? `${kpis.timeSaved.toFixed(1)} Yrs` : 'N/A'}
+                    {kpis.timeSaved !== null ? `${kpis.timeSaved.toFixed(1)} Years Saved` : 'N/A'}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">Earlier than Traditional</p>
+                  <p className="text-xs text-muted-foreground mt-1">vs. Traditional Retirement</p>
                 </>
               )}
             </div>
@@ -86,25 +97,34 @@ export function TwinEngineKPIHeader({ kpis, milestones }: TwinEngineKPIHeaderPro
         </CardContent>
       </Card>
 
-      {/* Generational Wealth (renamed from Legacy Potential) */}
+      {/* Projected Wealth at Horizon (renamed from Generational Wealth) */}
       <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border-purple-500/20">
         <CardContent className="pt-4 pb-4">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-xs text-muted-foreground font-medium mb-1">Generational Wealth</p>
+              <p className="text-xs text-muted-foreground font-medium mb-1">
+                Projected Wealth at Horizon (Age {kpis.legacyAge || settings.targetAge})
+              </p>
               <p className="text-2xl font-bold text-purple-600">
                 {kpis.legacyValue ? formatMoney(kpis.legacyValue) : '-'}
               </p>
-              <div className="flex items-center gap-2 mt-1">
-                <p className="text-xs text-muted-foreground">
-                  {kpis.legacyAge ? `Projected Estate at Age ${kpis.legacyAge}` : ''}
-                </p>
+              <div className="mt-1 space-y-0.5">
+                {kpis.costOfWaiting && kpis.costOfWaiting > 0 && (
+                  <p className="text-xs text-destructive font-medium">
+                    Cost of Waiting: {formatMoney(kpis.costOfWaiting)}
+                  </p>
+                )}
+                {kpis.costOfWaiting && kpis.costOfWaiting > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    (Lost compounding if you delay 1 year)
+                  </p>
+                )}
+                {kpis.tradLegacyValue && (
+                  <p className="text-xs text-muted-foreground">
+                    Trad: {formatMoney(kpis.tradLegacyValue)}
+                  </p>
+                )}
               </div>
-              {kpis.tradLegacyValue && (
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Trad: {formatMoney(kpis.tradLegacyValue)}
-                </p>
-              )}
             </div>
             <div className="p-2 bg-purple-500/10 rounded-full">
               <Landmark className="w-5 h-5 text-purple-600" />

@@ -1,5 +1,7 @@
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { TwinEngineRow, TwinEngineSettings } from "@/utils/twinEngineCalculations";
 
@@ -21,6 +23,12 @@ export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
   const bottomScrollRef = useRef<HTMLDivElement>(null);
   const [tableWidth, setTableWidth] = useState(0);
   const isSyncingRef = useRef(false);
+
+  // v4.5: Find the FIRST year where freedom is achieved for special highlighting
+  const firstFreedomYear = useMemo(() => {
+    const freedomRow = data.find(row => row.isFreedom);
+    return freedomRow?.year || null;
+  }, [data]);
 
   // Measure table width
   useEffect(() => {
@@ -145,7 +153,19 @@ export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
                 {/* Passive Income */}
                 <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">Balance</th>
                 <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">Growth</th>
-                <th className="h-10 px-2 text-center align-middle font-medium text-muted-foreground whitespace-nowrap text-xs border-r">RPIC</th>
+                <th className="h-10 px-2 text-center align-middle font-medium text-muted-foreground whitespace-nowrap text-xs border-r">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger className="flex items-center gap-1 justify-center w-full">
+                        RPIC
+                        <Info className="w-3 h-3" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-xs text-xs">Reliable Passive Income Coverage: Percentage of gross expenses covered by passive income.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </th>
                 {/* Wallet & Lifestyle - renamed W/D to DISTRIB. */}
                 <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">Other</th>
                 <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground whitespace-nowrap text-xs">DISTRIB.</th>
@@ -158,13 +178,17 @@ export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
               </tr>
             </thead>
             <tbody>
-              {data.map((row) => (
+              {data.map((row) => {
+                const isFirstFreedomRow = row.year === firstFreedomYear;
+                return (
                 <tr 
                   key={row.year}
                   className={cn(
                     "border-b transition-colors hover:bg-muted/50",
                     row.isFreedom && "bg-green-50 dark:bg-green-950/20",
-                    row.isCapHit && !row.isFreedom && "bg-blue-50 dark:bg-blue-950/20"
+                    row.isCapHit && !row.isFreedom && "bg-blue-50 dark:bg-blue-950/20",
+                    // v4.5: Green border highlight for first freedom row
+                    isFirstFreedomRow && "ring-2 ring-green-500 ring-inset"
                   )}
                 >
                   {/* Sticky Year */}
@@ -244,7 +268,7 @@ export function TwinEngineTable({ data, settings }: TwinEngineTableProps) {
                     {row.tradWithdrawal > 0 ? formatMoneyCondensed(row.tradWithdrawal) : '-'}
                   </td>
                 </tr>
-              ))}
+              )})}
             </tbody>
           </table>
         </div>

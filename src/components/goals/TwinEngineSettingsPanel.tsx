@@ -194,7 +194,19 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
           />
 
           <div className="space-y-2">
-            <Label className="text-sm text-muted-foreground tracking-wide">Account Size Comfortable Trading</Label>
+            <div className="flex items-center gap-1">
+              <Label className="text-sm text-muted-foreground tracking-wide">Excess Profit Sweep Threshold</Label>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <AlertCircle className="w-3 h-3 text-muted-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs text-xs">The target balance for your trading account. Once reached, all excess profits are automatically swept into your passive portfolio to lock in gains.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
               <Input
@@ -245,7 +257,7 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
 
           {settings.enableRampUp && (
             <InputSlider
-              label="Ramp Up Duration"
+              label="Ramp Up Period"
               value={settings.rampUpDuration}
               onChange={(val) => updateSetting('rampUpDuration', val)}
               min={6}
@@ -342,7 +354,7 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
           />
 
           <InputSlider
-            label="Traditional Market Return"
+            label="S&P 500 Benchmark"
             value={settings.tradReturn}
             onChange={(val) => updateSetting('tradReturn', val)}
             min={2}
@@ -378,14 +390,14 @@ export function TwinEngineSettingsPanel({ settings, onSettingsChange }: TwinEngi
               />
 
               <InputSlider
-                label="One-Time Spend at Stop (%)"
+                label="Transition Cash-Out"
                 value={settings.activeCashOutPercent}
                 onChange={(val) => updateSetting('activeCashOutPercent', val)}
                 min={0}
                 max={100}
                 step={5}
                 suffix="%"
-                tooltip="Percentage of active account to cash out when transitioning to passive"
+                tooltip="Percentage of active account to cash out when transitioning to passive."
               />
             </>
           )}

@@ -404,8 +404,11 @@ export function calculateTwinEngineProjection(settings: TwinEngineSettings): Twi
     const netWalletBase = withdrawalAmount - withdrawalTax;
     const totalWallet = netWalletBase + annualRetirementIncome;
     
-    // Calculate expense shortfall (gap)
-    const expenseShortfall = Math.max(0, currentExpenses - totalWallet);
+    // v4.5: Calculate expense shortfall (gap) as GROSS
+    // Gap = (Net Wallet - Cost of Living) / (1 - TaxRate), but only if negative
+    const netGap = totalWallet - currentExpenses;
+    const grossGap = netGap < 0 ? Math.abs(netGap) / (1 - (taxRate / 100)) : 0;
+    const expenseShortfall = Math.round(grossGap);
 
     data.push({
       year,
@@ -504,10 +507,22 @@ export interface TwinEngineKPIs {
   tradCapital: number | null;
   capitalSavedPercent: number | null;
   taxRate: number;
-  // NEW: Legacy Potential
+  // Legacy Potential
   legacyValue: number | null;
   legacyAge: number | null;
   tradLegacyValue: number | null;
+  // v4.5: Cost of Waiting
+  costOfWaiting: number | null;
+}
+
+// Helper: Run projection with 1-year delay for Cost of Waiting calculation
+function calculateDelayedProjection(settings: TwinEngineSettings): TwinEngineResult {
+  const delayedSettings: TwinEngineSettings = {
+    ...settings,
+    startYear: settings.startYear + 1,
+    currentAge: settings.currentAge + 1,
+  };
+  return calculateTwinEngineProjection(delayedSettings);
 }
 
 export function calculateTwinEngineKPIs(result: TwinEngineResult, settings: TwinEngineSettings): TwinEngineKPIs {
@@ -535,6 +550,16 @@ export function calculateTwinEngineKPIs(result: TwinEngineResult, settings: Twin
   const legacyAge = finalRow ? finalRow.age : null;
   const tradLegacyValue = finalRow ? finalRow.tradBalance : null;
 
+  // v4.5: Calculate Cost of Waiting (1-year delay impact)
+  let costOfWaiting: number | null = null;
+  if (finalRow) {
+    const delayedResult = calculateDelayedProjection(settings);
+    const delayedFinalRow = delayedResult.rows[delayedResult.rows.length - 1];
+    if (delayedFinalRow) {
+      costOfWaiting = finalRow.totalWealthOS - delayedFinalRow.totalWealthOS;
+    }
+  }
+
   return {
     freedomYear: milestones.freedomYear,
     freedomAge,
@@ -545,6 +570,7 @@ export function calculateTwinEngineKPIs(result: TwinEngineResult, settings: Twin
     taxRate: settings.taxRate,
     legacyValue,
     legacyAge,
-    tradLegacyValue
+    tradLegacyValue,
+    costOfWaiting
   };
 }
