@@ -109,19 +109,19 @@ export function TwinEngineKPIHeader({ kpis, milestones, settings }: TwinEngineKP
                 {kpis.legacyValue ? formatMoney(kpis.legacyValue) : '-'}
               </p>
               <div className="mt-1 space-y-0.5">
+                {kpis.tradLegacyValue && (
+                  <p className="text-xs text-muted-foreground">
+                    vs Traditional Retirement ({formatMoney(kpis.tradLegacyValue)})
+                  </p>
+                )}
                 {kpis.costOfWaiting && kpis.costOfWaiting > 0 && (
-                  <p className="text-xs text-destructive font-medium">
+                  <p className="text-xs text-destructive font-medium mt-2">
                     Cost of Waiting: {formatMoney(kpis.costOfWaiting)}
                   </p>
                 )}
                 {kpis.costOfWaiting && kpis.costOfWaiting > 0 && (
                   <p className="text-xs text-muted-foreground">
                     (Lost compounding if you delay 1 year)
-                  </p>
-                )}
-                {kpis.tradLegacyValue && (
-                  <p className="text-xs text-muted-foreground">
-                    Trad: {formatMoney(kpis.tradLegacyValue)}
                   </p>
                 )}
               </div>
